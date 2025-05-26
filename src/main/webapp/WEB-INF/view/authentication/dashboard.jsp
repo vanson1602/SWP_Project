@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %> <%@ taglib prefix="c"
-uri="http://java.sun.com/jsp/jstl/core" %>
+uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib
+uri="http://www.springframework.org/tags/form" prefix="form" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -29,11 +30,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
       <div class="d-flex justify-content-between align-items-center">
         <!-- 1. Ảnh -->
         <div class="me-4">
-          <img
-            src="https://via.placeholder.com/120x80"
-            alt="Logo"
-            class="img-fluid"
-          />
+          <img src="../../../../webapp/resources/images/TECH.png" alt="Logo" />
         </div>
 
         <!-- 2. Navbar ở giữa -->

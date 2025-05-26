@@ -20,4 +20,9 @@ public class PageController {
     public String getRegisterPage(Model model) {
         return "authentication/form-register";
     }
+
+    @RequestMapping("/admin")
+    public String getAdminPage(Model model) {
+        return "admin/admin-page";
+    }
 }

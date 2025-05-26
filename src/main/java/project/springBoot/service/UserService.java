@@ -1,12 +1,26 @@
-// package project.springBoot.service;
+package project.springBoot.service;
 
-// import project.springBoot.repository.UserRepository;
+import java.util.List;
 
-// public class UserService {
-//     private final UserRepository userRepository;
+import org.springframework.stereotype.Service;
 
-//     public UserService(UserRepository userRepository) {
-//         this.userRepository = userRepository;
-//     }
+import project.springBoot.model.User;
+import project.springBoot.repository.UserRepository;
+
+@Service
+public class UserService {
+    private final UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
     
-// }
+    public User handleSaveUser(User user){
+        User newUser = this.userRepository.save(user);
+        return newUser;
+    }
+
+    public List<User> getAllUser(){
+        return this.userRepository.findAll();
+    }
+}
