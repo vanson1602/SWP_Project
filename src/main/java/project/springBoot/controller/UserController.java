@@ -1,14 +1,40 @@
-// package project.springBoot.controller;
+package project.springBoot.controller;
 
-// import project.springBoot.service.UserService;
+import java.util.List;
 
-// public class UserController {
-//     private final UserService userService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-//     public UserController(UserService userService) {
-//         this.userService = userService;
-//     }
+import project.springBoot.model.User;
+import project.springBoot.service.UserService;
 
+@Controller
+public class UserController {
+    private final UserService userService;
 
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
-// }   
+    @RequestMapping("/admin/create")
+    public String getCreateUserPage(Model model) {
+        model.addAttribute("newUser", new User());
+        return "user/create-user";
+    }
+
+    @RequestMapping(value="/admin/create", method = RequestMethod.POST)
+    public String getCreatePage(Model model,@ModelAttribute("newUser") User user) {
+        this.userService.handleSaveUser(user);
+        return "redirect:user";
+    }
+
+    @RequestMapping("/admin/user")
+    public String getUserPage(Model model) {
+        List<User> users = this.userService.getAllUser();
+        model.addAttribute("users", users);
+        return "user/list-user";
+    }
+}   
