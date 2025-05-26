@@ -8,6 +8,16 @@ import ch.qos.logback.core.model.Model;
 public class PageController {
     @RequestMapping("/")
     public String getHomePage(Model model) {
+        return "authentication/dashboard";
+    }
+
+    @RequestMapping("/login")
+    public String getLoginPage(Model model) {
         return "authentication/form-login";
+    }
+
+    @RequestMapping("/register")
+    public String getRegisterPage(Model model) {
+        return "authentication/form-register";
     }
 }

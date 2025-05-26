@@ -57,7 +57,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
                     <input type="checkbox" class="form-check-input" />
                     <label class="form-check-label">Remember me</label>
                   </div>
-                  <a href="#" class="text-decoration-none">Register</a>
+                  <a href="/register" class="text-decoration-none">Register</a>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100">
