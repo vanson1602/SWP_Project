@@ -75,8 +75,17 @@ uri="http://www.springframework.org/tags/form" prefix="form" %>
                     <a href="/admin/user/${user.id}" class="btn btn-success"
                       >View</a
                     >
-                    <a class="btn btn-warning mx-2">Update</a>
-                    <a class="btn btn-danger">Delete</a>
+                    <a
+                      href="/admin/user/update/${user.id}"
+                      class="btn btn-warning mx-2"
+                      >Update</a
+                    >
+                    <a
+                      href="/admin/user/delete/${user.id}"
+                      onclick="return confirm('Are you sure?')"
+                      class="btn btn-danger"
+                      >Delete</a
+                    >
                   </td>
                 </tr>
               </c:forEach>

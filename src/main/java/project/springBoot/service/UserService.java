@@ -2,6 +2,7 @@ package project.springBoot.service;
 
 import java.util.List;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import project.springBoot.model.User;
@@ -16,6 +17,8 @@ public class UserService {
     }
     
     public User handleSaveUser(User user){
+        String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+        user.setPassword(hashed);
         User newUser = this.userRepository.save(user);
         return newUser;
     }
@@ -26,5 +29,25 @@ public class UserService {
 
     public User getUserById(long id){
         return this.userRepository.findById(id);
+    }
+
+    public User handleUpdateUser(User user){
+        String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+        user.setPassword(hashed);
+        return this.userRepository.save(user);
+    }
+
+    public void deleteUserById(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    public User login(String email, String Password) {
+        User user = userRepository.findByEmail(email);
+        if (user != null) {        
+            if (BCrypt.checkpw(Password, user.getPassword())) {
+                return user;
+            }
+        }
+        return null;
     }
 }
