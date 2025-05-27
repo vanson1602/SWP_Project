@@ -19,7 +19,7 @@ uri="http://www.springframework.org/tags/form" prefix="form" %>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
       <div class="container">
-        <a class="navbar-brand fw-bold fs-4" href="#">MyApp</a>
+        <a class="navbar-brand fw-bold fs-4" href="/admin">MyApp</a>
         <button
           class="navbar-toggler"
           type="button"
