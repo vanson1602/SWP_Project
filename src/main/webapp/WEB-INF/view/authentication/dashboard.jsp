@@ -25,7 +25,7 @@ uri="http://www.springframework.org/tags/form" prefix="form" %>
   </head>
 
   <body class="bg-light">
-    <!-- Dòng ngang: Ảnh - Navbar - Link Login -->
+    <!-- Dòng ngang: Ảnh - Navbar - Link Login/User -->
     <div class="container-fluid py-3">
       <div class="d-flex justify-content-between align-items-center">
         <!-- 1. Ảnh -->
@@ -48,8 +48,25 @@ uri="http://www.springframework.org/tags/form" prefix="form" %>
           </ul>
         </nav>
 
+        <!-- 3. Login hoặc User dropdown -->
         <div class="ms-4">
-          <a href="/login" class="btn btn-sm btn-outline-primary"> Login </a>
+          <c:choose>
+            <c:when test="${not empty sessionScope.currentUser}">
+              <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
+                  ${sessionScope.currentUser.firstName}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="/profile">Trang cá nhân</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                </ul>
+              </div>
+            </c:when>
+            <c:otherwise>
+              <a href="/login" class="btn btn-sm btn-outline-primary">Đăng nhập</a>
+            </c:otherwise>
+          </c:choose>
         </div>
       </div>
     </div>

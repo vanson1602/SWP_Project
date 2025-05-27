@@ -24,47 +24,44 @@ uri="http://www.springframework.org/tags/form" prefix="form" %>
     <title>Document</title>
   </head>
 
-  <body>
+  <body class="bg-light">
     <div class="container mt-5">
       <div class="row justify-content-center">
-        <div class="col-md-5 col-sm-10">
-          <div class="card shadow-lg rounded-4 border-0">
-            <div class="card-body p-4">
-              <h3 class="mb-4 text-center">Sign In</h3>
-              <form>
-                <div class="mb-3">
-                  <label class="form-label">Email address</label>
-                  <div class="input-group">
-                    <span class="input-group-text">
-                      <i class="bi bi-envelope"></i>
-                    </span>
-                    <input type="email" class="form-control" />
-                  </div>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Password</label>
-                  <div class="input-group">
-                    <span class="input-group-text">
-                      <i class="bi bi-lock"></i>
-                    </span>
-                    <input type="password" class="form-control" />
-                  </div>
-                </div>
+        <div class="col-md-4">
+          <div class="card p-4 shadow rounded">
+            <h3 class="text-center mb-3">Đăng nhập</h3>
+            <form method="post" action="/login">
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  name="email"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Mật khẩu</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  name="password"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary w-100">
+                Đăng nhập
+              </button>
+            </form>
 
-                <div
-                  class="d-flex justify-content-between align-items-center mb-3"
-                >
-                  <div class="form-check">
-                    <input type="checkbox" class="form-check-input" />
-                    <label class="form-check-label">Remember me</label>
-                  </div>
-                  <a href="/register" class="text-decoration-none">Register</a>
-                </div>
+            <c:if test="${not empty error}">
+              <div class="text-danger mt-2 text-center">${error}</div>
+            </c:if>
 
-                <button type="submit" class="btn btn-primary w-100">
-                  Login
-                </button>
-              </form>
+            <hr />
+            <div class="text-center">
+              <span>Bạn chưa có tài khoản?</span>
+              <a href="/register" class="btn btn-primary">Đăng ký</a>
             </div>
           </div>
         </div>
