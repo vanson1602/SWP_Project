@@ -30,9 +30,8 @@ uri="http://www.springframework.org/tags/form" prefix="form" %>
       <div class="d-flex justify-content-between align-items-center">
         <!-- 1. Ảnh -->
         <div>
-          <img src="<c:url value='/resources/images/TECH.png' />" alt="Logo" />
+          <img src="${pageContext.request.contextPath}/resources/images/TECH.png" alt="Logo" />
         </div>
-
         <!-- 2. Navbar ở giữa -->
         <nav class="flex-grow-1">
           <ul class="nav justify-content-center">

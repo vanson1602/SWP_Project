@@ -16,12 +16,12 @@ public class UserService {
         this.userRepository = userRepository;
     }
     
-    public User handleSaveUser(User user){
-        String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-        user.setPassword(hashed);
-        User newUser = this.userRepository.save(user);
-        return newUser;
-    }
+    // public User handleSaveUser(User user){
+    //     String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+    //     user.setPassword(hashed);
+    //     User newUser = this.userRepository.save(user);
+    //     return newUser;
+    // }
 
     public List<User> getAllUser(){
         return this.userRepository.findAll();
@@ -31,11 +31,16 @@ public class UserService {
         return this.userRepository.findById(id);
     }
 
-    public User handleUpdateUser(User user){
-        String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-        user.setPassword(hashed);
-        return this.userRepository.save(user);
+    public User getUserByEmail(String email){
+        return this.userRepository.findByEmail(email);
     }
+
+
+    // public User handleUpdateUser(User user){
+    //     String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+    //     user.setPassword(hashed);
+    //     return this.userRepository.save(user);
+    // }
 
     public void deleteUserById(Long id) {
         userRepository.deleteById(id);
@@ -49,5 +54,25 @@ public class UserService {
             }
         }
         return null;
+    }
+
+    private boolean isPasswordEncoded(String password) {
+        return password != null && password.startsWith("$2a$") || password.startsWith("$2b$") || password.startsWith("$2y$");
+    }
+
+    public User handleSaveUser(User user) {
+        if (!isPasswordEncoded(user.getPassword())) {
+            String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+            user.setPassword(hashed);
+        }
+        return this.userRepository.save(user);
+    }
+
+    public User handleUpdateUser(User user) {
+        if (!isPasswordEncoded(user.getPassword())) {
+            String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+            user.setPassword(hashed);
+        }
+        return this.userRepository.save(user);
     }
 }
