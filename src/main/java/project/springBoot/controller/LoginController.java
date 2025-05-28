@@ -19,30 +19,30 @@ public class LoginController {
      }
 
     @PostMapping("/login")
-public String handleLogin(@RequestParam String email,
+    public String handleLogin(@RequestParam String email,
                           @RequestParam String password,
                           HttpSession session,
                           Model model) {
-    User user = userService.login(email, password);
-    if (user != null) {
-        session.setAttribute("currentUser", user);
+        User user = userService.login(email, password);
+        if (user != null) {
+            session.setAttribute("currentUser", user);
 
-        String role = user.getRole(); // Giả sử User có getRole()
+            String role = user.getRole(); // Giả sử User có getRole()
 
-        if ("admin".equalsIgnoreCase(role)) {
+            if ("admin".equalsIgnoreCase(role)) {
             return "redirect:/admin";
-        } else if ("patient".equalsIgnoreCase(role) || 
+            } else if ("patient".equalsIgnoreCase(role) || 
                    "doctor".equalsIgnoreCase(role) || 
                    "receptionist".equalsIgnoreCase(role)) {
             return "redirect:/";
-        } else {
+            } else {
             return "redirect:/";
+            }
+        } else {
+            model.addAttribute("error", "Sai email hoặc mật khẩu!");
+            return "authentication/form-login";
         }
-    } else {
-        model.addAttribute("error", "Sai email hoặc mật khẩu!");
-        return "authentication/form-login";
     }
-}
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
