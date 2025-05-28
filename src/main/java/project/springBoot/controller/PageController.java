@@ -1,9 +1,11 @@
 package project.springBoot.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import ch.qos.logback.core.model.Model;
+import project.springBoot.model.User;
 @Controller
 public class PageController {
     @RequestMapping("/")
@@ -18,8 +20,11 @@ public class PageController {
 
     @RequestMapping("/register")
     public String getRegisterPage(Model model) {
+        model.addAttribute("user",new User());
         return "authentication/form-register";
     }
+
+    
 
     @RequestMapping("/admin")
     public String getAdminPage(Model model) {
