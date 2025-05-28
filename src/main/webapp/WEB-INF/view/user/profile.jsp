@@ -22,6 +22,10 @@ uri="http://www.springframework.org/tags/form" prefix="form" %>
 
       <table class="table table-bordered">
         <tr>
+          <th>ID</th>
+          <td>${user.id}</td>
+        </tr>
+        <tr>
           <th>Tên</th>
           <td>${user.firstName}</td>
         </tr>
@@ -38,8 +42,8 @@ uri="http://www.springframework.org/tags/form" prefix="form" %>
           <td>${user.role}</td>
         </tr>
       </table>
-
       <a href="/" class="btn btn-success">Back</a>
+      <a href="/profile/edit" class="btn btn-secondary">Edit Profile</a>
     </div>
   </body>
 </html>

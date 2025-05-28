@@ -1,5 +1,6 @@
 package project.springBoot.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
 import project.springBoot.model.User;
@@ -46,7 +48,7 @@ public class UserController {
         model.addAttribute("userDetail", user);
         return "user/detail-user";
     }
-
+    
     @RequestMapping("/admin/user/update/{id}")
     public String getEditUserPage(Model model,@PathVariable Long id) {
         User user = this.userService.getUserById(id);
@@ -70,9 +72,36 @@ public class UserController {
     public String getProfileUserPage(Model model, HttpSession session) {
         User user = (User) session.getAttribute("currentUser");
         if(user == null){
-            return "/login";
+            return "/authentication/form-login";
         }
         model.addAttribute("user", user);
         return "user/profile";
+    }
+
+    @RequestMapping("/profile/edit")
+        public String editProfile(Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if(currentUser == null){
+            return "/authentication/form-login";
+        }
+        model.addAttribute("user", currentUser);
+        return "user/edit-profile";
+    }
+
+
+    @RequestMapping(value = "/profile/update", method = RequestMethod.POST)
+        public String updateProfile(@ModelAttribute("user") User user, HttpSession session
+        ,RedirectAttributes ra) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
+        return "/authentication/form-login";
+        }
+        user.setId(currentUser.getId());
+        user.setEmail(currentUser.getEmail());
+        user.setRole(currentUser.getRole());
+        user.setPassword(currentUser.getPassword());
+        this.userService.handleSaveUser(user);
+        session.setAttribute("currentUser", user);
+        return "redirect:/profile";      
     }
 }   
