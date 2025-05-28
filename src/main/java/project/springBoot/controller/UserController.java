@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -48,7 +49,7 @@ public class UserController {
         model.addAttribute("userDetail", user);
         return "user/detail-user";
     }
-    
+
     @RequestMapping("/admin/user/update/{id}")
     public String getEditUserPage(Model model,@PathVariable Long id) {
         User user = this.userService.getUserById(id);
@@ -103,5 +104,13 @@ public class UserController {
         this.userService.handleSaveUser(user);
         session.setAttribute("currentUser", user);
         return "redirect:/profile";      
+    }
+
+    @PostMapping("/register")
+    public String processRegister(@ModelAttribute("user") User user, Model model) {
+        user.setRole("patient"); 
+        this.userService.handleSaveUser(user);
+        model.addAttribute("message", "Đăng ký thành công!");
+        return "redirect:/login";
     }
 }   
