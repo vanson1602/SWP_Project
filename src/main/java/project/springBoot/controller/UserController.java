@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import jakarta.servlet.http.HttpSession;
 import project.springBoot.model.User;
 import project.springBoot.service.UserService;
 
@@ -63,5 +64,15 @@ public class UserController {
         public String deleteUser(@PathVariable Long id) {
         userService.deleteUserById(id);
         return "redirect:/admin/user";
+    }
+
+    @RequestMapping("/profile")
+    public String getProfileUserPage(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("currentUser");
+        if(user == null){
+            return "/login";
+        }
+        model.addAttribute("user", user);
+        return "user/profile";
     }
 }   
