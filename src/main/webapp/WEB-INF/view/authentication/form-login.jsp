@@ -52,6 +52,9 @@ uri="http://www.springframework.org/tags/form" prefix="form" %>
               <button type="submit" class="btn btn-primary w-100">
                 Đăng nhập
               </button>
+              <a href="${googleLoginUrl}" class="btn btn-warning w-100 mt-2">
+                Đăng nhập bằng Google
+              </a>
             </form>
 
             <c:if test="${not empty error}">
