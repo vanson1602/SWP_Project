@@ -1,6 +1,5 @@
 package project.springBoot.repository;
 
-
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,9 +14,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findById(long id);
 
-    User findByEmail(String email);
+    User findByEmailOrUsername(String email, String username);
+
+    User findByUsername(String username);
 
     User findByEmailAndPassword(String email, String password);
+
+    User findByUsernameAndPassword(String username, String password);
 
     void deleteById(Long id);
 }

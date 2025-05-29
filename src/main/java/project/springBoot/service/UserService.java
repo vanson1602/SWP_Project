@@ -15,40 +15,39 @@ public class UserService {
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-    
+
     // public User handleSaveUser(User user){
-    //     String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-    //     user.setPassword(hashed);
-    //     User newUser = this.userRepository.save(user);
-    //     return newUser;
+    // String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+    // user.setPassword(hashed);
+    // User newUser = this.userRepository.save(user);
+    // return newUser;
     // }
 
-    public List<User> getAllUser(){
+    public List<User> getAllUser() {
         return this.userRepository.findAll();
     }
 
-    public User getUserById(long id){
+    public User getUserById(long id) {
         return this.userRepository.findById(id);
     }
 
-    public User getUserByEmail(String email){
-        return this.userRepository.findByEmail(email);
+    public User getUserByEmailOrUsername(String email, String username) {
+        return this.userRepository.findByEmailOrUsername(email, username);
     }
 
-
     // public User handleUpdateUser(User user){
-    //     String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-    //     user.setPassword(hashed);
-    //     return this.userRepository.save(user);
+    // String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+    // user.setPassword(hashed);
+    // return this.userRepository.save(user);
     // }
 
     public void deleteUserById(Long id) {
         userRepository.deleteById(id);
     }
 
-    public User login(String email, String Password) {
-        User user = userRepository.findByEmail(email);
-        if (user != null) {        
+    public User login(String emailorusername, String Password) {
+        User user = userRepository.findByEmailOrUsername(emailorusername, emailorusername);
+        if (user != null) {
             if (BCrypt.checkpw(Password, user.getPassword())) {
                 return user;
             }
@@ -57,7 +56,8 @@ public class UserService {
     }
 
     private boolean isPasswordEncoded(String password) {
-        return password != null && password.startsWith("$2a$") || password.startsWith("$2b$") || password.startsWith("$2y$");
+        return password != null && password.startsWith("$2a$") || password.startsWith("$2b$")
+                || password.startsWith("$2y$");
     }
 
     public User handleSaveUser(User user) {
