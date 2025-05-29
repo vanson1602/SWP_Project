@@ -12,31 +12,31 @@ import project.springBoot.service.UserService;
 
 @Controller
 public class LoginController {
-     private final UserService userService;
+    private final UserService userService;
 
-     public LoginController(UserService userService) {
+    public LoginController(UserService userService) {
         this.userService = userService;
-     }
+    }
 
     @PostMapping("/login")
-    public String handleLogin(@RequestParam String email,
-                          @RequestParam String password,
-                          HttpSession session,
-                          Model model) {
-        User user = userService.login(email, password);
+    public String handleLogin(@RequestParam String emailorusername,
+            @RequestParam String password,
+            HttpSession session,
+            Model model) {
+        User user = userService.login(emailorusername, password);
         if (user != null) {
             session.setAttribute("currentUser", user);
 
-            String role = user.getRole(); // Giả sử User có getRole()
+            String role = user.getRole();
 
             if ("admin".equalsIgnoreCase(role)) {
-            return "redirect:/admin";
-            } else if ("patient".equalsIgnoreCase(role) || 
-                   "doctor".equalsIgnoreCase(role) || 
-                   "receptionist".equalsIgnoreCase(role)) {
-            return "redirect:/";
+                return "redirect:/admin";
+            } else if ("patient".equalsIgnoreCase(role) ||
+                    "doctor".equalsIgnoreCase(role) ||
+                    "receptionist".equalsIgnoreCase(role)) {
+                return "redirect:/";
             } else {
-            return "redirect:/";
+                return "redirect:/";
             }
         } else {
             model.addAttribute("error", "Sai email hoặc mật khẩu!");
@@ -49,5 +49,5 @@ public class LoginController {
         session.invalidate();
         return "redirect:/";
     }
-     
+
 }
