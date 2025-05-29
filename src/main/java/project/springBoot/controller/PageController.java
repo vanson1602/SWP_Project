@@ -23,11 +23,13 @@ public class PageController {
     public String getRegisterPage(Model model) {
         User user = new User();
         model.addAttribute("user", user);
+        model.addAttribute("user", new User());
         return "authentication/form-register";
     }
 
     @RequestMapping("/admin")
     public String getAdminPage(Model model) {
-        return "admin/admin-page";
+        return "admin/dashboard";
     }
+
 }

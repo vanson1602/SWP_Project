@@ -19,7 +19,8 @@
             <div class="login-image-overlay">
               <div class="login-image-text">
                 <h1>Chào mừng đến với HealthCare+</h1>
-                <p>Hệ thống chăm sóc sức khỏe toàn diện, kết nối bạn với các bác sĩ chuyên nghiệp và dịch vụ y tế chất
+                <p>Hệ thống chăm sóc sức khỏe toàn diện, kết nối bạn với các bác sĩ chuyên nghiệp và dịch vụ y tế
+                  chất
                   lượng cao.</p>
               </div>
             </div>

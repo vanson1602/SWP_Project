@@ -111,4 +111,5 @@ public class UserController {
         model.addAttribute("message", "Đăng ký thành công!");
         return "redirect:/login";
     }
+
 }
