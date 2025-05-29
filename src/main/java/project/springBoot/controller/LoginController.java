@@ -1,5 +1,6 @@
 package project.springBoot.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,10 +13,28 @@ import project.springBoot.service.UserService;
 
 @Controller
 public class LoginController {
+    @Value("${google.client.id}")
+    private String clientId;
+
+    @Value("${google.redirect.uri}")
+    private String redirectUri;
+
     private final UserService userService;
 
     public LoginController(UserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping("/login")
+    public String loginPage(Model model) {
+        String googleLoginUrl = "https://accounts.google.com/o/oauth2/v2/auth?" +
+                "client_id=" + clientId +
+                "&redirect_uri=" + redirectUri +
+                "&response_type=code" +
+                "&scope=openid%20email%20profile" +
+                "&access_type=online";
+        model.addAttribute("googleLoginUrl", googleLoginUrl);
+        return "authentication/form-login";
     }
 
     @PostMapping("/login")
@@ -49,5 +68,4 @@ public class LoginController {
         session.invalidate();
         return "redirect:/";
     }
-
 }
