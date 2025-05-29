@@ -11,7 +11,7 @@ import project.springBoot.model.User;
 public class PageController {
     @RequestMapping("/")
     public String getHomePage(Model model) {
-        return "authentication/dashboard";
+        return "authentication/homepage";
     }
 
     @RequestMapping("/login")
@@ -21,6 +21,8 @@ public class PageController {
 
     @RequestMapping("/register")
     public String getRegisterPage(Model model) {
+        User user = new User();
+        model.addAttribute("user", user);
         model.addAttribute("user", new User());
         return "authentication/form-register";
     }
