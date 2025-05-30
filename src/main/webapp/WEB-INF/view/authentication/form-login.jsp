@@ -74,8 +74,7 @@
               </div>
 
               <!-- Google Login -->
-              <a href="https://accounts.google.com/o/oauth2/v2/auth?client_id=466371957964-j3qsb2g0fn7j46rh4q58vq95e7qdah6a.apps.googleusercontent.com&redirect_uri=http://localhost:8080/oauth2/callback&response_type=code&scope=openid%20email%20profile&access_type=online"
-                class="google-btn">
+              <a href="${googleLoginUrl}" class="google-btn">
                 <div class="google-icon">G</div>
                 Đăng nhập bằng Google
               </a>
