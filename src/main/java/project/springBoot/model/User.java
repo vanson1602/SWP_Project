@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Column;
 
 @Entity
 public class User {
@@ -22,12 +23,14 @@ public class User {
     private String address;
     private String phone;
     private String email;
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 1")
+    private boolean state;
 
     public User() {
     }
 
     public User(long id, String username, String password, String firstName, String lastName, String role,
-            String avatar, String dob, String gender, String address, String phone, String email) {
+            String avatar, String dob, String gender, String address, String phone, String email, boolean state) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -40,6 +43,7 @@ public class User {
         this.address = address;
         this.phone = phone;
         this.email = email;
+        this.state = state;
     }
 
     public long getId() {
@@ -136,6 +140,14 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public boolean isState() {
+        return state;
+    }
+
+    public void setState(boolean state) {
+        this.state = state;
     }
 
     @Override
