@@ -35,3 +35,7 @@ build/
 ### Environment Variables ###
 .env
 .env.local
+
+#config application.properties
+/src/main/resources/application.properties
+
