@@ -103,13 +103,4 @@ public class UserController {
         session.setAttribute("currentUser", user);
         return "redirect:/profile";
     }
-
-    @PostMapping("/register")
-    public String processRegister(@ModelAttribute("user") User user, Model model) {
-        user.setRole("patient");
-        this.userService.handleSaveUser(user);
-        model.addAttribute("message", "Đăng ký thành công!");
-        return "redirect:/login";
-    }
-
 }

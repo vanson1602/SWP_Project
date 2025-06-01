@@ -3,11 +3,12 @@
     <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
       <!DOCTYPE html>
-      <html lang="en">
+      <html lang="vi">
 
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <link rel="stylesheet" href="/css/login.css">
         <title>Đăng Nhập - HealthCare+</title>
       </head>
@@ -18,10 +19,9 @@
           <div class="login-image-section">
             <div class="login-image-overlay">
               <div class="login-image-text">
-                <h1>Chào mừng đến với HealthCare+</h1>
-                <p>Hệ thống chăm sóc sức khỏe toàn diện, kết nối bạn với các bác sĩ chuyên nghiệp và dịch vụ y tế
-                  chất
-                  lượng cao.</p>
+                <h1>Chào mừng trở lại!</h1>
+                <p>Đăng nhập để tiếp tục trải nghiệm dịch vụ chăm sóc sức khỏe toàn diện cùng đội ngũ bác sĩ chuyên
+                  nghiệp.</p>
               </div>
             </div>
           </div>
@@ -37,35 +37,49 @@
                 </div>
               </div>
 
-              <form class="login-form" id="loginForm" method="post" action="/login">
-                <div class="form-group">
-                  <label class="form-label" for="username">Email hoặc tên đăng nhập</label>
-                  <input type="text" id="username" class="form-input" placeholder="Nhập email hoặc tên đăng nhập"
-                    name="emailorusername" required>
+              <!-- Messages -->
+              <c:if test="${not empty message}">
+                <div class="alert alert-success">
+                  <i class="bi bi-check-circle"></i>
+                  ${message}
                 </div>
-                <div class="form-group">
-                  <label class="form-label" for="password">Mật khẩu</label>
-                  <input type="password" id="password" class="form-input" placeholder="Nhập mật khẩu" name="password"
-                    required>
-                  <span class="password-toggle" onclick="togglePassword()">🙈</span>
+              </c:if>
+              <c:if test="${not empty error}">
+                <div class="alert alert-danger">
+                  <i class="bi bi-exclamation-circle"></i>
+                  ${error}
                 </div>
-                <c:if test="${not empty error}">
-                  <div class="error-message">
-                    ${error}
+              </c:if>
+
+              <form action="${pageContext.request.contextPath}/login" method="post" class="login-form">
+                <div class="form-group">
+                  <label class="form-label">Email hoặc tên đăng nhập</label>
+                  <div class="input-with-icon">
+                    <i class="bi bi-person"></i>
+                    <input type="text" name="emailorusername" class="form-input"
+                      placeholder="Nhập email hoặc tên đăng nhập" required value="${emailorusername}">
                   </div>
-                </c:if>
-                <div class="remember-me">
-                  <div class="checkbox" id="rememberCheckbox" onclick="toggleRemember()"></div>
-                  <label class="remember-label" for="rememberCheckbox">Ghi nhớ đăng nhập</label>
                 </div>
-
-                <div class="forgot-password">
-                  <a href="#" onclick="forgotPassword()">Quên mật khẩu?</a>
+                <div class="form-group">
+                  <label class="form-label">Mật khẩu</label>
+                  <div class="input-with-icon">
+                    <i class="bi bi-lock"></i>
+                    <input type="password" name="password" class="form-input" placeholder="Nhập mật khẩu" required>
+                  </div>
                 </div>
-
-                <button type="submit" class="login-btn" id="loginBtn">
+                <div class="form-options">
+                  <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Ghi nhớ đăng nhập</label>
+                  </div>
+                  <a href="/forgot-password" class="forgot-password">Quên mật khẩu?</a>
+                </div>
+                <button type="submit" class="login-btn">
                   Đăng nhập
                 </button>
+                <div class="register-link">
+                  Chưa có tài khoản? <a href="/register">Đăng ký ngay</a>
+                </div>
               </form>
 
               <!-- Divider -->
@@ -78,34 +92,9 @@
                 <div class="google-icon">G</div>
                 Đăng nhập bằng Google
               </a>
-
-              <!-- Signup Link -->
-              <div class="signup-link">
-                Chưa có tài khoản? <a href="/register">Đăng ký ngay</a>
-              </div>
             </div>
           </div>
         </div>
-
-        <script>
-          let isPasswordVisible = false;
-          let isRemembered = false;
-
-          function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const toggleIcon = document.querySelector('.password-toggle');
-
-            if (isPasswordVisible) {
-              passwordInput.type = 'password';
-              toggleIcon.textContent = '🙈';
-            } else {
-              passwordInput.type = 'text';
-              toggleIcon.textContent = '👁️';
-            }
-            isPasswordVisible = !isPasswordVisible;
-          }
-
-        </script>
       </body>
 
       </html>

@@ -32,7 +32,10 @@ public class LoginController {
     }
 
     @GetMapping("/login")
-    public String loginPage(Model model) {
+    public String loginPage(Model model, @RequestParam(required = false) String error) {
+        if (error != null) {
+            model.addAttribute("error", "Email/tên đăng nhập hoặc mật khẩu không chính xác!");
+        }
         String googleLoginUrl = "https://accounts.google.com/o/oauth2/v2/auth?" +
                 "client_id=" + clientId +
                 "&redirect_uri=" + redirectUri +
@@ -48,23 +51,46 @@ public class LoginController {
             @RequestParam String password,
             HttpSession session,
             Model model) {
-        User user = userService.login(emailorusername, password);
-        if (user != null) {
-            session.setAttribute("currentUser", user);
+        System.out.println("Login controller received request for: " + emailorusername);
 
-            String role = user.getRole();
-
-            if ("admin".equalsIgnoreCase(role)) {
-                return "redirect:/admin";
-            } else if ("patient".equalsIgnoreCase(role) ||
-                    "doctor".equalsIgnoreCase(role) ||
-                    "receptionist".equalsIgnoreCase(role)) {
-                return "redirect:/";
-            } else {
-                return "redirect:/";
+        try {
+            // Kiểm tra user có tồn tại không
+            User user = userService.getUserByEmailOrUsername(emailorusername, emailorusername);
+            if (user == null) {
+                model.addAttribute("error", "Tài khoản không tồn tại!");
+                model.addAttribute("emailorusername", emailorusername);
+                return "authentication/form-login";
             }
-        } else {
-            model.addAttribute("error", "Sai email hoặc mật khẩu!");
+
+            // Kiểm tra đã xác thực email chưa
+            if (!user.isVerified()) {
+                model.addAttribute("error", "Tài khoản chưa được xác thực! Vui lòng kiểm tra email để xác thực.");
+                model.addAttribute("emailorusername", emailorusername);
+                return "authentication/form-login";
+            }
+
+            // Thử đăng nhập
+            user = userService.login(emailorusername, password);
+            if (user != null) {
+                session.setAttribute("currentUser", user);
+                String role = user.getRole();
+                System.out.println("Login successful. User role: " + role);
+
+                if ("admin".equalsIgnoreCase(role)) {
+                    return "redirect:/admin";
+                } else {
+                    return "redirect:/";
+                }
+            } else {
+                model.addAttribute("error", "Tên đăng nhập hoăc mật khẩu không chính xác!");
+                model.addAttribute("emailorusername", emailorusername);
+                return "authentication/form-login";
+            }
+        } catch (Exception e) {
+            System.out.println("Login error: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "Có lỗi xảy ra trong quá trình đăng nhập!");
+            model.addAttribute("emailorusername", emailorusername);
             return "authentication/form-login";
         }
     }
@@ -100,7 +126,6 @@ public class LoginController {
                 JSONObject jsonObject = new JSONObject(response.getBody());
                 String accessToken = jsonObject.getString("access_token");
 
-                // Lấy thông tin người dùng
                 HttpHeaders userInfoHeaders = new HttpHeaders();
                 userInfoHeaders.setBearerAuth(accessToken);
 
