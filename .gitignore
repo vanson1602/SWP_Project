@@ -35,6 +35,21 @@ build/
 ### Environment Variables ###
 .env
 .env.local
-application.properties
-**/application.properties
+
+### Configuration Files ###
+# Ignore application properties but keep example
 src/main/resources/application.properties
+!src/main/resources/application.properties.example
+
+# Keep the main application.properties but ignore if it contains secrets
+# file .gitignore
+
+
+
+*.properties
+!application.properties.example
+application-*.properties
+application.yml
+application-*.yml
+!application.yml.example
+

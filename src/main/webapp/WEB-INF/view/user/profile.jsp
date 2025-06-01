@@ -245,25 +245,58 @@
                 <form id="changePasswordForm" action="/profile/change-password" method="POST">
                   <div class="mb-3">
                     <label for="currentPassword" class="form-label">Mật khẩu hiện tại</label>
-                    <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                    <div class="input-group">
+                      <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                      <button class="btn btn-outline-secondary toggle-password" type="button">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                    </div>
                   </div>
                   <div class="mb-3">
                     <label for="newPassword" class="form-label">Mật khẩu mới</label>
-                    <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                    <div class="input-group">
+                      <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                      <button class="btn btn-outline-secondary toggle-password" type="button">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                    </div>
                   </div>
                   <div class="mb-3">
                     <label for="confirmPassword" class="form-label">Xác nhận mật khẩu mới</label>
-                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                    <div class="input-group">
+                      <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                      <button class="btn btn-outline-secondary toggle-password" type="button">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="modal-footer px-0 pb-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                   </div>
                 </form>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="submit" form="changePasswordForm" class="btn btn-primary">Lưu thay đổi</button>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Alert Messages -->
+        <c:if test="${not empty error}">
+          <div
+            class="alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            role="alert">
+            ${error}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        </c:if>
+        <c:if test="${not empty success}">
+          <div
+            class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+            role="alert">
+            ${success}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        </c:if>
 
         <script>
           function previewImage(input) {
@@ -279,6 +312,25 @@
           // Thêm sự kiện click cho avatar container
           document.querySelector('.avatar-container').addEventListener('click', function () {
             document.getElementById('avatarInput').click();
+          });
+
+          // Password visibility toggle
+          document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', function () {
+              const input = this.previousElementSibling;
+              const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+              input.setAttribute('type', type);
+              this.querySelector('i').classList.toggle('bi-eye');
+              this.querySelector('i').classList.toggle('bi-eye-slash');
+            });
+          });
+
+          // Auto hide alerts after 5 seconds
+          document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+              const bsAlert = new bootstrap.Alert(alert);
+              bsAlert.close();
+            }, 5000);
           });
         </script>
       </body>

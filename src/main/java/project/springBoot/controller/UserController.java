@@ -15,6 +15,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 import project.springBoot.model.User;
 import project.springBoot.service.UserService;
+import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class UserController {
@@ -110,6 +113,45 @@ public class UserController {
         this.userService.handleSaveUser(user);
         model.addAttribute("message", "Đăng ký thành công!");
         return "redirect:/login";
+    }
+
+    @PostMapping("/profile/change-password")
+    public String changePassword(@RequestParam("currentPassword") String currentPassword,
+            @RequestParam("newPassword") String newPassword,
+            @RequestParam("confirmPassword") String confirmPassword,
+            HttpSession session,
+            RedirectAttributes ra) {
+        try {
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null) {
+                return "redirect:/login";
+            }
+
+            // Validate current password
+            if (!BCrypt.checkpw(currentPassword, currentUser.getPassword())) {
+                ra.addFlashAttribute("error", "Mật khẩu hiện tại không đúng");
+                return "redirect:/profile";
+            }
+
+            // Validate new password
+            if (!newPassword.equals(confirmPassword)) {
+                ra.addFlashAttribute("error", "Mật khẩu xác nhận không khớp");
+                return "redirect:/profile";
+            }
+
+            // Update password
+            String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+            currentUser.setPassword(hashedPassword);
+            userService.handleUpdateUser(currentUser);
+            session.setAttribute("currentUser", currentUser);
+
+            ra.addFlashAttribute("success", "Đổi mật khẩu thành công!");
+            return "redirect:/profile";
+        } catch (Exception e) {
+            e.printStackTrace();
+            ra.addFlashAttribute("error", "Có lỗi xảy ra. Vui lòng thử lại sau!");
+            return "redirect:/profile";
+        }
     }
 
 }
