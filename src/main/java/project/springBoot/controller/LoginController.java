@@ -147,7 +147,7 @@ public class LoginController {
                         user = new User();
                         user.setEmail(email);
                         user.setFirstName(name);
-                        user.setRole("patient"); // hoặc role mặc định
+                        user.setRole("patient");
                         userService.handleSaveUser(user);
                     }
 
