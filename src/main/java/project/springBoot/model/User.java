@@ -1,3 +1,4 @@
+
 package project.springBoot.model;
 
 import jakarta.persistence.Column;
@@ -27,6 +28,8 @@ public class User {
 
     @Column(name = "reset_token")
     private String resetToken;
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 1")
+    private boolean state;
 
     public User() {
     }
@@ -172,6 +175,14 @@ public class User {
         return "User [id=" + id + ", username=" + username + ", password=" + password + ", firstName=" + firstName
                 + ", lastName=" + lastName + ", role=" + role + ", avatar=" + avatar + ", dob=" + dob + ", gender="
                 + gender + ", address=" + address + ", phone=" + phone + ", email=" + email + "]";
+    }
+
+    public boolean isState() {
+        return state;
+    }
+
+    public void setState(boolean state) {
+        this.state = state;
     }
 
 }
