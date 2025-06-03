@@ -335,4 +335,17 @@ body {
         width: 38px;
         height: 38px;
     }
+
+    .hero-section input,
+    .hero-section button {
+        height: 50px;
+        border-radius: 10px;
+    }
+
+    .hero-section input:focus,
+    .hero-section button:focus {
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
 }

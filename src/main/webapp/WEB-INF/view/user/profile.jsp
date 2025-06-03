@@ -156,17 +156,7 @@
             <div class="row align-items-center">
               <div class="col-md-3 text-center">
                 <div class="avatar-container">
-                  <img
-                    src="${user.avatar != null ? user.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"
-                    alt="Profile Avatar" class="profile-avatar">
-                  <div class="avatar-overlay">
-                    <div class="text-center">
-                      <i class="bi bi-camera"></i>
-                      <div class="avatar-overlay-text">Thay đổi ảnh</div>
-                    </div>
-                  </div>
-                  <input type="file" class="avatar-file-input" id="avatarInput" accept="images/*"
-                    onchange="previewImage(this)">
+                  <img src="${pageContext.request.contextPath}${user.avatar}" alt="" class="profile-avatar">
                 </div>
 
               </div>

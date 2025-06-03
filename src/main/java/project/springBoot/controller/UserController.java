@@ -3,6 +3,11 @@ package project.springBoot.controller;
 import java.security.Principal;
 import java.util.List;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.Path;
+import org.springframework.web.multipart.MultipartFile;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -93,17 +98,43 @@ public class UserController {
     }
 
     @RequestMapping(value = "/profile/update", method = RequestMethod.POST)
-    public String updateProfile(@ModelAttribute("user") User user, HttpSession session, RedirectAttributes ra) {
+    public String updateProfile(@ModelAttribute("user") User user,
+            @RequestParam(value = "avatarFile", required = false) MultipartFile file,
+            HttpSession session,
+            RedirectAttributes ra) {
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) {
             return "/authentication/form-login";
         }
+
+        // Giữ lại các giá trị không được cập nhật từ form
         user.setId(currentUser.getId());
         user.setEmail(currentUser.getEmail());
         user.setRole(currentUser.getRole());
         user.setPassword(currentUser.getPassword());
-        this.userService.handleSaveUser(user);
+
+        // Xử lý avatar nếu có upload mới
+        if (file != null && !file.isEmpty()) {
+            try {
+                String uploadDir = "uploads/";
+                Files.createDirectories(Paths.get(uploadDir));
+
+                String filename = "avatar_" + user.getId() + "_" + file.getOriginalFilename();
+                Path path = Paths.get(uploadDir + filename);
+                Files.write(path, file.getBytes());
+
+                user.setAvatar("/uploads/" + filename);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            // Nếu không upload mới, giữ ảnh cũ
+            user.setAvatar(currentUser.getAvatar());
+        }
+
+        userService.handleSaveUser(user);
         session.setAttribute("currentUser", user);
+        ra.addFlashAttribute("success", "Cập nhật thông tin thành công!");
         return "redirect:/profile";
     }
 

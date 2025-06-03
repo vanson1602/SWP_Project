@@ -109,15 +109,6 @@
             border: 1px solid #e9ecef;
             border-radius: 8px;
           }
-
-          .form-floating>.form-control {
-            height: calc(3.5rem + 2px);
-            padding: 1rem 0.75rem;
-          }
-
-          .form-floating>label {
-            padding: 1rem 0.75rem;
-          }
         </style>
       </head>
 
@@ -137,7 +128,7 @@
 
         <div class="container edit-profile-container">
           <div class="edit-profile-card">
-            <form:form method="POST" modelAttribute="user" action="/profile/update">
+            <form:form method="POST" modelAttribute="user" action="/profile/update" enctype="multipart/form-data">
               <div class="row">
                 <div class="col-md-6">
                   <div class="form-group">
@@ -183,30 +174,45 @@
                   <form:input path="address" cssClass="form-control" placeholder="Nhập địa chỉ của bạn" />
                 </div>
               </div>
+
               <div class="form-group">
-                <label class="form-label">Gender</label>
+                <label class="form-label">Giới tính</label>
                 <div class="input-group">
                   <span class="input-group-text">
-                    <i class="bi bi-geo-alt"></i>
+                    <i class="bi bi-gender-ambiguous"></i>
                   </span>
                   <form:select path="gender" cssClass="form-select">
                     <form:option value="" label="Chọn giới tính" />
-                    <form:option value="Male" label="Male" />
-                    <form:option value="Female" label="Female" />
-                    <form:option value="Another" label="Another" />
+                    <form:option value="Male" label="Nam" />
+                    <form:option value="Female" label="Nữ" />
+                    <form:option value="Another" label="Khác" />
                   </form:select>
                 </div>
               </div>
+
               <div class="form-group">
-                <label class="form-label">Date of Birth</label>
+                <label class="form-label">Ngày sinh</label>
                 <div class="input-group">
                   <span class="input-group-text">
-                    <i class="bi bi-geo-alt"></i>
+                    <i class="bi bi-calendar"></i>
                   </span>
                   <form:input path="dob" cssClass="form-control" placeholder="Nhập ngày sinh của bạn" type="date" />
                 </div>
               </div>
 
+              <div>
+                <div class="mb-3">
+                  <label class="form-label">Ảnh đại diện hiện tại</label><br />
+                  <c:if test="${not empty user.avatar}">
+                    <img src="${user.avatar}" width="150" height="150" class="rounded mb-2" />
+                  </c:if>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Chọn ảnh mới</label>
+                  <input type="file" name="avatarFile" class="form-control" />
+                </div>
+              </div>
 
               <div class="d-flex justify-content-end gap-2 mt-4">
                 <a href="/profile" class="btn btn-secondary">
@@ -219,7 +225,6 @@
             </form:form>
           </div>
         </div>
-
 
       </body>
 
