@@ -19,17 +19,15 @@ public class PageController {
         return "authentication/form-login";
     }
 
-    @RequestMapping("/register")
-    public String getRegisterPage(Model model) {
-        User user = new User();
-        model.addAttribute("user", user);
-        model.addAttribute("user", new User());
-        return "authentication/form-register";
-    }
-
     @RequestMapping("/admin")
     public String getAdminPage(Model model) {
         return "admin/dashboard";
+    }
+
+    @RequestMapping("/register")
+    public String getRegisterPage(User user, Model model) {
+        model.addAttribute("user", user);
+        return "authentication/form-register";
     }
 
 }

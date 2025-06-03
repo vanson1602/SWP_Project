@@ -1,5 +1,7 @@
+
 package project.springBoot.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -7,7 +9,6 @@ import jakarta.persistence.Id;
 
 @Entity
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -22,8 +23,39 @@ public class User {
     private String address;
     private String phone;
     private String email;
+    private String verificationToken;
+    private boolean isVerified;
+
+    @Column(name = "reset_token")
+    private String resetToken;
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 1")
+    private boolean state;
 
     public User() {
+    }
+
+    public String getVerificationToken() {
+        return verificationToken;
+    }
+
+    public void setVerificationToken(String verificationToken) {
+        this.verificationToken = verificationToken;
+    }
+
+    public boolean isVerified() {
+        return isVerified;
+    }
+
+    public void setVerified(boolean isVerified) {
+        this.isVerified = isVerified;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
     }
 
     public User(long id, String username, String password, String firstName, String lastName, String role,
@@ -143,6 +175,14 @@ public class User {
         return "User [id=" + id + ", username=" + username + ", password=" + password + ", firstName=" + firstName
                 + ", lastName=" + lastName + ", role=" + role + ", avatar=" + avatar + ", dob=" + dob + ", gender="
                 + gender + ", address=" + address + ", phone=" + phone + ", email=" + email + "]";
+    }
+
+    public boolean isState() {
+        return state;
+    }
+
+    public void setState(boolean state) {
+        this.state = state;
     }
 
 }
