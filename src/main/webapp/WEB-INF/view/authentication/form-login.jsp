@@ -1,74 +1,100 @@
-<%@page contentType="text/html" pageEncoding="UTF-8" %> <%@ taglib prefix="c"
-uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib
-uri="http://www.springframework.org/tags/form" prefix="form" %>
+<%@page contentType="text/html" pageEncoding="UTF-8" %>
+  <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+    <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Latest compiled and minified CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
-      rel="stylesheet"
-    />
-    <!-- Latest compiled JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+      <!DOCTYPE html>
+      <html lang="vi">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <!-- <link rel="stylesheet" href="/css/demo.css"> -->
-    <title>Document</title>
-  </head>
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <link rel="stylesheet" href="/css/login.css">
+        <title>Đăng Nhập - HealthCare+</title>
+      </head>
 
-  <body class="bg-light">
-    <div class="container mt-5">
-      <div class="row justify-content-center">
-        <div class="col-md-4">
-          <div class="card p-4 shadow rounded">
-            <h3 class="text-center mb-3">Đăng nhập</h3>
-            <form method="post" action="/login">
-              <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input
-                  type="email"
-                  class="form-control"
-                  name="email"
-                  required
-                />
+      <body>
+        <div class="login-page-container">
+          <!-- Left Section with Image -->
+          <div class="login-image-section">
+            <div class="login-image-overlay">
+              <div class="login-image-text">
+                <h1>Chào mừng trở lại!</h1>
+                <p>Đăng nhập để tiếp tục trải nghiệm dịch vụ chăm sóc sức khỏe toàn diện cùng đội ngũ bác sĩ chuyên
+                  nghiệp.</p>
               </div>
-              <div class="mb-3">
-                <label class="form-label">Mật khẩu</label>
-                <input
-                  type="password"
-                  class="form-control"
-                  name="password"
-                  required
-                />
+            </div>
+          </div>
+
+          <!-- Right Section with Login Form -->
+          <div class="login-form-section">
+            <div class="login-container">
+              <!-- Logo Section -->
+              <div class="logo-section">
+                <div class="logo">
+                  <div class="logo-icon">⚕️</div>
+                  <div class="logo-text">HealthCare+</div>
+                </div>
               </div>
-              <button type="submit" class="btn btn-primary w-100">
-                Đăng nhập
-              </button>
-              <a href="${googleLoginUrl}" class="btn btn-warning w-100 mt-2">
+
+              <!-- Messages -->
+              <c:if test="${not empty message}">
+                <div class="alert alert-success">
+                  <i class="bi bi-check-circle"></i>
+                  ${message}
+                </div>
+              </c:if>
+              <c:if test="${not empty error}">
+                <div class="alert alert-danger">
+                  <i class="bi bi-exclamation-circle"></i>
+                  ${error}
+                </div>
+              </c:if>
+
+              <form action="${pageContext.request.contextPath}/login" method="post" class="login-form">
+                <div class="form-group">
+                  <label class="form-label">Email hoặc tên đăng nhập</label>
+                  <div class="input-with-icon">
+                    <i class="bi bi-person"></i>
+                    <input type="text" name="emailorusername" class="form-input"
+                      placeholder="Nhập email hoặc tên đăng nhập" required value="${emailorusername}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Mật khẩu</label>
+                  <div class="input-with-icon">
+                    <i class="bi bi-lock"></i>
+                    <input type="password" name="password" class="form-input" placeholder="Nhập mật khẩu" required>
+                  </div>
+                </div>
+                <div class="form-options">
+                  <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Ghi nhớ đăng nhập</label>
+                  </div>
+                  <a href="/forgot-password" class="forgot-password">Quên mật khẩu?</a>
+                </div>
+                <button type="submit" class="login-btn">
+                  Đăng nhập
+                </button>
+                <div class="register-link">
+                  Chưa có tài khoản? <a href="/register">Đăng ký ngay</a>
+                </div>
+              </form>
+
+              <!-- Divider -->
+              <div class="divider">
+                <span>hoặc</span>
+              </div>
+
+              <!-- Google Login -->
+              <a href="${googleLoginUrl}" class="google-btn">
+                <div class="google-icon">G</div>
                 Đăng nhập bằng Google
               </a>
-            </form>
-
-            <c:if test="${not empty error}">
-              <div class="text-danger mt-2 text-center">${error}</div>
-            </c:if>
-
-            <hr />
-            <div class="text-center">
-              <span>Bạn chưa có tài khoản?</span>
-              <a href="/register" class="btn btn-primary">Đăng ký</a>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </body>
-</html>
+      </body>
+
+      </html>

@@ -6,11 +6,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import project.springBoot.model.User;
+
 @Controller
 public class PageController {
     @RequestMapping("/")
     public String getHomePage(Model model) {
-        return "authentication/dashboard";
+        return "authentication/homepage";
     }
 
     @RequestMapping("/login")
@@ -18,16 +19,15 @@ public class PageController {
         return "authentication/form-login";
     }
 
+    @RequestMapping("/admin")
+    public String getAdminPage(Model model) {
+        return "admin/dashboard";
+    }
+
     @RequestMapping("/register")
-    public String getRegisterPage(Model model) {
-        model.addAttribute("user",new User());
+    public String getRegisterPage(User user, Model model) {
+        model.addAttribute("user", user);
         return "authentication/form-register";
     }
 
-    
-
-    @RequestMapping("/admin")
-    public String getAdminPage(Model model) {
-        return "admin/admin-page";
-    }
 }
