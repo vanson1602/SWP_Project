@@ -23,10 +23,34 @@ import project.springBoot.service.UserService;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import project.springBoot.model.Avatar;
+import project.springBoot.service.AvatarService;
+import org.springframework.web.bind.annotation.RequestBody;
 
+@Slf4j
 @Controller
+@RequestMapping("/api")
 public class UserController {
     private final UserService userService;
+
+    @Autowired
+    private AvatarService avatarService;
+
+    private static final String UPLOAD_DIR = "uploads/avatars/";
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
+    private static final String[] ALLOWED_EXTENSIONS = { ".jpg", ".jpeg", ".png", ".gif" };
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -77,104 +101,89 @@ public class UserController {
         return "redirect:/admin/user";
     }
 
-    @RequestMapping("/profile")
-    public String getProfileUserPage(Model model, HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
-        if (user == null) {
-            return "/authentication/form-login";
-        }
-        model.addAttribute("user", user);
-        return "user/profile";
-    }
-
-    @RequestMapping("/profile/edit")
-    public String editProfile(Model model, HttpSession session) {
-        User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null) {
-            return "/authentication/form-login";
-        }
-        model.addAttribute("user", currentUser);
-        return "user/edit-profile";
-    }
-
-    @RequestMapping(value = "/profile/update", method = RequestMethod.POST)
-    public String updateProfile(@ModelAttribute("user") User user,
-            @RequestParam(value = "avatarFile", required = false) MultipartFile file,
-            HttpSession session,
-            RedirectAttributes ra) {
-        User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null) {
-            return "/authentication/form-login";
-        }
-
-        // Giữ lại các giá trị không được cập nhật từ form
-        user.setId(currentUser.getId());
-        user.setEmail(currentUser.getEmail());
-        user.setRole(currentUser.getRole());
-        user.setPassword(currentUser.getPassword());
-
-        // Xử lý avatar nếu có upload mới
-        if (file != null && !file.isEmpty()) {
-            try {
-                String uploadDir = "uploads/";
-                Files.createDirectories(Paths.get(uploadDir));
-
-                String filename = "avatar_" + user.getId() + "_" + file.getOriginalFilename();
-                Path path = Paths.get(uploadDir + filename);
-                Files.write(path, file.getBytes());
-
-                user.setAvatar("/uploads/" + filename);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            // Nếu không upload mới, giữ ảnh cũ
-            user.setAvatar(currentUser.getAvatar());
-        }
-
-        userService.handleSaveUser(user);
-        session.setAttribute("currentUser", user);
-        ra.addFlashAttribute("success", "Cập nhật thông tin thành công!");
-        return "redirect:/profile";
-    }
-
-    @PostMapping("/profile/change-password")
-    public String changePassword(@RequestParam("currentPassword") String currentPassword,
-            @RequestParam("newPassword") String newPassword,
-            @RequestParam("confirmPassword") String confirmPassword,
-            HttpSession session,
-            RedirectAttributes ra) {
+    @PostMapping("/users/update")
+    public ResponseEntity<?> updateUser(@RequestParam(required = false) MultipartFile file,
+            @RequestBody User updatedUser,
+            @AuthenticationPrincipal UserDetails userDetails) {
         try {
-            User currentUser = (User) session.getAttribute("currentUser");
-            if (currentUser == null) {
-                return "redirect:/login";
+            User currentUser = userService.findByUsername(userDetails.getUsername())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            currentUser.setFirstName(updatedUser.getFirstName());
+            currentUser.setLastName(updatedUser.getLastName());
+            currentUser.setPhone(updatedUser.getPhone());
+            currentUser.setAddress(updatedUser.getAddress());
+            currentUser.setGender(updatedUser.getGender());
+            currentUser.setDob(updatedUser.getDob());
+
+            if (file != null && !file.isEmpty()) {
+                String avatarUrl = handleAvatarUpload(file, currentUser);
+                if (avatarUrl != null) {
+                    for (Avatar oldAvatar : currentUser.getAvatars()) {
+                        String oldPath = oldAvatar.getAvatarUrl().replace("/uploads/avatars/", UPLOAD_DIR);
+                        try {
+                            Files.deleteIfExists(Paths.get(oldPath));
+                            avatarService.delete(oldAvatar);
+                        } catch (IOException e) {
+                            log.error("Failed to delete old avatar file: " + oldPath, e);
+                        }
+                    }
+                }
             }
 
-            // Validate current password
-            if (!BCrypt.checkpw(currentPassword, currentUser.getPassword())) {
-                ra.addFlashAttribute("error", "Mật khẩu hiện tại không đúng");
-                return "redirect:/profile";
-            }
+            currentUser.setModifiedAt(LocalDateTime.now());
+            User savedUser = userService.save(currentUser);
 
-            // Validate new password
-            if (!newPassword.equals(confirmPassword)) {
-                ra.addFlashAttribute("error", "Mật khẩu xác nhận không khớp");
-                return "redirect:/profile";
-            }
-
-            // Update password
-            String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
-            currentUser.setPassword(hashedPassword);
-            userService.handleUpdateUser(currentUser);
-            session.setAttribute("currentUser", currentUser);
-
-            ra.addFlashAttribute("success", "Đổi mật khẩu thành công!");
-            return "redirect:/profile";
+            return ResponseEntity.ok(savedUser);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
-            ra.addFlashAttribute("error", "Có lỗi xảy ra. Vui lòng thử lại sau!");
-            return "redirect:/profile";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error updating user: " + e.getMessage());
         }
     }
 
+    private String handleAvatarUpload(MultipartFile file, User user) {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+
+        if (file.getSize() > MAX_FILE_SIZE) {
+            throw new IllegalArgumentException("File size exceeds maximum limit of 5MB");
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        String extension = originalFilename != null
+                ? originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase()
+                : "";
+        boolean isValidExtension = Arrays.asList(ALLOWED_EXTENSIONS).contains(extension);
+        if (!isValidExtension) {
+            throw new IllegalArgumentException(
+                    "Invalid file type. Allowed types: " + String.join(", ", ALLOWED_EXTENSIONS));
+        }
+
+        try {
+            Path uploadPath = Paths.get(UPLOAD_DIR);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            String filename = String.format("avatar_%d_%s%s",
+                    user.getUserID(),
+                    UUID.randomUUID().toString().substring(0, 8),
+                    extension);
+
+            Path filePath = uploadPath.resolve(filename);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            Avatar avatar = new Avatar();
+            avatar.setUser(user);
+            avatar.setAvatarUrl("/uploads/avatars/" + filename);
+            avatarService.save(avatar);
+
+            return avatar.getAvatarUrl();
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store avatar file", e);
+        }
+    }
 }

@@ -156,7 +156,9 @@
             <div class="row align-items-center">
               <div class="col-md-3 text-center">
                 <div class="avatar-container">
-                  <img src="${pageContext.request.contextPath}${user.avatar}" alt="" class="profile-avatar">
+                  <img
+                    src="${pageContext.request.contextPath}${empty user.avatarUrl ? '/resources/images/defaultImg.jpg' : user.avatarUrl}"
+                    alt="" class="profile-avatar">
                 </div>
 
               </div>

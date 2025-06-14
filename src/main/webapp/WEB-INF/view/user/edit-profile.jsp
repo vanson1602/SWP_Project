@@ -203,14 +203,19 @@
               <div>
                 <div class="mb-3">
                   <label class="form-label">Ảnh đại diện hiện tại</label><br />
-                  <c:if test="${not empty user.avatar}">
-                    <img src="${user.avatar}" width="150" height="150" class="rounded mb-2" />
+                  <c:if test="${not empty user.avatarUrl}">
+                    <img src="${pageContext.request.contextPath}${user.avatarUrl}" width="150" height="150"
+                      class="rounded mb-2" />
+                  </c:if>
+                  <c:if test="${empty user.avatarUrl}">
+                    <img src="${pageContext.request.contextPath}/resources/images/default-avatar.svg" width="150"
+                      height="150" class="rounded mb-2" />
                   </c:if>
                 </div>
 
                 <div class="mb-3">
                   <label class="form-label">Chọn ảnh mới</label>
-                  <input type="file" name="avatarFile" class="form-control" />
+                  <input type="file" name="avatarFile" class="form-control" accept=".jpg,.jpeg,.png,.gif" />
                 </div>
               </div>
 

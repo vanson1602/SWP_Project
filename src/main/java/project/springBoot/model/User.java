@@ -1,188 +1,146 @@
-
 package project.springBoot.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@Getter
+@Setter
+@Table(name = "tblUsers", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "username"),
+        @UniqueConstraint(columnNames = "email"),
+        @UniqueConstraint(columnNames = "phone")
+})
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private long userID;
+    @Column(nullable = false, length = 50)
     private String username;
+    @JsonIgnore
+    @Column(nullable = false, length = 512)
     private String password;
+    @Column(name = "first_name", length = 50)
     private String firstName;
+    @Column(name = "last_name", length = 50)
     private String lastName;
-    private String role;
-    private String avatar;
-    private String dob;
+    @Column(nullable = false)
+    private String role = "patient";
+    private LocalDate dob;
+    @Column(length = 10)
     private String gender;
+    @Column(length = 256)
     private String address;
+    @Column(length = 15)
     private String phone;
+    @Column(nullable = false, length = 100)
     private String email;
+    @Column(name = "verificationToken", length = 256)
     private String verificationToken;
-    private boolean isVerified;
 
-    @Column(name = "reset_token")
+    @Column(name = "isVerified")
+    private boolean isVerified = false;
+
+    @Column(name = "reset_token", length = 256)
     private String resetToken;
-    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 1")
-    private boolean state;
 
-    public User() {
+    @Column(name = "resetTokenExpiry")
+    private LocalDateTime resetTokenExpiry;
+
+    @Column(name = "last_login")
+    private LocalDateTime lastLogin;
+
+    @Column(nullable = false)
+    private Boolean state = true;
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Avatar> avatars = new ArrayList<>();
+    @Column(nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(nullable = false)
+    private LocalDateTime modifiedAt = LocalDateTime.now();
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "modified_by", referencedColumnName = "userID")
+    private User modifiedBy;
+
+    @PrePersist
+    protected void onCreate() {
+        if (role == null) {
+            role = "patient";
+        }
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        if (modifiedAt == null) {
+            modifiedAt = LocalDateTime.now();
+        }
+        if (state == null) {
+            state = true;
+        }
+
+        if (!role.matches("admin|patient|doctor")) {
+            throw new IllegalArgumentException("Invalid role: " + role);
+        }
+        if (gender != null && !gender.matches("Male|Female|Other")) {
+            throw new IllegalArgumentException("Invalid gender: " + gender);
+        }
     }
 
-    public String getVerificationToken() {
-        return verificationToken;
-    }
-
-    public void setVerificationToken(String verificationToken) {
-        this.verificationToken = verificationToken;
-    }
-
-    public boolean isVerified() {
-        return isVerified;
-    }
-
-    public void setVerified(boolean isVerified) {
-        this.isVerified = isVerified;
-    }
-
-    public String getResetToken() {
-        return resetToken;
-    }
-
-    public void setResetToken(String resetToken) {
-        this.resetToken = resetToken;
-    }
-
-    public User(long id, String username, String password, String firstName, String lastName, String role,
-            String avatar, String dob, String gender, String address, String phone, String email) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.role = role;
-        this.avatar = avatar;
-        this.dob = dob;
-        this.gender = gender;
-        this.address = address;
-        this.phone = phone;
-        this.email = email;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    public String getDob() {
-        return dob;
-    }
-
-    public void setDob(String dob) {
-        this.dob = dob;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    @PreUpdate
+    protected void onUpdate() {
+        if (!role.matches("admin|patient|doctor")) {
+            throw new IllegalArgumentException("Invalid role: " + role);
+        }
+        if (gender != null && !gender.matches("Male|Female|Other")) {
+            throw new IllegalArgumentException("Invalid gender: " + gender);
+        }
     }
 
     @Override
     public String toString() {
-        return "User [id=" + id + ", username=" + username + ", password=" + password + ", firstName=" + firstName
-                + ", lastName=" + lastName + ", role=" + role + ", avatar=" + avatar + ", dob=" + dob + ", gender="
-                + gender + ", address=" + address + ", phone=" + phone + ", email=" + email + "]";
+        return "User [UserID=" + userID + ", username=" + username + ", firstName="
+                + firstName + ", lastName=" + lastName + ", role=" + role + ", dob=" + dob + ", gender=" + gender
+                + ", address=" + address + ", phone=" + phone + ", email=" + email + ", isVerified=" + isVerified
+                + ", state=" + state + ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
 
-    public boolean isState() {
-        return state;
+    public void addAvatar(Avatar avatar) {
+        avatars.add(avatar);
+        avatar.setUser(this);
     }
 
-    public void setState(boolean state) {
-        this.state = state;
+    public void removeAvatar(Avatar avatar) {
+        avatars.remove(avatar);
+        avatar.setUser(null);
     }
 
+    @JsonIgnore
+    public Avatar getCurrentAvatar() {
+        if (avatars.isEmpty()) {
+            return null;
+        }
+        return avatars.get(avatars.size() - 1);
+    }
+
+    public String getAvatarUrl() {
+        Avatar currentAvatar = getCurrentAvatar();
+        return currentAvatar != null ? currentAvatar.getAvatarUrl() : null;
+    }
+
+    public void setRole(String role) {
+        if (role != null && (role.equals("admin") || role.equals("patient") || role.equals("doctor"))) {
+            this.role = role;
+        } else {
+            throw new IllegalArgumentException("Invalid role. Must be admin, patient, or doctor");
+        }
+    }
 }
