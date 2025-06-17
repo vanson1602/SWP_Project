@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Getter
@@ -33,6 +34,7 @@ public class User {
     private String lastName;
     @Column(nullable = false)
     private String role = "patient";
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dob;
     @Column(length = 10)
     private String gender;

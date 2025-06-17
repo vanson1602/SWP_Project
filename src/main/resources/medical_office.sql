@@ -394,3 +394,13 @@ CREATE INDEX IX_Notifications_Sent ON tblNotifications(sent_at);
 CREATE INDEX IX_Invoices_Date_Status ON tblInvoices(invoice_date, payment_status);
 CREATE INDEX IX_Invoices_Patient ON tblInvoices(patientID);
 
+-- USER AVATARS TABLE
+CREATE TABLE tbl_user_avatars (
+  avatarid INT IDENTITY(1,1) PRIMARY KEY,
+  userid INT NOT NULL,
+  avatar_url NVARCHAR(255) NOT NULL,
+  created_at DATETIME DEFAULT GETDATE(),
+  modified_at DATETIME DEFAULT GETDATE(),
+  FOREIGN KEY (userid) REFERENCES tbl_users(userid)
+);
+

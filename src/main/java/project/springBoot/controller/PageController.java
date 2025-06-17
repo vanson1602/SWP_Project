@@ -29,5 +29,4 @@ public class PageController {
         model.addAttribute("user", user);
         return "authentication/form-register";
     }
-
 }
