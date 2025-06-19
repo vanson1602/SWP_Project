@@ -52,8 +52,8 @@ public class Appointment {
     private List<Examination> examinations = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<DoctorBookingSlot> bookingSlots = new ArrayList<>();
+    @OneToOne(mappedBy = "appointment", fetch = FetchType.LAZY)
+    private DoctorBookingSlot bookingSlot;
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

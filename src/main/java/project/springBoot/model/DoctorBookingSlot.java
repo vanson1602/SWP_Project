@@ -15,7 +15,7 @@ public class DoctorBookingSlot {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long slotID;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scheduleID", nullable = false)
     private DoctorSchedule schedule;
 
@@ -28,8 +28,8 @@ public class DoctorBookingSlot {
     @Column(length = 20)
     private String status = "Available";
 
-    @ManyToOne
-    @JoinColumn(name = "appointmentID")
+    @OneToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinColumn(name = "appointmentID", unique = true)
     private Appointment appointment;
 
     @Column(nullable = false)
