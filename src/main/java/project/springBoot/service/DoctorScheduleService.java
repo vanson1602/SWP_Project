@@ -50,7 +50,7 @@ public class DoctorScheduleService {
         doctorScheduleRepository.deleteById(id);
     }
 
-    public List<DoctorSchedule> getSchedulesByDoctorId(int doctorId) {
+    public List<DoctorSchedule> getSchedulesByDoctorId(long doctorId) {
         return doctorScheduleRepository.findByDoctorDoctorID(doctorId);
     }
 }

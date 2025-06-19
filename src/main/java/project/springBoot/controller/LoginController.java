@@ -78,6 +78,8 @@ public class LoginController {
 
                 if ("admin".equalsIgnoreCase(role)) {
                     return "redirect:/admin";
+                } else if ("doctor".equalsIgnoreCase(role)) {
+                    return "redirect:/doctor";
                 } else {
                     return "redirect:/";
                 }
@@ -156,7 +158,9 @@ public class LoginController {
                     String role = user.getRole();
                     if ("admin".equalsIgnoreCase(role)) {
                         return "redirect:/admin";
-                    } else if ("patient".equalsIgnoreCase(role) || "doctor".equalsIgnoreCase(role)
+                    } else if ("doctor".equalsIgnoreCase(role)) {
+                        return "redirect:/doctor";
+                    } else if ("patient".equalsIgnoreCase(role)
                             || "receptionist".equalsIgnoreCase(role)) {
                         return "redirect:/";
                     } else {

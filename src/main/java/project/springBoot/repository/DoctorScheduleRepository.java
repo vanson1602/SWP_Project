@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, Integer> {
-    List<DoctorSchedule> findByDoctorDoctorID(int doctorID);
+    List<DoctorSchedule> findByDoctorDoctorID(long doctorId);
 }

@@ -30,4 +30,9 @@ public class PageController {
         return "authentication/form-register";
     }
 
+    @RequestMapping("/doctor")
+    public String getDoctorPage(Model model) {
+        return "doctor/doctorpage";
+    }
+
 }
