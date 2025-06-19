@@ -26,7 +26,7 @@
               <ul class="navbar-nav gap-4 fw-semibold fs-5">
 
                 <li class="nav-item">
-                  <a class="nav-link" href="/admin/user">List All User</a>
+                  <a class="nav-link" href="/api/admin/user">List All User</a>
                 </li>
               </ul>
             </div>
@@ -37,7 +37,7 @@
             <div class="col-12 mx-auto">
               <div class="d-flex justify-content-between">
                 <h3>Table User</h3>
-                <a href="/admin/create" class="btn btn-primary">Create User</a>
+                <a href="/api/admin/create" class="btn btn-primary">Create User</a>
               </div>
               <hr />
               <table class="table table-hover">
@@ -52,13 +52,13 @@
                 <tbody>
                   <c:forEach var="user" items="${users}">
                     <tr>
-                      <td>${user.id}</td>
+                      <td>${user.userID}</td>
                       <td>${user.email}</td>
                       <td>${user.firstName}</td>
                       <td>
-                        <a href="/admin/user/${user.id}" class="btn btn-success">View</a>
-                        <a href="/admin/user/update/${user.id}" class="btn btn-warning mx-2">Update</a>
-                        <a href="/admin/user/delete/${user.id}" onclick="return confirm('Are you sure?')"
+                        <a href="/api/admin/user/${user.userID}" class="btn btn-success">View</a>
+                        <a href="/api/admin/user/update/${user.userID}" class="btn btn-warning mx-2">Update</a>
+                        <a href="/api/admin/user/delete/${user.userID}" onclick="return confirm('Are you sure?')"
                           class="btn btn-danger">Delete</a>
                       </td>
                     </tr>

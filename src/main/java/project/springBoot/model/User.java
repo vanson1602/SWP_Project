@@ -143,4 +143,5 @@ public class User {
             throw new IllegalArgumentException("Invalid role. Must be admin, patient, or doctor");
         }
     }
+
 }

@@ -131,10 +131,10 @@
           </div>
           <ul class="sidebar-menu">
             <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
-            <li><a href="/admin/user"><i class="fas fa-users"></i> Users</a></li>
+            <li><a href="/api/admin/user"><i class="fas fa-users"></i> Users</a></li>
             <li><a href="#"><i class="fas fa-calendar-check"></i> Appointment</a></li>
 
-            <li><a href="#"><i class="fas fa-user-md"></i> Doctor Schedule</a></li>
+            <li><a href="/admin/schedules/doctors"><i class="fas fa-user-md"></i> Doctor Schedule</a></li>
             <li><a href="/"><i class="fas fa-sign-out-alt"></i> Home Page</a></li>
           </ul>
         </nav>
