@@ -25,7 +25,6 @@
                             <h1>Đặt lịch khám bệnh</h1>
                             <p>Chọn thời gian khám phù hợp với bạn</p>
                         </div>
-
                         <div class="content-container">
                             <!-- Progress Steps -->
                             <div class="progress-steps">

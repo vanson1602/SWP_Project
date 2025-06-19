@@ -15,10 +15,9 @@
                             <title>Thanh toán - HealthCare+</title>
                             <link rel="stylesheet"
                                 href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-                            <link rel="stylesheet"
-                                href="${pageContext.request.contextPath}/resources/css/appointment-style.css">
                             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
                                 rel="stylesheet">
+                            <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/payment.css">
                         </head>
 
                         <body>
@@ -71,8 +70,8 @@
 
                                             <!-- Appointment Summary -->
                                             <div class="card mb-4">
-                                                <div class="card-header bg-primary text-white">
-                                                    <h5 class="mb-0">Chi tiết lịch hẹn</h5>
+                                                <div class="card-header">
+                                                    <h5 class="mb-0 text-white">Chi tiết lịch hẹn</h5>
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="row">
@@ -103,7 +102,8 @@
                                                                 </c:forEach>
                                                             </p>
                                                             <p><strong>Phí khám:</strong>
-                                                                ${appointment.bookingSlot.schedule.doctor.consultationFee}đ
+                                                                <span
+                                                                    class="text-primary fw-bold">${appointment.bookingSlot.schedule.doctor.consultationFee}đ</span>
                                                             </p>
                                                         </div>
                                                     </div>
@@ -119,7 +119,7 @@
 
                                                 <div class="payment-methods">
                                                     <h5 class="mb-3">Chọn phương thức thanh toán</h5>
-                                                    <div class="row">
+                                                    <div class="row g-3">
                                                         <div class="col-md-4">
                                                             <div class="payment-method-card">
                                                                 <input type="radio" name="paymentMethod" id="momo"
@@ -157,13 +157,13 @@
                                                 </div>
 
                                                 <!-- Navigation Buttons -->
-                                                <div class="nav-buttons mt-4">
+                                                <div class="nav-buttons">
                                                     <a href="${pageContext.request.contextPath}/appointments/info?slotId=${appointment.bookingSlot.slotID}"
                                                         class="btn btn-secondary">
-                                                        ← Quay lại
+                                                        <i class="bi bi-arrow-left"></i> Quay lại
                                                     </a>
                                                     <button type="submit" class="btn btn-primary">
-                                                        Thanh toán →
+                                                        Thanh toán <i class="bi bi-arrow-right"></i>
                                                     </button>
                                                 </div>
                                             </form>
@@ -172,118 +172,24 @@
                                 </div>
                             </main>
 
-                            <style>
-                                .payment-container {
-                                    background: #fff;
-                                    border-radius: 10px;
-                                    padding: 2rem;
-                                }
-
-                                .payment-methods {
-                                    margin-top: 2rem;
-                                }
-
-                                .payment-method-card {
-                                    border: 2px solid #e9ecef;
-                                    border-radius: 10px;
-                                    padding: 1rem;
-                                    text-align: center;
-                                    cursor: pointer;
-                                    transition: all 0.3s ease;
-                                    height: 100%;
-                                }
-
-                                .payment-method-card:hover {
-                                    border-color: #007bff;
-                                    transform: translateY(-2px);
-                                }
-
-                                .payment-method-card input[type="radio"] {
-                                    display: none;
-                                }
-
-                                .payment-method-card label {
-                                    cursor: pointer;
-                                    margin: 0;
-                                    display: flex;
-                                    flex-direction: column;
-                                    align-items: center;
-                                    gap: 0.5rem;
-                                }
-
-                                .payment-method-card img {
-                                    max-width: 80px;
-                                    height: auto;
-                                    margin-bottom: 0.5rem;
-                                }
-
-                                .payment-method-card input[type="radio"]:checked+label {
-                                    color: #007bff;
-                                }
-
-                                .payment-method-card input[type="radio"]:checked+label img {
-                                    transform: scale(1.05);
-                                }
-
-                                .card {
-                                    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-                                }
-
-                                .card-header {
-                                    background-color: #007bff !important;
-                                }
-
-                                .nav-buttons {
-                                    display: flex;
-                                    justify-content: space-between;
-                                    margin-top: 2rem;
-                                }
-
-                                .btn {
-                                    padding: 0.5rem 1.5rem;
-                                    font-weight: 500;
-                                }
-
-                                .btn-primary {
-                                    background-color: #007bff;
-                                    border-color: #007bff;
-                                }
-
-                                .btn-primary:hover {
-                                    background-color: #0056b3;
-                                    border-color: #0056b3;
-                                }
-
-                                .alert {
-                                    border-radius: 8px;
-                                    margin-bottom: 1.5rem;
-                                }
-                            </style>
-
+                            <!-- Payment Validation Script -->
                             <script>
-                                document.addEventListener('DOMContentLoaded', function () {
-                                    const paymentCards = document.querySelectorAll('.payment-method-card');
+                                document.getElementById('paymentForm').addEventListener('submit', function (e) {
+                                    const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked');
+                                    if (!selectedMethod) {
+                                        e.preventDefault();
+                                        alert('Vui lòng chọn phương thức thanh toán');
+                                    }
+                                });
 
-                                    paymentCards.forEach(card => {
-                                        card.addEventListener('click', function () {
-                                            const radio = this.querySelector('input[type="radio"]');
-                                            radio.checked = true;
-
-                                            // Remove active class from all cards
-                                            paymentCards.forEach(c => c.style.borderColor = '#e9ecef');
-
-                                            // Add active class to selected card
-                                            this.style.borderColor = '#007bff';
+                                // Add active state to payment method cards
+                                document.querySelectorAll('.payment-method-card input[type="radio"]').forEach(radio => {
+                                    radio.addEventListener('change', function () {
+                                        document.querySelectorAll('.payment-method-card').forEach(card => {
+                                            card.classList.remove('active');
                                         });
-                                    });
-
-                                    // Form validation
-                                    const form = document.getElementById('paymentForm');
-                                    form.addEventListener('submit', function (event) {
-                                        const selectedMethod = form.querySelector('input[name="paymentMethod"]:checked');
-                                        if (!selectedMethod) {
-                                            event.preventDefault();
-                                            alert('Vui lòng chọn phương thức thanh toán');
+                                        if (this.checked) {
+                                            this.closest('.payment-method-card').classList.add('active');
                                         }
                                     });
                                 });

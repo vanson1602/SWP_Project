@@ -248,53 +248,28 @@
         </style>
 
         <!-- Header JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/vi.js"></script>
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                // Mobile menu handling
-                const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-                const navLinks = document.getElementById('navLinks');
+            // Set moment.js locale to Vietnamese
+            moment.locale('vi');
+        </script>
 
-                mobileMenuBtn.addEventListener('click', function () {
-                    navLinks.classList.toggle('show');
-                    const icon = this.querySelector('i');
-                    if (navLinks.classList.contains('show')) {
-                        icon.classList.remove('bi-list');
-                        icon.classList.add('bi-x-lg');
-                    } else {
-                        icon.classList.remove('bi-x-lg');
-                        icon.classList.add('bi-list');
-                    }
-                });
+        <script>
+            // Mobile menu toggle
+            document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.toggle('show');
+            });
 
-                // Profile dropdown handling
-                const profileBtn = document.getElementById('profileDropdownBtn');
-                const profileDropdown = document.getElementById('profileDropdown');
+            // Profile dropdown toggle
+            document.getElementById('profileDropdownBtn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('profileDropdown').classList.toggle('show');
+            });
 
-                if (profileBtn && profileDropdown) {
-                    profileBtn.addEventListener('click', function (e) {
-                        e.stopPropagation();
-                        profileDropdown.classList.toggle('show');
-                    });
-
-                    // Close dropdown when clicking outside
-                    document.addEventListener('click', function (e) {
-                        if (!profileDropdown.contains(e.target) && !profileBtn.contains(e.target)) {
-                            profileDropdown.classList.remove('show');
-                        }
-                    });
-                }
-
-                // Close mobile menu when clicking outside
-                document.addEventListener('click', function (e) {
-                    if (!e.target.closest('.nav-links') &&
-                        !e.target.closest('.mobile-menu-btn') &&
-                        navLinks.classList.contains('show')) {
-                        navLinks.classList.remove('show');
-                        const icon = mobileMenuBtn.querySelector('i');
-                        icon.classList.remove('bi-x-lg');
-                        icon.classList.add('bi-list');
-                    }
-                });
+            // Close dropdown when clicking outside
+            document.addEventListener('click', () => {
+                document.getElementById('profileDropdown')?.classList.remove('show');
             });
         </script>
 

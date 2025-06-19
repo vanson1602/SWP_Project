@@ -141,12 +141,43 @@ public class AppointmentController {
     }
 
     @GetMapping("/payment")
-    public String showPaymentPage(HttpSession session, Model model) {
-        Appointment appointment = (Appointment) session.getAttribute("pendingAppointment");
-        if (appointment == null) {
-            return "redirect:/appointments/booking";
+    public String showPaymentPage(@RequestParam(required = false) Long appointmentId, HttpSession session,
+            Model model) {
+        Appointment appointment;
+
+        if (appointmentId != null) {
+            try {
+                appointment = appointmentService.getAppointmentByIdWithDetails(appointmentId);
+                if (appointment == null) {
+                    return "redirect:/appointments/my-appointments?error=Appointment not found";
+                }
+                if (!appointment.getStatus().equals("Pending")) {
+                    return "redirect:/appointments/my-appointments?error=This appointment cannot be paid";
+                }
+
+                // Kiểm tra xem người dùng hiện tại có phải là chủ của appointment không
+                User currentUser = (User) session.getAttribute("currentUser");
+                if (currentUser.getUserID() != appointment.getPatient().getUser().getUserID()) {
+                    return "redirect:/appointments/my-appointments?error=Unauthorized access";
+                }
+
+                session.setAttribute("pendingAppointment", appointment);
+            } catch (Exception e) {
+                return "redirect:/appointments/my-appointments?error=" + e.getMessage();
+            }
+        } else {
+            // Nếu không có appointmentId, lấy từ session như cũ
+            appointment = (Appointment) session.getAttribute("pendingAppointment");
+            if (appointment == null) {
+                return "redirect:/appointments/booking";
+            }
+            try {
+                appointment = appointmentService.getAppointmentByIdWithDetails(appointment.getAppointmentID());
+            } catch (Exception e) {
+                return "redirect:/appointments/booking?error=" + e.getMessage();
+            }
         }
-        appointment = appointmentService.getAppointmentByIdWithDetails(appointment.getAppointmentID());
+
         model.addAttribute("appointment", appointment);
         return "appointment/payment";
     }
@@ -158,25 +189,44 @@ public class AppointmentController {
             HttpSession session,
             Model model) {
         try {
+            // Kiểm tra xem appointment có tồn tại và thuộc về người dùng hiện tại không
             Appointment appointment = appointmentService.getAppointmentById(appointmentId);
+            if (appointment == null) {
+                throw new RuntimeException("Appointment not found");
+            }
 
-            // Xử lý thanh toán theo phương thức được chọn
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (appointment.getPatient().getUser().getUserID() != currentUser.getUserID()) {
+                throw new RuntimeException("Unauthorized access");
+            }
+
+            if (!appointment.getStatus().equals("Pending")) {
+                throw new RuntimeException("This appointment cannot be paid");
+            }
+
             boolean paymentSuccess = false;
+            String paymentNote = "";
+
             switch (paymentMethod) {
                 case "momo":
-                    paymentSuccess = true; // Giả lập thanh toán thành công
+                    paymentSuccess = true;
+                    paymentNote = "Thanh toán qua MoMo thành công";
                     break;
                 case "vnpay":
-                    paymentSuccess = true; // Giả lập thanh toán thành công
+                    paymentSuccess = true;
+                    paymentNote = "Thanh toán qua VNPay thành công";
                     break;
                 case "banking":
-                    paymentSuccess = true; // Giả lập thanh toán thành công
+                    paymentSuccess = true;
+                    paymentNote = "Thanh toán qua Banking thành công";
                     break;
+                default:
+                    throw new RuntimeException("Invalid payment method");
             }
 
             if (paymentSuccess) {
                 // Cập nhật trạng thái appointment thành CONFIRMED sau khi thanh toán thành công
-                appointmentService.updateAppointmentStatus(appointmentId, "Confirmed", "Payment completed");
+                appointmentService.updateAppointmentStatus(appointmentId, "Confirmed", paymentNote);
                 session.removeAttribute("pendingAppointment");
                 return "redirect:/appointments/payment-success";
             } else {
@@ -185,6 +235,7 @@ public class AppointmentController {
             }
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
+            model.addAttribute("appointment", appointmentService.getAppointmentByIdWithDetails(appointmentId));
             return "appointment/payment";
         }
     }
