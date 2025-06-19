@@ -39,7 +39,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Slf4j
 @Controller
-@RequestMapping("/api")
 public class UserController {
     private final UserService userService;
 

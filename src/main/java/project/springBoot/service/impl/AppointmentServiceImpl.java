@@ -43,6 +43,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         Appointment appointment = new Appointment();
         appointment.setPatient(patient);
+        appointment.setDoctor(slot.getSchedule().getDoctor());
         appointment.setAppointmentDate(slot.getStartTime());
         appointment.setAppointmentNumber(AppointmentUtils.generateAppointmentNumber());
         appointment.setStatus("Pending");
@@ -111,6 +112,11 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new RuntimeException("Appointment is already cancelled");
         }
 
+        Doctor doctor = appointment.getBookingSlot().getSchedule().getDoctor();
+        if (appointment.getDoctor() == null) {
+            appointment.setDoctor(doctor);
+        }
+
         appointment.setStatus("Cancelled");
         appointment.setAdminNotes(reason);
         appointment.setModifiedAt(LocalDateTime.now());
@@ -123,13 +129,23 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         Notification doctorNotification = new Notification();
-        doctorNotification.setUser(slot.getSchedule().getDoctor().getUser());
+        doctorNotification.setUser(doctor.getUser());
         doctorNotification.setTitle("Lịch hẹn bị hủy");
         doctorNotification.setMessage("Lịch hẹn với bệnh nhân " + appointment.getPatient().getUser().getFullName() +
                 " vào lúc " + appointment.getAppointmentDate() + " đã bị hủy. Lý do: " + reason);
-        doctorNotification.setNotificationType("Appointment");
+        doctorNotification.setNotificationType("General");
         doctorNotification.setRead(false);
         notificationRepository.save(doctorNotification);
+
+        Notification patientNotification = new Notification();
+        patientNotification.setUser(appointment.getPatient().getUser());
+        patientNotification.setTitle("Lịch hẹn đã bị hủy");
+        patientNotification.setMessage("Lịch hẹn của bạn với bác sĩ " + doctor.getUser().getFullName() +
+                " vào lúc " + appointment.getAppointmentDate() +
+                " đã bị hủy. Lý do: " + reason);
+        patientNotification.setNotificationType("General");
+        patientNotification.setRead(false);
+        notificationRepository.save(patientNotification);
 
         appointmentRepository.save(appointment);
     }

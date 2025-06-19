@@ -281,15 +281,36 @@
                                                     <img src="${pageContext.request.contextPath}/resources/images/defaultImg.jpg"
                                                         alt="Doctor Avatar" class="doctor-avatar">
                                                     <div class="doctor-name">
-                                                        BS. ${appointment.bookingSlot.schedule.doctor.user.firstName}
-                                                        ${appointment.bookingSlot.schedule.doctor.user.lastName}
+                                                        <c:choose>
+                                                            <c:when test="${appointment.doctor != null}">
+                                                                BS. ${appointment.doctor.user.firstName}
+                                                                ${appointment.doctor.user.lastName}
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                BS.
+                                                                ${appointment.bookingSlot.schedule.doctor.user.firstName}
+                                                                ${appointment.bookingSlot.schedule.doctor.user.lastName}
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                     </div>
                                                     <div class="doctor-specialty">
-                                                        <c:forEach
-                                                            items="${appointment.bookingSlot.schedule.doctor.specializations}"
-                                                            var="spec" varStatus="loop">
-                                                            <c:if test="${loop.first}">${spec.specializationName}</c:if>
-                                                        </c:forEach>
+                                                        <c:choose>
+                                                            <c:when test="${appointment.doctor != null}">
+                                                                <c:forEach items="${appointment.doctor.specializations}"
+                                                                    var="spec" varStatus="loop">
+                                                                    <c:if test="${loop.first}">
+                                                                        ${spec.specializationName}</c:if>
+                                                                </c:forEach>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <c:forEach
+                                                                    items="${appointment.bookingSlot.schedule.doctor.specializations}"
+                                                                    var="spec" varStatus="loop">
+                                                                    <c:if test="${loop.first}">
+                                                                        ${spec.specializationName}</c:if>
+                                                                </c:forEach>
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                     </div>
                                                 </div>
                                                 <div class="appointment-details">
@@ -307,7 +328,15 @@
                                                     <div class="appointment-info">
                                                         <i class="bi bi-cash"></i>
                                                         <span>Phí khám:
-                                                            ${appointment.bookingSlot.schedule.doctor.consultationFee}đ</span>
+                                                            <c:choose>
+                                                                <c:when test="${appointment.doctor != null}">
+                                                                    ${appointment.doctor.consultationFee}đ
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    ${appointment.bookingSlot.schedule.doctor.consultationFee}đ
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </span>
                                                     </div>
                                                     <div class="appointment-info">
                                                         <i class="bi bi-card-text"></i>

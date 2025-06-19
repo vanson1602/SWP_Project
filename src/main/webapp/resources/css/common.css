@@ -1,4 +1,4 @@
-/* Main Content Styles */
+/* Common Layout Styles */
 .main-content {
     padding: 2rem 0;
     background-color: #f8f9fa;
@@ -78,6 +78,12 @@
     color: white;
 }
 
+.step.completed .step-number {
+    background: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
 .step span {
     font-size: 0.9rem;
     color: #666;
@@ -88,63 +94,9 @@
     font-weight: 600;
 }
 
-/* Specialty Grid */
-.specialties-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin: 2rem 0;
-}
-
-.specialty-card {
-    background: white;
-    border-radius: 15px;
-    padding: 1.5rem;
-    text-align: center;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    border: 2px solid transparent;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-    opacity: 0;
-    animation: fadeInUp 0.8s ease forwards;
-}
-
-.specialty-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-    border-color: #667eea;
-}
-
-.specialty-card.selected {
-    border-color: #667eea;
-    background: rgba(102, 126, 234, 0.05);
-}
-
-.specialty-icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 1rem;
-    border-radius: 50%;
-    overflow: hidden;
-}
-
-.specialty-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.specialty-card h3 {
-    font-size: 1.2rem;
+.step.completed span {
+    color: #28a745;
     font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #333;
-}
-
-.specialty-card p {
-    font-size: 0.9rem;
-    color: #666;
-    line-height: 1.5;
 }
 
 /* Navigation Buttons */
@@ -173,13 +125,16 @@
     border-color: #667eea;
 }
 
-.nav-buttons .btn-primary:disabled {
+.nav-buttons .btn-primary:disabled,
+.nav-buttons .btn-primary.disabled {
     background-color: #a5b4f3;
     border-color: #a5b4f3;
     cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.6;
 }
 
-/* Animation keyframes */
+/* Common Animations */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -191,15 +146,7 @@
     }
 }
 
-/* Animation delay for cards */
-.specialty-card:nth-child(1) { animation-delay: 0.4s; }
-.specialty-card:nth-child(2) { animation-delay: 0.5s; }
-.specialty-card:nth-child(3) { animation-delay: 0.6s; }
-.specialty-card:nth-child(4) { animation-delay: 0.7s; }
-.specialty-card:nth-child(5) { animation-delay: 0.8s; }
-.specialty-card:nth-child(6) { animation-delay: 0.9s; }
-
-/* Responsive adjustments */
+/* Responsive Styles */
 @media (max-width: 768px) {
     .progress-steps {
         flex-wrap: wrap;
@@ -212,24 +159,6 @@
     
     .step {
         flex: 0 0 calc(33.333% - 1rem);
-    }
-    
-    .specialties-grid {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-    }
-
-    .specialty-card {
-        padding: 1rem;
-    }
-
-    .specialty-icon {
-        width: 60px;
-        height: 60px;
-    }
-
-    .specialty-card h3 {
-        font-size: 1.1rem;
     }
     
     .nav-buttons {
