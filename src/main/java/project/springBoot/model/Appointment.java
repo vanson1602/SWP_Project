@@ -1,11 +1,29 @@
 package project.springBoot.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -23,6 +41,10 @@ public class Appointment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patientID", nullable = false)
     private Patient patient;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "doctorID")
+    private Doctor doctor;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "appointmentTypeID", nullable = false)
@@ -52,8 +74,8 @@ public class Appointment {
     private List<Examination> examinations = new ArrayList<>();
 
     @JsonIgnore
-    @OneToOne(mappedBy = "appointment", fetch = FetchType.LAZY)
-    private DoctorBookingSlot bookingSlot;
+    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<DoctorBookingSlot> bookingSlots = new ArrayList<>();
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -76,6 +98,7 @@ public class Appointment {
     public String toString() {
         return "Appointment [appointmentID=" + appointmentID +
                 ", patientID=" + (patient != null ? patient.getPatientID() : null) +
+                ", doctorID=" + (doctor != null ? doctor.getDoctorID() : null) +
                 ", appointmentTypeID=" + (appointmentType != null ? appointmentType.getAppointmentTypeID() : null) +
                 ", appointmentDate=" + appointmentDate + ", appointmentNumber=" + appointmentNumber +
                 ", status=" + status + ", adminID=" + (admin != null ? admin.getUserID() : null) +

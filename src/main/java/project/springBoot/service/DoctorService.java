@@ -1,11 +1,18 @@
 package project.springBoot.service;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
 import project.springBoot.model.Doctor;
 import project.springBoot.model.DoctorBookingSlot;
 import project.springBoot.model.Patient;
-import java.time.LocalDate;
-import java.util.List;
 
+
+
+@Service
 public interface DoctorService {
     List<Doctor> getDoctorsBySpecialization(Long specializationId);
 
@@ -16,4 +23,11 @@ public interface DoctorService {
     Patient getPatientByUsername(String username);
 
     Doctor getDoctorById(Long doctorId);
+
+
+    Optional<Doctor> findByUserId(long userId);
+    Doctor getDoctorByUserId(long userId);
+
+    Doctor save(Doctor doctor);
+    Doctor findById(Long id);
 }

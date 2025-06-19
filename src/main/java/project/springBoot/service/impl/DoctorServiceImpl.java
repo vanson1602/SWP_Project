@@ -1,18 +1,23 @@
 package project.springBoot.service.impl;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import project.springBoot.model.Doctor;
-import project.springBoot.model.DoctorBookingSlot;
-import project.springBoot.model.Patient;
-import project.springBoot.repository.*;
-import project.springBoot.service.DoctorService;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
 import org.hibernate.Hibernate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
+import project.springBoot.model.Doctor;
+import project.springBoot.model.DoctorBookingSlot;
+import project.springBoot.model.Patient;
+import project.springBoot.repository.DoctorBookingSlotRepository;
+import project.springBoot.repository.DoctorRepository;
+import project.springBoot.repository.PatientRepository;
+import project.springBoot.repository.UserRepository;
+import project.springBoot.service.DoctorService;
 
 @Service
 @Transactional
@@ -60,5 +65,25 @@ public class DoctorServiceImpl implements DoctorService {
         // Initialize the specializations if needed
         Hibernate.initialize(doctor.getSpecializations());
         return doctor;
+    }
+
+    @Override
+    public Optional<Doctor> findByUserId(long userId) {
+        return doctorRepository.findByUserUserID(userId);
+    }
+
+    @Override
+    public Doctor getDoctorByUserId(long userId) {
+        return doctorRepository.findByUserUserID(userId).orElse(null);
+    }
+
+    @Override
+    public Doctor save(Doctor doctor) {
+        return doctorRepository.save(doctor);
+    }
+
+    @Override
+    public Doctor findById(Long id) {
+        return doctorRepository.findById(id).orElse(null);
     }
 }

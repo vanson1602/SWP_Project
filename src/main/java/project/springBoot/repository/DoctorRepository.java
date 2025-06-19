@@ -1,13 +1,13 @@
 package project.springBoot.repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import project.springBoot.model.Doctor;
-
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
@@ -19,4 +19,6 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
     @Query("SELECT d FROM Doctor d LEFT JOIN FETCH d.specializations WHERE d.doctorID = :id")
     Optional<Doctor> findByIdWithSpecializations(Long id);
+
+    Optional<Doctor> findByUserUserID(long userId);
 }

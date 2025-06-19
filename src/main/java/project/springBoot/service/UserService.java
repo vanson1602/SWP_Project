@@ -7,13 +7,18 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import project.springBoot.model.Doctor;
 import project.springBoot.model.User;
+import project.springBoot.repository.DoctorRepository;
 import project.springBoot.repository.UserRepository;
 
 @Service
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private DoctorRepository doctorRepository;
 
     public User handleSaveUser(User user) {
         if (user.getUserID() == 0) {
@@ -73,6 +78,14 @@ public class UserService {
             System.out.println("Password match: " + passwordMatch);
 
             if (passwordMatch) {
+                // If this is a doctor, ensure they have a doctor record
+                if ("doctor".equalsIgnoreCase(user.getRole())) {
+                    Long doctorId = getDoctorIdByUserId(user.getUserID());
+                    if (doctorId == null) {
+                        System.out.println("Doctor record not found for user: " + user.getUserID());
+                        return null;
+                    }
+                }
                 return user;
             }
         }
@@ -93,5 +106,11 @@ public class UserService {
 
     public User save(User user) {
         return userRepository.save(user);
+    }
+
+    public Long getDoctorIdByUserId(long userId) {
+        return doctorRepository.findByUserUserID(userId)
+                .map(Doctor::getDoctorID)
+                .orElse(null);
     }
 }

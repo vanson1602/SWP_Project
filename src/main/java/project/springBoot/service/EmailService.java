@@ -1,5 +1,7 @@
 package project.springBoot.service;
 
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -10,8 +12,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import project.springBoot.model.Appointment;
-
-import java.time.format.DateTimeFormatter;
 
 @Service
 public class EmailService {
@@ -103,7 +103,7 @@ public class EmailService {
                         """,
                 appointment.getPatient().getUser().getFullName(),
                 appointment.getAppointmentNumber(),
-                appointment.getBookingSlot().getSchedule().getDoctor().getUser().getFullName(),
+                // appointment.getBookingSlot().getSchedule().getDoctor().getUser().getFullName(),
                 appointment.getAppointmentDate().format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")),
                 appointment.getAppointmentType().getTypeName());
 
@@ -154,7 +154,7 @@ public class EmailService {
                             </div>
                         </div>
                         """,
-                appointment.getBookingSlot().getSchedule().getDoctor().getUser().getFullName(),
+                // appointment.getBookingSlot().getSchedule().getDoctor().getUser().getFullName(),
                 appointment.getAppointmentNumber(),
                 appointment.getPatient().getUser().getFullName(),
                 appointment.getAppointmentDate().format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")),

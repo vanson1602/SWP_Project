@@ -1,20 +1,25 @@
 package project.springBoot.controller.AuthController;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.ui.Model;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import jakarta.servlet.http.HttpSession;
 import project.springBoot.model.User;
 import project.springBoot.service.UserService;
-import org.json.JSONObject;
 
 @Controller
 public class LoginController {
@@ -78,6 +83,16 @@ public class LoginController {
 
                 if ("admin".equalsIgnoreCase(role)) {
                     return "redirect:/admin";
+                } else if ("doctor".equalsIgnoreCase(role)) {
+                    // Get doctor ID and set it in session
+                    Long doctorId = userService.getDoctorIdByUserId(user.getUserID());
+                    if (doctorId != null) {
+                        session.setAttribute("doctorId", doctorId);
+                        System.out.println("Set doctorId in session: " + doctorId);
+                    } else {
+                        System.out.println("Could not find doctorId for user: " + user.getUserID());
+                    }
+                    return "redirect:/doctor/home";
                 } else {
                     return "redirect:/";
                 }
@@ -156,10 +171,12 @@ public class LoginController {
                     String role = user.getRole();
                     if ("admin".equalsIgnoreCase(role)) {
                         return "redirect:/admin";
-                    } else if ("patient".equalsIgnoreCase(role) || "doctor".equalsIgnoreCase(role)
+                    } else if ("patient".equalsIgnoreCase(role)
                             || "receptionist".equalsIgnoreCase(role)) {
                         return "redirect:/";
-                    } else {
+                    } else if ("doctor".equalsIgnoreCase(role)) {
+                        return "redirect:/doctor/home";
+                    }else {
                         return "redirect:/";
                     }
                 }
