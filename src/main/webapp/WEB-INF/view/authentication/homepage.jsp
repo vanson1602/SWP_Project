@@ -63,10 +63,10 @@
     </head>
 
     <body>
-      <!-- Include Header -->
+  
       <jsp:include page="../shared/header.jsp" />
 
-      <!-- Search Section -->
+    
       <section class="search-section">
         <div class="container">
           <div class="search-tabs">
@@ -75,7 +75,7 @@
               <a href="#" class="search-tab" data-tab="doctor">Tìm theo tên bác sĩ</a>
             </div>
 
-            <!-- Specialty Search Form -->
+          
             <form action="/search/specialties" method="GET" class="search-form" id="specialtyForm">
               <div class="row g-3">
                 <div class="col-md-9">
@@ -90,7 +90,7 @@
               </div>
             </form>
 
-            <!-- Doctor Search Form -->
+          
             <form action="/search/doctors" method="GET" class="search-form d-none" id="doctorForm">
               <div class="row g-3">
                 <div class="col-md-9">
@@ -164,6 +164,68 @@
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- Danh sách bác sĩ -->
+      <section class="py-5">
+        <div class="container">
+          <h2 class="fw-bold text-center mb-5">Đội ngũ bác sĩ</h2>
+          <div class="row g-4">
+            <c:forEach items="${doctors}" var="doctor">
+              <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card h-100 shadow-sm border-0">
+                  <div class="position-relative">
+                    <c:choose>
+                      <c:when test="${not empty doctor.user.avatarUrl}">
+                        <img src="${doctor.user.avatarUrl}" class="card-img-top" alt="Doctor's photo"
+                          style="height: 200px; object-fit: cover;">
+                      </c:when>
+                      <c:otherwise>
+                        <img src="/resources/images/defaultImg.jpg" class="card-img-top" alt="Default doctor photo"
+                          style="height: 200px; object-fit: cover;">
+                      </c:otherwise>
+                    </c:choose>
+                  </div>
+                  <div class="card-body">
+                    <h5 class="card-title mb-1">BS. ${doctor.user.firstName} ${doctor.user.lastName}</h5>
+                    <div class="text-muted small mb-2">
+                      <c:forEach items="${doctor.specializations}" var="spec" varStatus="status">
+                        ${spec.specializationName}${!status.last ? ', ' : ''}
+                      </c:forEach>
+                    </div>
+                    <p class="card-text small mb-2">
+                      <i class="bi bi-briefcase-fill me-1"></i> ${doctor.experienceYears} năm kinh nghiệm
+                    </p>
+                    <p class="card-text small mb-3">
+                      <i class="bi bi-cash me-1"></i> Phí tư vấn: ${doctor.consultationFee} VNĐ
+                    </p>
+                    <a href="/search/doctors/details/${doctor.doctorID}" class="btn btn-outline-primary w-100">Xem chi
+                      tiết</a>
+                  </div>
+                </div>
+              </div>
+            </c:forEach>
+          </div>
+
+          <!-- Pagination -->
+          <c:if test="${totalPages > 1}">
+            <nav class="mt-5">
+              <ul class="pagination justify-content-center">
+                <li class="page-item ${currentPage == 0 ? 'disabled' : ''}">
+                  <a class="page-link" href="/?page=${currentPage - 1}">Trước</a>
+                </li>
+                <c:forEach begin="0" end="${totalPages - 1}" var="i">
+                  <li class="page-item ${currentPage == i ? 'active' : ''}">
+                    <a class="page-link" href="/?page=${i}">${i + 1}</a>
+                  </li>
+                </c:forEach>
+                <li class="page-item ${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                  <a class="page-link" href="/?page=${currentPage + 1}">Sau</a>
+                </li>
+              </ul>
+            </nav>
+          </c:if>
         </div>
       </section>
 

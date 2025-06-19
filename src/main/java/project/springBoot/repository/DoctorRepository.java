@@ -1,5 +1,7 @@
 package project.springBoot.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,21 +21,11 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
         List<Doctor> findBySpecializationName(@Param("specializationName") String specializationName);
 
         @Query("SELECT DISTINCT d FROM Doctor d " +
-                        "JOIN d.schedules s " +
-                        "JOIN d.user u " +
-                        "WHERE s.workDate = :workDate " +
-                        "AND s.status = 'Available' " +
+                        "JOIN FETCH d.user u " +
+                        "JOIN FETCH d.specializations s " +
+                        "WHERE s.isActive = true " +
                         "AND u.state = true")
-        List<Doctor> findByWorkDate(@Param("workDate") LocalDate workDate);
-
-        @Query("SELECT  d FROM Doctor d " +
-                        "JOIN d.specializations s " +
-                        "JOIN d.user u " +
-                        "WHERE d.experienceYears >= 5 " +
-                        "AND s.isActive = true " +
-                        "AND u.state = true " +
-                        "ORDER BY d.experienceYears DESC")
-        List<Doctor> findFeaturedDoctors();
+        Page<Doctor> findAllActiveDoctors(Pageable pageable);
 
         @Query("SELECT d FROM Doctor d " +
                         "JOIN d.specializations s " +
@@ -43,5 +35,7 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
                         "AND s.isActive = true " +
                         "AND u.state = true")
         List<Doctor> findByName(@Param("name") String name);
+
+        List<Doctor> findAll();
 
 }

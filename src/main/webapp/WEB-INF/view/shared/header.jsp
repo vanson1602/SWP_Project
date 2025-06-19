@@ -1,22 +1,21 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-        <!-- Header -->
+
         <header class="header">
             <div class="container">
                 <nav class="nav">
-                    <!-- Logo -->
+                
                     <a href="/" class="logo">
                         <div class="logo-icon">⚕️</div>
                         HealthCare+
                     </a>
 
-                    <!-- Mobile Menu Button -->
                     <button class="mobile-menu-btn" id="mobileMenuBtn">
                         <i class="bi bi-list"></i>
                     </button>
 
-                    <!-- Navigation Links -->
+                   
                     <ul class="nav-links" id="navLinks">
                         <li><a href="/" class="active"><i class="bi bi-house-door"></i> Trang chủ</a></li>
                         <li><a href="/doctors"><i class="bi bi-person-badge"></i> Bác sĩ</a></li>
@@ -24,7 +23,7 @@
                         <li><a href="/appointments"><i class="bi bi-calendar-check"></i> Lịch hẹn</a></li>
                     </ul>
 
-                    <!-- User Menu -->
+                   
                     <div class="user-menu">
                         <c:choose>
                             <c:when test="${not empty sessionScope.currentUser}">
@@ -62,10 +61,10 @@
             </div>
         </header>
 
-        <!-- Header Scripts -->
+
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // Mobile menu handling
+       
                 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
                 const navLinks = document.getElementById('navLinks');
 
@@ -81,7 +80,7 @@
                     }
                 });
 
-                // Profile dropdown handling
+
                 const profileBtn = document.getElementById('profileDropdownBtn');
                 const profileDropdown = document.getElementById('profileDropdown');
 
@@ -91,7 +90,7 @@
                         profileDropdown.classList.toggle('show');
                     });
 
-                    // Close dropdown when clicking outside
+                   
                     document.addEventListener('click', function (e) {
                         if (!profileDropdown.contains(e.target) && !profileBtn.contains(e.target)) {
                             profileDropdown.classList.remove('show');
@@ -99,7 +98,7 @@
                     });
                 }
 
-                // Close mobile menu when clicking outside
+               
                 document.addEventListener('click', function (e) {
                     if (!e.target.closest('.nav-links') &&
                         !e.target.closest('.mobile-menu-btn') &&

@@ -78,10 +78,10 @@
         </head>
 
         <body>
-            <!-- Include Header -->
+         
             <jsp:include page="../shared/header.jsp" />
 
-            <!-- Search Section -->
+          
             <section class="search-section">
                 <div class="container">
                     <div class="search-tabs">
@@ -90,7 +90,6 @@
                             <a href="#" class="search-tab" data-tab="doctor">Tìm theo tên bác sĩ</a>
                         </div>
 
-                        <!-- Specialty Search Form -->
                         <form action="/search/specialties" method="GET" class="search-form" id="specialtyForm">
                             <div class="row g-3">
                                 <div class="col-md-9">
@@ -106,7 +105,7 @@
                             </div>
                         </form>
 
-                        <!-- Doctor Search Form -->
+               
                         <form action="/search/doctors" method="GET" class="search-form d-none" id="doctorForm">
                             <div class="row g-3">
                                 <div class="col-md-9">
@@ -125,7 +124,7 @@
                 </div>
             </section>
 
-            <!-- Results Section -->
+      
             <section class="py-5">
                 <div class="container">
                     <div class="row">
@@ -141,8 +140,9 @@
                                 </div>
                                 <c:forEach items="${doctors}" var="doctor">
                                     <div class="col-md-6 col-lg-4 mb-4">
-                                        <div class="card doctor-card h-100">
-                                            <div class="card-body">
+                                        <div class="card doctor-card h-100" style="cursor: pointer;">
+                                            <div class="card-body"
+                                                onclick="window.location.href='/search/doctors/details/${doctor.doctorID}'">
                                                 <div class="d-flex align-items-center mb-3">
                                                     <img src="${empty doctor.user.avatarUrl ? '/images/default-avatar.png' : doctor.user.avatarUrl}"
                                                         alt="BS. ${doctor.user.firstName} ${doctor.user.lastName}"
@@ -169,10 +169,16 @@
                                                         <i class="bi bi-cash me-2"></i>
                                                         Phí khám: ${doctor.consultationFee} VNĐ
                                                     </p>
-                                                    <a href="/doctors/${doctor.doctorID}"
-                                                        class="btn btn-outline-primary w-100">
-                                                        <i class="bi bi-calendar-check me-2"></i>Đặt lịch khám
-                                                    </a>
+                                                    <div class="d-flex gap-2" onclick="event.stopPropagation()">
+                                                        <a href="/search/doctors/details/${doctor.doctorID}"
+                                                            class="btn btn-outline-secondary flex-grow-1">
+                                                            <i class="bi bi-info-circle me-2"></i>Xem chi tiết
+                                                        </a>
+                                                        <a href="/search/doctors/${doctor.doctorID}"
+                                                            class="btn btn-outline-primary flex-grow-1">
+                                                            <i class="bi bi-calendar-check me-2"></i>Đặt lịch khám
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
