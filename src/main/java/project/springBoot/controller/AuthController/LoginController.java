@@ -1,4 +1,4 @@
-package project.springBoot.controller;
+package project.springBoot.controller.AuthController;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;

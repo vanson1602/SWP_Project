@@ -62,6 +62,26 @@
       </style>
     </head>
 
+      <body>
+        <!-- Include shared header -->
+        <jsp:include page="/WEB-INF/view/shared/header.jsp" />
+
+        <!-- Hero Section -->
+        <section class="text-center text-white py-5" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+          <div class="container">
+            <h1 class="fw-bold display-5">Chăm sóc sức khỏe thông minh</h1>
+            <p class="lead">Đặt lịch khám với các bác sĩ hàng đầu một cách nhanh chóng và tiện lợi</p>
+            <form class="row justify-content-center g-2 mt-4">
+              <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="Tìm bác sĩ, chuyên khoa">
+              </div>
+              <div class="col-md-3">
+                <input type="date" class="form-control">
+              </div>
+              <div class="col-auto">
+                <button class="btn btn-light text-primary fw-semibold">
+                  <i class="bi bi-search"></i> Tìm kiếm
+                </button>
     <body>
   
       <jsp:include page="../shared/header.jsp" />
@@ -111,6 +131,22 @@
       <!-- Hero Section -->
 
 
+        <!-- Dịch vụ nổi bật -->
+        <section class="py-5 bg-light">
+          <div class="container text-center">
+            <h2 class="fw-bold mb-5">Dịch vụ nổi bật</h2>
+            <div class="row g-4">
+              <div class="col-md-3 col-sm-6">
+                <div class="card h-100 shadow-sm border-0 p-3">
+                  <div
+                    class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center mx-auto mb-3"
+                    style="width: 60px; height: 60px;">
+                    <i class="bi bi-calendar-check fs-4"></i>
+                  </div>
+                  <h5 class="fw-semibold"><a href="/appointments">Đặt lịch khám</a></h5>
+                  <p class="text-muted small">Đặt lịch hẹn với bác sĩ chuyên khoa phù hợp</p>
+                </div>
+              </div>
       <!-- Dịch vụ nổi bật -->
       <section class="py-5 bg-light">
         <div class="container text-center">

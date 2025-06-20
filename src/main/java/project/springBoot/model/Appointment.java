@@ -25,6 +25,10 @@ public class Appointment {
     private Patient patient;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "doctorID")
+    private Doctor doctor;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "appointmentTypeID", nullable = false)
     private AppointmentType appointmentType;
 
@@ -52,8 +56,8 @@ public class Appointment {
     private List<Examination> examinations = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<DoctorBookingSlot> bookingSlots = new ArrayList<>();
+    @OneToOne(mappedBy = "appointment", fetch = FetchType.LAZY)
+    private DoctorBookingSlot bookingSlot;
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
