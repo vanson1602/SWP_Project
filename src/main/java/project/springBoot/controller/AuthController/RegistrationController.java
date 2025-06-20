@@ -1,4 +1,4 @@
-package project.springBoot.controller;
+package project.springBoot.controller.AuthController;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import project.springBoot.model.User;
+import project.springBoot.model.Patient;
 import project.springBoot.repository.UserRepository;
+import project.springBoot.repository.PatientRepository;
 import project.springBoot.service.EmailService;
 import project.springBoot.service.UserService;
 import project.springBoot.utils.JwtTokenUtil;
@@ -17,6 +19,9 @@ import project.springBoot.utils.JwtTokenUtil;
 public class RegistrationController {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PatientRepository patientRepository;
 
     @Autowired
     private UserService userService;
@@ -51,6 +56,10 @@ public class RegistrationController {
             user.setVerificationToken(verificationToken);
             user.setRole("patient");
             userRepository.save(user);
+            Patient patient = new Patient();
+            patient.setUser(user);
+            patientRepository.save(patient);
+
             emailService.sendVerificationEmail(user.getEmail(), verificationToken);
 
             redirectAttributes.addFlashAttribute("message",

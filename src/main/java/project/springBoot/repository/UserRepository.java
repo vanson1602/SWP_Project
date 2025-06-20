@@ -1,8 +1,10 @@
 package project.springBoot.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import project.springBoot.model.User;
 
@@ -16,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByEmailOrUsername(String email, String username);
 
-    User findByUsername(String username);
+    Optional<User> findByUsername(String username);
 
     User findByEmail(String email);
 
@@ -27,4 +29,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     void deleteById(Long id);
 
     User findByVerificationToken(String token);
+    
+  
+    
 }

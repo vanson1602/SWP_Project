@@ -1,8 +1,10 @@
 package project.springBoot.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import project.springBoot.model.User;
@@ -10,17 +12,17 @@ import project.springBoot.repository.UserRepository;
 
 @Service
 public class UserService {
-    private final UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    @Autowired
+    private UserRepository userRepository;
 
     public User handleSaveUser(User user) {
-        System.out.println("Saving new user: " + user.getEmail());
-        String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-        System.out.println("Generated password hash: " + hashed);
-        user.setPassword(hashed);
+        if (user.getUserID() == 0) {
+            // This is a new user
+            System.out.println("Saving new user: " + user.getEmail());
+            String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+            System.out.println("Generated password hash: " + hashed);
+            user.setPassword(hashed);
+        }
         return this.userRepository.save(user);
     }
 
@@ -28,8 +30,8 @@ public class UserService {
         return this.userRepository.findAll();
     }
 
-    public User getUserById(long id) {
-        return this.userRepository.findById(id);
+    public User getUserById(Long id) {
+        return this.userRepository.findById(id).orElse(null);
     }
 
     public User getUserByEmailOrUsername(String email, String username) {
@@ -37,9 +39,13 @@ public class UserService {
     }
 
     public User handleUpdateUser(User user) {
-        if (!isPasswordEncoded(user.getPassword())) {
-            String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-            user.setPassword(hashed);
+        User existingUser = userRepository.findById(user.getUserID());
+        if (existingUser != null) {
+            // Only hash the password if it's different from the existing one
+            if (!user.getPassword().equals(existingUser.getPassword()) && !isPasswordEncoded(user.getPassword())) {
+                String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+                user.setPassword(hashed);
+            }
         }
         return this.userRepository.save(user);
     }
@@ -74,11 +80,18 @@ public class UserService {
     }
 
     private boolean isPasswordEncoded(String password) {
-        return password != null && (password.startsWith("$2a$") || password.startsWith("$2b$")
-                || password.startsWith("$2y$"));
+        return password != null && password.startsWith("$2a$");
     }
 
     public User getUserByEmail(String email) {
         return this.userRepository.findByEmail(email);
+    }
+
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public User save(User user) {
+        return userRepository.save(user);
     }
 }

@@ -41,11 +41,13 @@
                 <div class="form-row">
                   <div class="form-group">
                     <label class="form-label">Tên đăng nhập</label>
-                    <form:input path="username" cssClass="form-input" placeholder="Nhập tên đăng nhập" />
+                    <form:input path="username" cssClass="form-input" placeholder="Nhập tên đăng nhập"
+                      aria-required="true" required="true" />
                   </div>
                   <div class="form-group">
                     <label class="form-label">Mật khẩu</label>
-                    <form:password path="password" cssClass="form-input" placeholder="Nhập mật khẩu" />
+                    <form:password path="password" cssClass="form-input" placeholder="Nhập mật khẩu"
+                      aria-required="true" required="true" />
                   </div>
                 </div>
 
@@ -71,15 +73,15 @@
                     <label class="form-label">Giới tính</label>
                     <div class="radio-group">
                       <label class="radio-option">
-                        <form:radiobutton path="gender" value="female" cssClass="radio-input" />
+                        <form:radiobutton path="gender" value="Female" cssClass="radio-input" />
                         <span>Nữ</span>
                       </label>
                       <label class="radio-option">
-                        <form:radiobutton path="gender" value="male" cssClass="radio-input" />
+                        <form:radiobutton path="gender" value="Male" cssClass="radio-input" />
                         <span>Nam</span>
                       </label>
                       <label class="radio-option">
-                        <form:radiobutton path="gender" value="other" cssClass="radio-input" />
+                        <form:radiobutton path="gender" value="Other" cssClass="radio-input" />
                         <span>Khác</span>
                       </label>
                     </div>
@@ -90,7 +92,8 @@
                 <div class="form-row">
                   <div class="form-group">
                     <label class="form-label">Email</label>
-                    <form:input path="email" type="email" cssClass="form-input" placeholder="Nhập email" />
+                    <form:input path="email" type="email" cssClass="form-input" placeholder="Nhập email"
+                      aria-required="true" required="true" />
                   </div>
                   <div class="form-group">
                     <label class="form-label">Số điện thoại</label>
