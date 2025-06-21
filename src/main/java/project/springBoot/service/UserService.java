@@ -18,6 +18,9 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private DoctorRepository doctorRepository;
+
     public User handleSaveUser(User user) {
         if (user.getUserID() == 0) {
             // This is a new user
@@ -83,6 +86,14 @@ public class UserService {
             System.out.println("Password match: " + passwordMatch);
 
             if (passwordMatch) {
+                // If this is a doctor, ensure they have a doctor record
+                if ("doctor".equalsIgnoreCase(user.getRole())) {
+                    Long doctorId = getDoctorIdByUserId(user.getUserID());
+                    if (doctorId == null) {
+                        System.out.println("Doctor record not found for user: " + user.getUserID());
+                        return null;
+                    }
+                }
                 return user;
             }
         }
@@ -105,4 +116,9 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public Long getDoctorIdByUserId(long userId) {
+        return doctorRepository.findByUserUserID(userId)
+                .map(Doctor::getDoctorID)
+                .orElse(null);
+    }
 }

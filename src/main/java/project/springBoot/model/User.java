@@ -1,12 +1,26 @@
 package project.springBoot.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -59,9 +73,10 @@ public class User {
 
     @Column(nullable = false)
     private Boolean state = true;
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Avatar> avatars = new ArrayList<>();
+
+    @Column(nullable = false)
+    private String avatarUrl = "/resources/images/defaultImg.jpg";
+
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -113,29 +128,6 @@ public class User {
                 + ", state=" + state + ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
 
-    public void addAvatar(Avatar avatar) {
-        avatars.add(avatar);
-        avatar.setUser(this);
-    }
-
-    public void removeAvatar(Avatar avatar) {
-        avatars.remove(avatar);
-        avatar.setUser(null);
-    }
-
-    @JsonIgnore
-    public Avatar getCurrentAvatar() {
-        if (avatars.isEmpty()) {
-            return null;
-        }
-        return avatars.get(avatars.size() - 1);
-    }
-
-    public String getAvatarUrl() {
-        Avatar currentAvatar = getCurrentAvatar();
-        return currentAvatar != null ? currentAvatar.getAvatarUrl() : null;
-    }
-
     public void setRole(String role) {
         if (role != null && (role.equals("admin") || role.equals("patient") || role.equals("doctor"))) {
             this.role = role;
@@ -144,4 +136,7 @@ public class User {
         }
     }
 
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
 }

@@ -73,7 +73,7 @@ public class AdminScheduleController {
     @GetMapping("/doctor/{doctorId}")
     public String getSchedulesByDoctor(@PathVariable int doctorId, Model model) {
         List<DoctorSchedule> schedules = doctorScheduleService.getSchedulesByDoctorId(doctorId);
-        Doctor doctor = doctorRepository.findById(doctorId).orElse(null);
+        Doctor doctor = doctorRepository.findByDoctorID(doctorId);
         model.addAttribute("schedules", schedules);
         model.addAttribute("doctor", doctor);
         return "admin/schedules/doctor_schedules";
