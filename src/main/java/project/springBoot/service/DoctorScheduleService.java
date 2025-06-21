@@ -22,7 +22,7 @@ public class DoctorScheduleService {
     }
 
     public DoctorSchedule updateSchedule(long scheduleID, DoctorSchedule updatedSchedule) {
-        Optional<DoctorSchedule> existingSchedule = doctorScheduleRepository.findById((int) scheduleID);
+        Optional<DoctorSchedule> existingSchedule = doctorScheduleRepository.findById((Long) scheduleID);
         if (existingSchedule.isPresent()) {
             DoctorSchedule schedule = existingSchedule.get();
             schedule.setWorkDate(updatedSchedule.getWorkDate());
@@ -42,15 +42,15 @@ public class DoctorScheduleService {
         return doctorScheduleRepository.findAll();
     }
 
-    public DoctorSchedule getScheduleById(int scheduleID) {
+    public DoctorSchedule getScheduleById(Long scheduleID) {
         return doctorScheduleRepository.findById(scheduleID).orElse(null);
     }
 
-    public void deleteSchedule(int id) {
+    public void deleteSchedule(Long id) {
         doctorScheduleRepository.deleteById(id);
     }
 
-    public List<DoctorSchedule> getSchedulesByDoctorId(int doctorId) {
+    public List<DoctorSchedule> getSchedulesByDoctorId(Long doctorId) {
         return doctorScheduleRepository.findByDoctorDoctorID(doctorId);
     }
 }

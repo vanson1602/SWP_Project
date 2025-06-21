@@ -43,14 +43,14 @@ public class AdminScheduleController {
     }
 
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable int id, Model model) {
+    public String showEditForm(@PathVariable long id, Model model) {
         DoctorSchedule schedule = doctorScheduleService.getScheduleById(id);
         model.addAttribute("schedule", schedule);
         return "admin/schedules/edit";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteSchedule(@PathVariable int id) {
+    public String deleteSchedule(@PathVariable long id) {
         doctorScheduleService.deleteSchedule(id);
         return "redirect:/admin/schedules/list";
     }
@@ -69,7 +69,7 @@ public class AdminScheduleController {
     }
 
     @GetMapping("/doctor/{doctorId}")
-    public String getSchedulesByDoctor(@PathVariable int doctorId, Model model) {
+    public String getSchedulesByDoctor(@PathVariable Long doctorId, Model model) {
         List<DoctorSchedule> schedules = doctorScheduleService.getSchedulesByDoctorId(doctorId);
         Doctor doctor = doctorRepository.findById(doctorId).orElse(null);
         model.addAttribute("schedules", schedules);

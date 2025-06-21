@@ -50,7 +50,7 @@
                     </div>
 
                     <div class="d-flex justify-content-between">
-                      <a href="${pageContext.request.contextPath}/api/admin/user" class="btn btn-secondary">Cancel</a>
+                      <a href="${pageContext.request.contextPath}/admin/user" class="btn btn-secondary">Cancel</a>
                       <button type="submit" class="btn btn-primary">Update</button>
                     </div>
                   </form:form>

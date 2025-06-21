@@ -1,12 +1,31 @@
 package project.springBoot.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.OptionalDouble;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -45,11 +64,15 @@ public class Doctor {
     @JsonIgnore
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
     @JoinTable(name = "tblDoctorSpecializations", joinColumns = @JoinColumn(name = "doctorID"), inverseJoinColumns = @JoinColumn(name = "specializationID"))
-    private List<Specialization> specializations = new ArrayList<>();
+    private Set<Specialization> specializations = new HashSet<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<DoctorSchedule> schedules = new ArrayList<>();
+    private Set<DoctorSchedule> schedules = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<Feedback> feedbacks = new HashSet<>();
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -63,5 +86,25 @@ public class Doctor {
                 ", doctorCode=" + doctorCode + ", licenseNumber=" + licenseNumber +
                 ", experienceYears=" + experienceYears + ", consultationFee=" + consultationFee +
                 ", qualification=" + qualification + ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
+    }
+
+    public Double getAverageRating() {
+        if (feedbacks == null || feedbacks.isEmpty()) {
+            return null;
+        }
+        OptionalDouble average = feedbacks.stream()
+                .filter(f -> f.getRating() != null && f.getIsApproved() != null && f.getIsApproved())
+                .mapToInt(Feedback::getRating)
+                .average();
+        return average.isPresent() ? average.getAsDouble() : null;
+    }
+
+    public int getTotalFeedback() {
+        if (feedbacks == null) {
+            return 0;
+        }
+        return (int) feedbacks.stream()
+                .filter(f -> f.getRating() != null && f.getIsApproved() != null && f.getIsApproved())
+                .count();
     }
 }

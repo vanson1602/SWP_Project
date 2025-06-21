@@ -71,15 +71,15 @@
                     <label class="form-label">Giới tính</label>
                     <div class="radio-group">
                       <label class="radio-option">
-                        <form:radiobutton path="gender" value="female" cssClass="radio-input" />
+                        <form:radiobutton path="gender" value="Female" cssClass="radio-input" />
                         <span>Nữ</span>
                       </label>
                       <label class="radio-option">
-                        <form:radiobutton path="gender" value="male" cssClass="radio-input" />
+                        <form:radiobutton path="gender" value="Male" cssClass="radio-input" />
                         <span>Nam</span>
                       </label>
                       <label class="radio-option">
-                        <form:radiobutton path="gender" value="other" cssClass="radio-input" />
+                        <form:radiobutton path="gender" value="Other" cssClass="radio-input" />
                         <span>Khác</span>
                       </label>
                     </div>

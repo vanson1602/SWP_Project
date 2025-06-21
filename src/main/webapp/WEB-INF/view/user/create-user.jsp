@@ -21,7 +21,7 @@
               <div class="card shadow-lg border-0 rounded-4 p-4">
                 <h3 class="mb-3 text-center text-primary"><i class="bi bi-person-plus me-2"></i>Create User</h3>
                 <hr />
-                <form:form method="post" action="/api/admin/create" modelAttribute="newUser">
+                <form:form method="post" action="/admin/create" modelAttribute="newUser">
                   <div class="mb-3">
                     <label class="form-label">Username</label>
                     <div class="input-group">

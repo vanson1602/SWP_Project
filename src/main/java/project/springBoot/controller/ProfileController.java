@@ -13,9 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
 import project.springBoot.model.User;
-import project.springBoot.model.Avatar;
 import project.springBoot.service.UserService;
-import project.springBoot.service.AvatarService;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
@@ -33,16 +31,14 @@ import java.time.LocalDateTime;
 public class ProfileController {
 
     private final UserService userService;
-    private final AvatarService avatarService;
 
     private static final String UPLOAD_DIR = "uploads/avatars/";
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
     private static final String[] ALLOWED_EXTENSIONS = { ".jpg", ".jpeg", ".png", ".gif" };
 
     @Autowired
-    public ProfileController(UserService userService, AvatarService avatarService) {
+    public ProfileController(UserService userService) {
         this.userService = userService;
-        this.avatarService = avatarService;
     }
 
     @RequestMapping("/profile")
@@ -51,8 +47,6 @@ public class ProfileController {
         if (user == null) {
             return "redirect:/login";
         }
-        Avatar avatar = user.getCurrentAvatar();
-        model.addAttribute("avatar", avatar);
         model.addAttribute("user", user);
         return "user/profile";
     }
@@ -83,7 +77,7 @@ public class ProfileController {
         user.setEmail(currentUser.getEmail());
         user.setRole(currentUser.getRole());
         user.setPassword(currentUser.getPassword());
-        user.setAvatars(currentUser.getAvatars());
+        user.setAvatarUrl(currentUser.getAvatarUrl());
         user.setVerificationToken(currentUser.getVerificationToken());
         user.setVerified(currentUser.isVerified());
         user.setResetToken(currentUser.getResetToken());
@@ -99,16 +93,7 @@ public class ProfileController {
             try {
                 String avatarUrl = handleAvatarUpload(file, user);
                 if (avatarUrl != null) {
-                    for (Avatar oldAvatar : currentUser.getAvatars()) {
-                        String oldPath = oldAvatar.getAvatarUrl().replace("/uploads/avatars/", UPLOAD_DIR);
-                        try {
-                            Files.deleteIfExists(Paths.get(oldPath));
-                            avatarService.delete(oldAvatar);
-                        } catch (IOException e) {
-                            log.error("Failed to delete old avatar file: " + oldPath, e);
-                        }
-                    }
-                    user.getAvatars().clear();
+                    user.setAvatarUrl(avatarUrl);
                 }
             } catch (IllegalArgumentException e) {
                 ra.addFlashAttribute("error", e.getMessage());
@@ -208,13 +193,7 @@ public class ProfileController {
             Path filePath = uploadPath.resolve(filename);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // Create new Avatar entity
-            Avatar avatar = new Avatar();
-            avatar.setUser(user);
-            avatar.setAvatarUrl("/uploads/avatars/" + filename);
-            avatarService.save(avatar);
-
-            return avatar.getAvatarUrl();
+            return "/uploads/avatars/" + filename;
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to store avatar file", e);

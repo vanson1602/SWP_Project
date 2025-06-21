@@ -35,19 +35,14 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
-import project.springBoot.model.Avatar;
-import project.springBoot.service.AvatarService;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Slf4j
 @Controller
-@RequestMapping("/api")
 public class UserController {
     private final UserService userService;
 
     @Autowired
-    private AvatarService avatarService;
-
     private static final String UPLOAD_DIR = "uploads/avatars/";
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
     private static final String[] ALLOWED_EXTENSIONS = { ".jpg", ".jpeg", ".png", ".gif" };
@@ -118,15 +113,7 @@ public class UserController {
             if (file != null && !file.isEmpty()) {
                 String avatarUrl = handleAvatarUpload(file, currentUser);
                 if (avatarUrl != null) {
-                    for (Avatar oldAvatar : currentUser.getAvatars()) {
-                        String oldPath = oldAvatar.getAvatarUrl().replace("/uploads/avatars/", UPLOAD_DIR);
-                        try {
-                            Files.deleteIfExists(Paths.get(oldPath));
-                            avatarService.delete(oldAvatar);
-                        } catch (IOException e) {
-                            log.error("Failed to delete old avatar file: " + oldPath, e);
-                        }
-                    }
+                    currentUser.setAvatarUrl(avatarUrl);
                 }
             }
 
@@ -175,12 +162,7 @@ public class UserController {
             Path filePath = uploadPath.resolve(filename);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            Avatar avatar = new Avatar();
-            avatar.setUser(user);
-            avatar.setAvatarUrl("/uploads/avatars/" + filename);
-            avatarService.save(avatar);
-
-            return avatar.getAvatarUrl();
+            return "/uploads/avatars/" + filename;
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to store avatar file", e);
