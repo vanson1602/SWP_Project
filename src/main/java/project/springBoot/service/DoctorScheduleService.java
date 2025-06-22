@@ -58,4 +58,27 @@ public class DoctorScheduleService {
         return doctorScheduleRepository.findByDoctorDoctorIDOrderByWorkDateAscStartTimeAsc(doctorId);
     }
 
+    public DoctorSchedule saveSchedule(DoctorSchedule schedule) {
+        if (schedule.getStatus() == null || schedule.getStatus().trim().isEmpty()) {
+            schedule.setStatus("Processing");
+        }
+        return doctorScheduleRepository.save(schedule);
+    }
+
+    public DoctorSchedule updateScheduleStatus(Long scheduleId, String status) {
+        DoctorSchedule schedule = doctorScheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new RuntimeException("Schedule not found with ID: " + scheduleId));
+        schedule.setStatus(status);
+        schedule.setModifiedAt(LocalDateTime.now());
+        return doctorScheduleRepository.save(schedule);
+    }
+
+    public List<DoctorSchedule> getPendingSchedules() {
+        return doctorScheduleRepository.findByStatus("Processing");
+    }
+
+    public List<DoctorSchedule> getSchedulesByDoctorSorted2(Long doctorId) {
+        return doctorScheduleRepository.findByDoctorIdAndStatus(doctorId, null);
+    }
+
 }

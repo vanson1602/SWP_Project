@@ -12,17 +12,22 @@ import java.util.List;
 
 @Repository
 public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, Long> {
-    List<DoctorSchedule> findByDoctorAndWorkDateBetweenOrderByWorkDateAsc(
-            Doctor doctor,
-            LocalDate startDate,
-            LocalDate endDate);
+        List<DoctorSchedule> findByDoctorAndWorkDateBetweenOrderByWorkDateAsc(
+                        Doctor doctor,
+                        LocalDate startDate,
+                        LocalDate endDate);
 
-    @Query("SELECT DISTINCT ds.doctor FROM DoctorSchedule ds " +
-            "WHERE ds.workDate = :date AND ds.status = 'Available'")
-    List<Doctor> findAvailableDoctorsForDate(@Param("date") LocalDate date);
+        @Query("SELECT DISTINCT ds.doctor FROM DoctorSchedule ds " +
+                        "WHERE ds.workDate = :date AND ds.status = 'Available'")
+        List<Doctor> findAvailableDoctorsForDate(@Param("date") LocalDate date);
 
-    List<DoctorSchedule> findByDoctorDoctorID(long doctorId);
+        List<DoctorSchedule> findByDoctorDoctorID(long doctorId);
 
-    List<DoctorSchedule> findByDoctorDoctorIDOrderByWorkDateAscStartTimeAsc(Long doctorId);
+        List<DoctorSchedule> findByDoctorDoctorIDOrderByWorkDateAscStartTimeAsc(Long doctorId);
+
+        List<DoctorSchedule> findByStatus(String status);
+
+        @Query("SELECT ds FROM DoctorSchedule ds WHERE ds.doctor.doctorID = :doctorId AND ds.status = :status")
+        List<DoctorSchedule> findByDoctorIdAndStatus(@Param("doctorId") Long doctorId, @Param("status") String status);
 
 }

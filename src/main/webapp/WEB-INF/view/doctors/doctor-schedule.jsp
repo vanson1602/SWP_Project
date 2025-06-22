@@ -7,11 +7,8 @@
             <meta charset="UTF-8">
             <title>Lịch làm việc</title>
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+            <link rel="stylesheet" href="/css/homepage.css">
             <style>
-                body {
-                    background: #f3f6f9;
-                }
-
                 .schedule-container {
                     margin-top: 50px;
                     background: white;
@@ -49,6 +46,72 @@
         </head>
 
         <body>
+
+            <!-- Header -->
+            <header class="header">
+                <div class="container">
+                    <nav class="nav">
+                        <!-- Logo -->
+                        <a href="<c:url value='/doctor/home' />" class="logo">
+                            <div class="logo-icon">⚕️</div>
+                            HealthCare+
+                        </a>
+
+                        <!-- Mobile Menu Button -->
+                        <button class="mobile-menu-btn" id="mobileMenuBtn">
+                            <i class="bi bi-list"></i>
+                        </button>
+
+                        <!-- Navigation Links -->
+                        <ul class="nav-links" id="navLinks">
+                            <li><a href="<c:url value='/doctor/home' />"><i class="bi bi-house-door"></i> Trang chủ</a>
+                            </li>
+                            <li><a href="/doctor/busy/schedule"><i class="bi bi-person-badge"></i> Gửi lịch
+                                    bận</a></li>
+                            <li><a href="/doctor/schedules"><i class="bi bi-clipboard2-pulse"></i> Xem lịch làm việc</a>
+                            </li>
+                            <li><a href="<c:url value='/doctor/appointments' />" class="active"><i
+                                        class="bi bi-calendar-check"></i> Lịch hẹn</a></li>
+                        </ul>
+
+                        <!-- User Menu -->
+                        <div class="user-menu">
+                            <c:choose>
+                                <c:when test="${not empty currentUser}">
+                                    <button class="notification-btn">
+                                        <i class="bi bi-bell"></i>
+                                        <span class="notification-badge">2</span>
+                                    </button>
+                                    <div class="dropdown">
+                                        <button class="profile-btn" id="profileDropdownBtn">
+                                            <i class="bi bi-person-circle"></i>
+                                            ${currentUser.firstName} ${currentUser.lastName}
+                                        </button>
+                                        <ul class="dropdown-menu" id="profileDropdown">
+                                            <li><a class="dropdown-item" href="/doctor/profile"><i
+                                                        class="bi bi-person"></i> Trang cá nhân</a></li>
+                                            <li><a class="dropdown-item" href="/doctor/settings"><i
+                                                        class="bi bi-gear"></i> Cài đặt</a></li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li><a class="dropdown-item" href="/doctor/logout"><i
+                                                        class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+                                        </ul>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <a href="<c:url value='/doctor' />" class="profile-btn">
+                                        <i class="bi bi-box-arrow-in-right"></i>
+                                        Đăng nhập
+                                    </a>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                    </nav>
+                </div>
+            </header>
+
             <div class="container schedule-container">
                 <h2 class="text-center">Lịch làm việc của tôi</h2>
                 <div class="table-responsive">

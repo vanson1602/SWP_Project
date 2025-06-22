@@ -34,7 +34,8 @@
                         <ul class="nav-links" id="navLinks">
                             <li><a href="<c:url value='/doctor/home' />"><i class="bi bi-house-door"></i> Trang chủ</a>
                             </li>
-                            <li><a href="/doctors"><i class="bi bi-person-badge"></i> Bác sĩ</a></li>
+                            <li><a href="/doctor/busy/schedule"><i class="bi bi-person-badge"></i> Gửi lịch
+                                    bận</a></li>
                             <li><a href="/doctor/schedules"><i class="bi bi-clipboard2-pulse"></i> Xem lịch làm việc</a>
                             </li>
                             <li><a href="<c:url value='/doctor/appointments' />" class="active"><i
