@@ -32,7 +32,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
         @Query("SELECT DISTINCT a FROM Appointment a " +
                         "LEFT JOIN FETCH a.patient p " +
                         "LEFT JOIN FETCH p.user pu " +
-                        "LEFT JOIN FETCH a.bookingSlots bs " +
+                        "LEFT JOIN FETCH a.bookingSlot bs " +
                         "LEFT JOIN FETCH bs.schedule s " +
                         "LEFT JOIN FETCH a.doctor d " +
                         "LEFT JOIN FETCH d.user du " +
@@ -40,4 +40,21 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                         "WHERE a.appointmentID = :id")
         Optional<Appointment> findByIdWithDetails(@Param("id") Long id);
         List<Appointment> findByDoctorDoctorID(long doctorId);
+
+        @Query("SELECT DISTINCT a FROM Appointment a " +
+               "LEFT JOIN FETCH a.patient p " +
+               "LEFT JOIN FETCH p.user pu " +
+               "LEFT JOIN FETCH a.bookingSlot bs " +
+               "LEFT JOIN FETCH bs.schedule s " +
+               "LEFT JOIN FETCH a.doctor d " +
+               "LEFT JOIN FETCH d.user du " +
+               "LEFT JOIN FETCH a.appointmentType at " +
+               "WHERE a.doctor.doctorID = :doctorId " +
+               "AND a.appointmentDate BETWEEN :startDate AND :endDate " +
+               "AND a.status NOT IN ('Completed', 'Cancelled', 'NoShow') " +
+               "ORDER BY a.appointmentDate")
+        List<Appointment> findByDoctorAndDateRangeAndNotCompleted(
+               @Param("doctorId") Long doctorId,
+               @Param("startDate") LocalDateTime startDate,
+               @Param("endDate") LocalDateTime endDate);
 }

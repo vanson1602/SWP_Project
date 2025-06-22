@@ -41,11 +41,13 @@
                 <div class="form-row">
                   <div class="form-group">
                     <label class="form-label">Tên đăng nhập</label>
-                    <form:input path="username" cssClass="form-input" placeholder="Nhập tên đăng nhập" />
+                    <form:input path="username" cssClass="form-input" placeholder="Nhập tên đăng nhập"
+                      aria-required="true" required="true" />
                   </div>
                   <div class="form-group">
                     <label class="form-label">Mật khẩu</label>
-                    <form:password path="password" cssClass="form-input" placeholder="Nhập mật khẩu" />
+                    <form:password path="password" cssClass="form-input" placeholder="Nhập mật khẩu"
+                      aria-required="true" required="true" />
                   </div>
                 </div>
 
@@ -90,7 +92,8 @@
                 <div class="form-row">
                   <div class="form-group">
                     <label class="form-label">Email</label>
-                    <form:input path="email" type="email" cssClass="form-input" placeholder="Nhập email" />
+                    <form:input path="email" type="email" cssClass="form-input" placeholder="Nhập email"
+                      aria-required="true" required="true" />
                   </div>
                   <div class="form-group">
                     <label class="form-label">Số điện thoại</label>

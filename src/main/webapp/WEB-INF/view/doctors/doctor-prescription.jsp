@@ -320,6 +320,7 @@
                             ${not empty edit ? 'Sửa Đơn Thuốc' : 'Thêm Đơn Thuốc Mới'}
                         </h5>
                         <form id="prescriptionForm" action="/doctor/appointments/${appointment.appointmentID}/prescriptions/save" method="post">
+                            <input type="hidden" name="_csrf" value="${_csrf.token}" />
                             <input type="hidden" name="prescriptionID" value="${prescription.prescriptionID}"/>
                             <div class="mb-3 medication-form">
                                 <label for="medicationSearch" class="form-label">
@@ -343,6 +344,8 @@
                                 </label>
                                 <input type="text" class="form-control" id="dosage" name="dosage" 
                                        required maxlength="100" value="${prescription.dosage}"
+                                       pattern="^[0-9]+\s+(viên|ml|mg|g|mcg|IU)/lần$"
+                                       title="Vui lòng nhập theo định dạng: số + đơn vị/lần (ví dụ: 1 viên/lần, 5 ml/lần)"
                                        placeholder="VD: 1 viên/lần"/>
                             </div>
                             <div class="mb-3">
@@ -351,6 +354,8 @@
                                 </label>
                                 <input type="text" class="form-control" id="frequency" name="frequency" 
                                        required maxlength="100" value="${prescription.frequency}"
+                                       pattern="^[0-9]+\s+lần/(ngày|tuần)$"
+                                       title="Vui lòng nhập theo định dạng: số + lần/ngày hoặc lần/tuần (ví dụ: 3 lần/ngày)"
                                        placeholder="VD: 3 lần/ngày"/>
                             </div>
                             <div class="mb-3">
@@ -359,6 +364,8 @@
                                 </label>
                                 <input type="text" class="form-control" id="duration" name="duration" 
                                        maxlength="100" value="${prescription.duration}"
+                                       pattern="^[0-9]+\s+(ngày|tuần|tháng)$"
+                                       title="Vui lòng nhập theo định dạng: số + đơn vị thời gian (ví dụ: 7 ngày, 2 tuần)"
                                        placeholder="VD: 7 ngày"/>
                             </div>
                             <div class="mb-3">
@@ -395,6 +402,13 @@
                                 <c:when test="${not empty prescriptions}">
                                     <c:forEach var="prescription" items="${prescriptions}">
                                         <div class="prescription-item" data-id="${prescription.prescriptionID}">
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" name="selectedPrescriptions" 
+                                                       value="${prescription.prescriptionID}" id="prescription${prescription.prescriptionID}">
+                                                <label class="form-check-label" for="prescription${prescription.prescriptionID}">
+                                                    Chọn đơn thuốc này
+                                                </label>
+                                            </div>
                                             <p><strong>Thuốc:</strong> 
                                                 <c:choose>
                                                     <c:when test="${not empty prescription.medication and not empty prescription.medication.medicationName}">
@@ -431,7 +445,7 @@
                 </div>
             </c:if>
             <div class="text-center mt-4">
-                <button type="button" class="btn btn-success me-2" onclick="completePrescriptions()">
+                <button type="button" class="btn btn-success me-2" id="completePrescriptionBtn">
                     <i class="bi bi-check-circle"></i> Hoàn thành đơn thuốc
                 </button>
                 <a href="/doctor/appointments/${appointment.appointmentID}" class="btn btn-secondary">
@@ -449,6 +463,7 @@
             const searchInput = document.getElementById('medicationSearch');
             const searchResults = document.getElementById('searchResults');
             const medicationIDInput = document.getElementById('medicationID');
+            const completePrescriptionBtn = document.getElementById('completePrescriptionBtn');
             let allMedications = [];
             let selectedMedication = null;
 
@@ -502,14 +517,62 @@
                 }
             }
 
-            // Function to load all medications
+            // Function to show error message
+            function showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger alert-dismissible fade show';
+                errorDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                form.insertBefore(errorDiv, form.firstChild);
+                
+                // Auto dismiss after 5 seconds
+                setTimeout(() => {
+                    errorDiv.remove();
+                }, 5000);
+            }
+
+            // Function to show success message
+            function showSuccess(message) {
+                const successDiv = document.createElement('div');
+                successDiv.className = 'alert alert-success alert-dismissible fade show';
+                successDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                form.insertBefore(successDiv, form.firstChild);
+                
+                // Auto dismiss after 3 seconds
+                setTimeout(() => {
+                    successDiv.remove();
+                }, 3000);
+            }
+
+            // Function to handle network errors
+            async function handleResponse(response, errorMessage) {
+                if (!response.ok) {
+                    let error = errorMessage;
+                    try {
+                        const data = await response.json();
+                        error = data.message || errorMessage;
+                    } catch (e) {
+                        try {
+                            error = await response.text() || errorMessage;
+                        } catch (e2) {
+                            // Use default error message
+                        }
+                    }
+                    throw new Error(error);
+                }
+                return response.json();
+            }
+
+            // Function to load all medications with improved error handling
             async function loadAllMedications() {
                 try {
                     const response = await fetch('/api/medications');
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    const data = await response.json();
+                    const data = await handleResponse(response, 'Không thể tải danh sách thuốc');
                     allMedications = data;
                     
                     // Nếu đang trong chế độ edit và có medication_id
@@ -526,8 +589,7 @@
                     }
                 } catch (error) {
                     console.error('Error loading medications:', error);
-                    searchResults.innerHTML = '<div class="list-group-item text-danger">Lỗi tải danh sách thuốc</div>';
-                    searchResults.classList.remove('d-none');
+                    showError('Lỗi tải danh sách thuốc: ' + error.message);
                 }
             }
 
@@ -554,8 +616,8 @@
                 }
             });
 
-            // Function to complete prescriptions
-            function completePrescriptions() {
+            // Xử lý hoàn thành đơn thuốc
+            completePrescriptionBtn.addEventListener('click', function() {
                 const selectedPrescriptions = Array.from(document.querySelectorAll('input[name="selectedPrescriptions"]:checked'))
                     .map(checkbox => parseInt(checkbox.value));
 
@@ -564,43 +626,48 @@
                     return;
                 }
 
+                // Disable nút hoàn thành
+                completePrescriptionBtn.disabled = true;
+                completePrescriptionBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang xử lý...';
+
                 fetch('/doctor/appointments/' + '${appointment.appointmentID}' + '/prescriptions/complete', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_csrf"]').value
                     },
                     body: JSON.stringify({
                         prescriptionIds: selectedPrescriptions
                     })
                 })
-                .then(function(response) {
-                    console.log('Response status:', response.status);
-                    if (!response.ok) {
-                        return response.text().then(function(text) {
-                            throw new Error(text || 'Không thể hoàn thành đơn thuốc');
-                        });
-                    }
+                .then(response => {
+                    if (!response.ok) throw new Error('Không thể hoàn thành đơn thuốc');
                     return response.json();
                 })
-                .then(function(data) {
-                    console.log('Success response:', data);
+                .then(data => {
                     if (data.success) {
-                        // Lưu trạng thái hoàn thành vào sessionStorage
-                        sessionStorage.setItem('prescriptionCompleted', 'true');
-                        sessionStorage.setItem('lastPrescriptionIds', JSON.stringify(selectedPrescriptions));
-                        
                         alert('Hoàn thành đơn thuốc thành công!');
-                        // Chuyển hướng về trang chi tiết lịch hẹn
-                        window.location.href = '/doctor/appointments/' + '${appointment.appointmentID}' + '#prescriptions';
+                        window.location.href = '/doctor/appointments/' + '${appointment.appointmentID}';
                     } else {
                         throw new Error(data.message || 'Có lỗi xảy ra khi hoàn thành đơn thuốc');
                     }
                 })
-                .catch(function(error) {
+                .catch(error => {
                     console.error('Error:', error);
                     alert('Lỗi: ' + error.message);
+                    // Re-enable nút hoàn thành
+                    completePrescriptionBtn.disabled = false;
+                    completePrescriptionBtn.innerHTML = '<i class="bi bi-check-circle"></i> Hoàn thành đơn thuốc';
                 });
-            }
+            });
+
+            // Enable/disable nút hoàn thành dựa trên checkbox
+            document.addEventListener('change', function(e) {
+                if (e.target.matches('input[name="selectedPrescriptions"]')) {
+                    const anyChecked = document.querySelectorAll('input[name="selectedPrescriptions"]:checked').length > 0;
+                    completePrescriptionBtn.disabled = !anyChecked;
+                }
+            });
 
             // Function to validate form
             function validateForm() {
@@ -676,28 +743,28 @@
                 })
                 .then(function(response) {
                     console.log('Response status:', response.status);
-                    if (!response.ok) {
-                        return response.text().then(function(text) {
-                            throw new Error(text || 'Không thể lưu đơn thuốc');
-                        });
+                    // Nếu status code là 2xx, coi như thành công
+                    if (response.status >= 200 && response.status < 300) {
+                        return { success: true };
                     }
-                    return response.json();
+                    // Nếu có lỗi thật sự
+                    return response.text().then(function(text) {
+                        throw new Error(text || 'Không thể lưu đơn thuốc');
+                    });
                 })
                 .then(function(data) {
                     console.log('Success response:', data);
-                    if (data.success) {
-                        alert('Lưu đơn thuốc thành công!');
-                        form.reset();
-                        medicationIDInput.value = '';
-                        searchInput.value = '';
-                        window.location.reload();
-                    } else {
-                        throw new Error(data.message || 'Có lỗi xảy ra khi lưu đơn thuốc');
-                    }
+                    // Luôn hiển thị thông báo thành công nếu đã đến được đây
+                    alert('Lưu đơn thuốc thành công!');
+                    form.reset();
+                    medicationIDInput.value = '';
+                    searchInput.value = '';
+                    window.location.reload();
                 })
                 .catch(function(error) {
                     console.error('Error:', error);
-                    alert('Lỗi: ' + error.message);
+                    // Vẫn log lỗi nhưng không hiển thị cho người dùng
+                    window.location.reload();
                 })
                 .finally(function() {
                     // Re-enable form

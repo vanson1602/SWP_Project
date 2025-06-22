@@ -380,9 +380,22 @@
     <div class="exam-form-container">
         <div class="container">
             <div class="exam-form-card">
-                <h2 class="form-title">Tạo Hồ sơ Khám bệnh</h2>
+                <h2 class="form-title">
+                    <c:choose>
+                        <c:when test="${not empty examination.examinationID}">
+                            Sửa Hồ sơ Khám bệnh
+                        </c:when>
+                        <c:otherwise>
+                            Tạo Hồ sơ Khám bệnh
+                        </c:otherwise>
+                    </c:choose>
+                </h2>
                 
                 <form:form modelAttribute="examination" method="post" action="${pageContext.request.contextPath}/doctor/appointments/${appointmentId}/examination/save">
+                    <!-- Add hidden field for examinationID when editing -->
+                    <c:if test="${not empty examination.examinationID}">
+                        <form:hidden path="examinationID"/>
+                    </c:if>
                     <!-- Ngày khám -->
                     <div class="form-group">
                         <label for="examinationDate" class="form-label">
@@ -576,7 +589,14 @@
                     <div class="btn-group">
                         <button type="submit" class="btn-save">
                             <i class="bi bi-check-circle"></i>
-                            Lưu Hồ sơ
+                            <c:choose>
+                                <c:when test="${not empty examination.examinationID}">
+                                    Cập nhật Hồ sơ
+                                </c:when>
+                                <c:otherwise>
+                                    Lưu Hồ sơ
+                                </c:otherwise>
+                            </c:choose>
                         </button>
                         <a href="<c:url value='/doctor/appointments/${appointmentId}' />" class="btn-cancel">
                             <i class="bi bi-x-circle"></i>

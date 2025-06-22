@@ -1,5 +1,7 @@
 package project.springBoot.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -13,10 +15,16 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequiredArgsConstructor
 @RequestMapping("/notifications")
 public class NotificationController {
     private final NotificationService notificationService;
+    private final ObjectMapper objectMapper;
+
+    public NotificationController(NotificationService notificationService, ObjectMapper objectMapper) {
+        this.notificationService = notificationService;
+        this.objectMapper = objectMapper;
+        this.objectMapper.registerModule(new JavaTimeModule());
+    }
 
     @GetMapping("/unread-count")
     @ResponseBody
@@ -39,6 +47,13 @@ public class NotificationController {
         }
 
         List<Notification> notifications = notificationService.getRecentNotifications(currentUser.getUserID());
+
+        try {
+            System.out.println("Debug - Notifications JSON: " + objectMapper.writeValueAsString(notifications));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return ResponseEntity.ok(notifications);
     }
 

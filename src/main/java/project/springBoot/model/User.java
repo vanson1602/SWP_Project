@@ -3,6 +3,8 @@ package project.springBoot.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -47,6 +49,7 @@ public class User {
     private String lastName;
     @Column(nullable = false)
     private String role = "patient";
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dob;
     @Column(length = 10)
     private String gender;

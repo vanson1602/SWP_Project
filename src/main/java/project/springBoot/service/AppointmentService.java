@@ -6,15 +6,16 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import project.springBoot.model.Appointment;
+import project.springBoot.model.AppointmentType;
 
 @Service
 public interface AppointmentService {
-    // Appointment createAppointment(Long patientId, Long slotId, Long specializationId,
-    //         Long appointmentTypeId, String notes);
+    Appointment createAppointment(Long patientId, Long slotId, Long specializationId,
+            Long appointmentTypeId, String notes);
 
-    // Appointment updateAppointmentStatus(Long appointmentId, String status, String notes);
+    Appointment updateAppointmentStatus(Long appointmentId, String status, String notes);
 
-    // void cancelAppointment(Long appointmentId, String reason);
+    void cancelAppointment(Long appointmentId, String reason);
 
     Appointment getAppointmentById(Long appointmentId);
 
@@ -26,9 +27,9 @@ public interface AppointmentService {
 
     boolean canBookAppointment(Long patientId, Long doctorId, LocalDateTime appointmentDate);
 
-    // List<AppointmentType> getAllAppointmentTypes();
+    List<AppointmentType> getAllAppointmentTypes();
 
-    // AppointmentType getAppointmentTypeById(Long appointmentTypeId);
+    AppointmentType getAppointmentTypeById(Long appointmentTypeId);
 
     List<Appointment> findByPatientPatientIDOrderByAppointmentDateDesc(Long patientId);
 

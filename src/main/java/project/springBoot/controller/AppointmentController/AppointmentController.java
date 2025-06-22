@@ -10,14 +10,20 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import project.springBoot.model.Appointment;
+import project.springBoot.model.AppointmentType;
 import project.springBoot.model.Doctor;
 import project.springBoot.model.DoctorBookingSlot;
+import project.springBoot.model.Patient;
 import project.springBoot.model.Specialization;
+import project.springBoot.model.User;
 import project.springBoot.service.AppointmentService;
 import project.springBoot.service.DoctorService;
 import project.springBoot.service.SpecializationService;
@@ -90,134 +96,195 @@ public class AppointmentController {
         return "appointment/time-selection";
     }
 
-    // @GetMapping("/info")
-    // public String showPatientInfo(
-    //         @RequestParam Long slotId,
-    //         HttpSession session,
-    //         Model model) {
-    //     DoctorBookingSlot slot = doctorService.getSlotById(slotId);
-    //     User user = (User) session.getAttribute("currentUser");
-    //     Patient patient = doctorService.getPatientByUsername(user.getUsername());
-    //     Specialization specialization = (Specialization) session.getAttribute("selectedSpecialization");
-    //     List<AppointmentType> appointmentTypes = appointmentService.getAllAppointmentTypes();
+    @GetMapping("/info")
+    public String showPatientInfo(
+            @RequestParam Long slotId,
+            HttpSession session,
+            Model model) {
+        User user = (User) session.getAttribute("currentUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+        
+        try {
+            DoctorBookingSlot slot = doctorService.getSlotById(slotId);
+            Patient patient = doctorService.getPatientByUsername(user.getUsername());
+            Specialization specialization = (Specialization) session.getAttribute("selectedSpecialization");
+            
+            if (specialization == null) {
+                return "redirect:/appointments/specialty";
+            }
+            
+            List<AppointmentType> appointmentTypes = appointmentService.getAllAppointmentTypes();
 
-    //     model.addAttribute("slot", slot);
-    //     model.addAttribute("patient", patient);
-    //     model.addAttribute("specialization", specialization);
-    //     model.addAttribute("appointmentTypes", appointmentTypes);
+            model.addAttribute("slot", slot);
+            model.addAttribute("patient", patient);
+            model.addAttribute("specialization", specialization);
+            model.addAttribute("appointmentTypes", appointmentTypes);
 
-    //     return "appointment/patient-info";
-    // }
+            return "appointment/patient-info";
+        } catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            return "appointment/error";
+        }
+    }
 
-    // @PostMapping("/payment")
-    // public String confirmAppointment(
-    //         @RequestParam Long slotId,
-    //         @RequestParam(required = false) String notes,
-    //         @RequestParam Long appointmentTypeId,
-    //         HttpSession session,
-    //         Model model) {
-    //     try {
-    //         User user = (User) session.getAttribute("currentUser");
-    //         Patient patient = doctorService.getPatientByUsername(user.getUsername());
-    //         Specialization specialization = (Specialization) session.getAttribute("selectedSpecialization");
+    @PostMapping("/payment")
+    public String confirmAppointment(
+            @RequestParam Long slotId,
+            @RequestParam(required = false) String notes,
+            @RequestParam Long appointmentTypeId,
+            HttpSession session,
+            Model model) {
+        try {
+            User user = (User) session.getAttribute("currentUser");
+            Patient patient = doctorService.getPatientByUsername(user.getUsername());
+            Specialization specialization = (Specialization) session.getAttribute("selectedSpecialization");
 
-    //         DoctorBookingSlot slot = doctorService.getSlotById(slotId);
-    //         System.out.println("Slot:" + slot);
-    //         System.out.println("Slot id:" + slotId);
-    //         System.out.println("Specialization ID: " + specialization.getSpecializationID());
-    //         System.out.println("Patient ID: " + patient.getPatientID());
-    //         System.out.println("Appointment Type ID: " + appointmentTypeId);
-    //         System.out.println("Notes: " + notes);
+            DoctorBookingSlot slot = doctorService.getSlotById(slotId);
+            System.out.println("Slot:" + slot);
+            System.out.println("Slot id:" + slotId);
+            System.out.println("Specialization ID: " + specialization.getSpecializationID());
+            System.out.println("Patient ID: " + patient.getPatientID());
+            System.out.println("Appointment Type ID: " + appointmentTypeId);
+            System.out.println("Notes: " + notes);
 
-    //         Appointment appointment = appointmentService.createAppointment(
-    //                 patient.getPatientID(), slotId, specialization.getSpecializationID(),
-    //                 appointmentTypeId, notes);
+            Appointment appointment = appointmentService.createAppointment(
+                    patient.getPatientID(), slotId, specialization.getSpecializationID(),
+                    appointmentTypeId, notes);
 
-    //         model.addAttribute("appointment", appointment);
-    //         session.setAttribute("pendingAppointment", appointment);
-    //         return "redirect:/appointments/payment";
-    //     } catch (RuntimeException e) {
-    //         model.addAttribute("error", e.getMessage());
-    //         System.out.println("Error: " + e.getMessage());
-    //         return "appointment/error";
-    //     }
-    // }
+            model.addAttribute("appointment", appointment);
+            session.setAttribute("pendingAppointment", appointment);
+            return "redirect:/appointments/payment";
+        } catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            System.out.println("Error: " + e.getMessage());
+            return "appointment/error";
+        }
+    }
 
-    // @GetMapping("/payment")
-    // public String showPaymentPage(HttpSession session, Model model) {
-    //     Appointment appointment = (Appointment) session.getAttribute("pendingAppointment");
-    //     if (appointment == null) {
-    //         return "redirect:/appointments/booking";
-    //     }
-    //     appointment = appointmentService.getAppointmentByIdWithDetails(appointment.getAppointmentID());
-    //     model.addAttribute("appointment", appointment);
-    //     return "appointment/payment";
-    // }
+    @GetMapping("/payment")
+    public String showPaymentPage(@RequestParam(required = false) Long appointmentId, HttpSession session,
+            Model model) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
 
-    // @PostMapping("/process-payment")
-    // public String processPayment(
-    //         @RequestParam String paymentMethod,
-    //         @RequestParam Long appointmentId,
-    //         HttpSession session,
-    //         Model model) {
-    //     try {
-    //         Appointment appointment = appointmentService.getAppointmentById(appointmentId);
+        Appointment appointment;
 
-    //         // Xử lý thanh toán theo phương thức được chọn
-    //         boolean paymentSuccess = false;
-    //         switch (paymentMethod) {
-    //             case "momo":
-    //                 paymentSuccess = true; // Giả lập thanh toán thành công
-    //                 break;
-    //             case "vnpay":
-    //                 paymentSuccess = true; // Giả lập thanh toán thành công
-    //                 break;
-    //             case "banking":
-    //                 paymentSuccess = true; // Giả lập thanh toán thành công
-    //                 break;
-    //         }
+        if (appointmentId != null) {
+            try {
+                appointment = appointmentService.getAppointmentByIdWithDetails(appointmentId);
+                if (appointment == null) {
+                    return "redirect:/appointments/my-appointments?error=Appointment not found";
+                }
+                if (!appointment.getStatus().equals("Pending")) {
+                    return "redirect:/appointments/my-appointments?error=This appointment cannot be paid";
+                }
 
-    //         if (paymentSuccess) {
-    //             // Cập nhật trạng thái appointment thành CONFIRMED sau khi thanh toán thành công
-    //             appointmentService.updateAppointmentStatus(appointmentId, "Confirmed", "Payment completed");
-    //             session.removeAttribute("pendingAppointment");
-    //             return "redirect:/appointments/payment-success";
-    //         } else {
-    //             model.addAttribute("error", "Payment failed. Please try again.");
-    //             return "appointment/payment";
-    //         }
-    //     } catch (Exception e) {
-    //         model.addAttribute("error", e.getMessage());
-    //         return "appointment/payment";
-    //     }
-    // }
+                // Kiểm tra xem người dùng hiện tại có phải là chủ của appointment không
+                if (currentUser.getUserID() != appointment.getPatient().getUser().getUserID()) {
+                    return "redirect:/appointments/my-appointments?error=Unauthorized access";
+                }
 
-    // @GetMapping("/payment-success")
-    // public String showPaymentSuccess() {
-    //     return "appointment/payment-success";
-    // }
+                session.setAttribute("pendingAppointment", appointment);
+            } catch (Exception e) {
+                return "redirect:/appointments/my-appointments?error=" + e.getMessage();
+            }
+        } else {
+            // Nếu không có appointmentId, lấy từ session như cũ
+            appointment = (Appointment) session.getAttribute("pendingAppointment");
+            if (appointment == null) {
+                return "redirect:/appointments/booking";
+            }
+            try {
+                appointment = appointmentService.getAppointmentByIdWithDetails(appointment.getAppointmentID());
+                // Verify ownership again after fetching from database
+                if (currentUser.getUserID() != appointment.getPatient().getUser().getUserID()) {
+                    session.removeAttribute("pendingAppointment");
+                    return "redirect:/appointments/my-appointments?error=Unauthorized access";
+                }
+            } catch (Exception e) {
+                return "redirect:/appointments/booking?error=" + e.getMessage();
+            }
+        }
 
-    // @GetMapping("/my-appointments")
-    // public String showMyAppointments(HttpSession session, Model model) {
-    //     User user = (User) session.getAttribute("currentUser");
-    //     Patient patient = doctorService.getPatientByUsername(user.getUsername());
-    //     List<Appointment> appointments = appointmentService.getPatientAppointments(patient.getPatientID());
-    //     model.addAttribute("appointments", appointments);
-    //     return "appointment/my-appointments";
-    // }
+        model.addAttribute("appointment", appointment);
+        return "appointment/payment";
+    }
 
-    // @PostMapping("/{id}/cancel")
-    // public String cancelAppointment(
-    //         @PathVariable("id") Long appointmentId,
-    //         @RequestParam String reason,
-    //         Principal principal,
-    //         Model model) {
-    //     try {
-    //         appointmentService.cancelAppointment(appointmentId, reason);
-    //         return "redirect:/appointments/my-appointments?success=true";
-    //     } catch (RuntimeException e) {
-    //         model.addAttribute("error", e.getMessage());
-    //         return "redirect:/appointments/my-appointments?error=" + e.getMessage();
-    //     }
-    // }
+    @PostMapping("/process-payment")
+    public String processPayment(
+            @RequestParam String paymentMethod,
+            @RequestParam Long appointmentId,
+            HttpSession session,
+            Model model) {
+        try {
+            // Kiểm tra xem appointment có tồn tại và thuộc về người dùng hiện tại không
+            Appointment appointment = appointmentService.getAppointmentByIdWithDetails(appointmentId);
+            if (appointment == null) {
+                throw new RuntimeException("Appointment not found");
+            }
+
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null) {
+                return "redirect:/login";
+            }
+
+            // Cập nhật trạng thái appointment
+            appointment = appointmentService.updateAppointmentStatus(appointmentId, "Confirmed", null);
+            
+            // Lưu thông tin thanh toán vào session
+            session.setAttribute("paymentSuccess", true);
+            session.setAttribute("appointmentId", appointmentId);
+            session.setAttribute("paymentMethod", paymentMethod);
+
+            return "redirect:/appointments/payment-success";
+        } catch (Exception e) {
+            model.addAttribute("error", "Có lỗi xảy ra trong quá trình thanh toán: " + e.getMessage());
+            return "appointment/payment";
+        }
+    }
+
+    @GetMapping("/payment-success")
+    public String showPaymentSuccess(HttpSession session, Model model) {
+        Boolean paymentSuccess = (Boolean) session.getAttribute("paymentSuccess");
+        Long appointmentId = (Long) session.getAttribute("appointmentId");
+        
+        if (paymentSuccess == null || !paymentSuccess || appointmentId == null) {
+            return "redirect:/appointments/my-appointments";
+        }
+
+        // Clear payment session attributes
+        session.removeAttribute("paymentSuccess");
+        session.removeAttribute("appointmentId");
+        session.removeAttribute("paymentMethod");
+        
+        return "appointment/payment-success";
+    }
+
+    @GetMapping("/my-appointments")
+    public String showMyAppointments(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("currentUser");
+        Patient patient = doctorService.getPatientByUsername(user.getUsername());
+        List<Appointment> appointments = appointmentService.getPatientAppointments(patient.getPatientID());
+        model.addAttribute("appointments", appointments);
+        return "appointment/my-appointments";
+    }
+
+    @PostMapping("/{id}/cancel")
+    public String cancelAppointment(
+            @PathVariable("id") Long appointmentId,
+            @RequestParam String reason,
+            Principal principal,
+            Model model) {
+        try {
+            appointmentService.cancelAppointment(appointmentId, reason);
+            return "redirect:/appointments/my-appointments?success=true";
+        } catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            return "redirect:/appointments/my-appointments?error=" + e.getMessage();
+        }
+    }
 }

@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -73,40 +74,45 @@
         <div class="container">
             <h1 class="page-title">Lịch hẹn của bạn</h1>
             
-            <!-- Today's Bookings -->
+            <!-- Today's Appointments -->
             <h2 class="section-title">
                 <i class="bi bi-calendar-day"></i>
                 Lịch hẹn hôm nay
             </h2>
             <div class="appointment-cards">
                 <c:choose>
-                    <c:when test="${not empty bookingSlots}">
-                        <c:forEach var="slot" items="${bookingSlots}">
+                    <c:when test="${not empty todayBookingSlots}">
+                        <c:forEach var="slot" items="${todayBookingSlots}">
                             <div class="appointment-card">
                                 <div class="appointment-item">
                                     <div class="appointment-info">
                                         <div class="appointment-time">
                                             <i class="bi bi-clock"></i>
-                                            ${slot.startTime} - ${slot.endTime}
+                                            <fmt:parseDate value="${slot.startTime}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedStartTime" type="both"/>
+                                            <fmt:formatDate value="${parsedStartTime}" pattern="HH:mm" />
                                         </div>
-                                        <c:if test="${not empty slot.appointment.patient}">
+                                        <c:if test="${not empty slot.appointment}">
                                             <div class="appointment-patient">
                                                 <i class="bi bi-person"></i>
                                                 ${slot.appointment.patient.user.firstName} ${slot.appointment.patient.user.lastName}
                                             </div>
+                                            <div class="appointment-type">
+                                                <i class="bi bi-bookmark"></i>
+                                                ${slot.appointment.appointmentType.typeName}
+                                            </div>
                                         </c:if>
                                     </div>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <span class="status-badge ${slot.status == 'Available' ? 'status-available' : 'status-confirmed'}">
-                                            ${slot.status}
-                                        </span>
-                                        <c:if test="${not empty slot.appointment.patient}">
+                                    <c:if test="${not empty slot.appointment}">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <span class="status-badge ${slot.appointment.status == 'Pending' ? 'status-pending' : 'status-confirmed'}">
+                                                ${slot.appointment.status}
+                                            </span>
                                             <a href="<c:url value='/doctor/appointments/${slot.appointment.appointmentID}' />" 
                                                class="action-button view-btn">
                                                 <i class="bi bi-eye"></i> Xem chi tiết
                                             </a>
-                                        </c:if>
-                                    </div>
+                                        </div>
+                                    </c:if>
                                 </div>
                             </div>
                         </c:forEach>
@@ -114,42 +120,51 @@
                     <c:otherwise>
                         <div class="empty-state">
                             <i class="bi bi-calendar-x"></i>
-                            <p>Không có lịch hẹn nào trong ngày hôm nay</p>
+                            <p>Không có lịch hẹn nào hôm nay</p>
                         </div>
                     </c:otherwise>
                 </c:choose>
             </div>
 
-            <!-- Week's Appointments -->
+            <!-- Tomorrow's Appointments -->
             <h2 class="section-title">
-                <i class="bi bi-calendar-week"></i>
-                Lịch hẹn trong tuần
+                <i class="bi bi-calendar-day"></i>
+                Lịch hẹn ngày mai
             </h2>
             <div class="appointment-cards">
                 <c:choose>
-                    <c:when test="${not empty appointments}">
-                        <c:forEach var="appointment" items="${appointments}">
+                    <c:when test="${not empty tomorrowBookingSlots}">
+                        <c:forEach var="slot" items="${tomorrowBookingSlots}">
                             <div class="appointment-card">
                                 <div class="appointment-item">
                                     <div class="appointment-info">
                                         <div class="appointment-time">
-                                            <i class="bi bi-calendar2-date"></i>
-                                            ${appointment.appointmentDate}
+                                            <i class="bi bi-clock"></i>
+                                            <fmt:parseDate value="${slot.startTime}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedStartTime" type="both"/>
+                                            <fmt:formatDate value="${parsedStartTime}" pattern="HH:mm" />
                                         </div>
-                                        <div class="appointment-patient">
-                                            <i class="bi bi-hash"></i>
-                                            ${appointment.appointmentNumber}
+                                        <c:if test="${not empty slot.appointment}">
+                                            <div class="appointment-patient">
+                                                <i class="bi bi-person"></i>
+                                                ${slot.appointment.patient.user.firstName} ${slot.appointment.patient.user.lastName}
+                                            </div>
+                                            <div class="appointment-type">
+                                                <i class="bi bi-bookmark"></i>
+                                                ${slot.appointment.appointmentType.typeName}
+                                            </div>
+                                        </c:if>
+                                    </div>
+                                    <c:if test="${not empty slot.appointment}">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <span class="status-badge ${slot.appointment.status == 'Pending' ? 'status-pending' : 'status-confirmed'}">
+                                                ${slot.appointment.status}
+                                            </span>
+                                            <a href="<c:url value='/doctor/appointments/${slot.appointment.appointmentID}' />" 
+                                               class="action-button view-btn">
+                                                <i class="bi bi-eye"></i> Xem chi tiết
+                                            </a>
                                         </div>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <span class="status-badge ${appointment.status == 'Pending' ? 'status-pending' : 'status-confirmed'}">
-                                            ${appointment.status}
-                                        </span>
-                                        <a href="<c:url value='/doctor/appointments/${appointment.appointmentID}' />" 
-                                           class="action-button view-btn">
-                                            <i class="bi bi-eye"></i> Xem chi tiết
-                                        </a>
-                                    </div>
+                                    </c:if>
                                 </div>
                             </div>
                         </c:forEach>
@@ -157,7 +172,7 @@
                     <c:otherwise>
                         <div class="empty-state">
                             <i class="bi bi-calendar-x"></i>
-                            <p>Không có lịch hẹn nào trong tuần này</p>
+                            <p>Không có lịch hẹn nào ngày mai</p>
                         </div>
                     </c:otherwise>
                 </c:choose>

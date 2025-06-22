@@ -222,126 +222,119 @@
     }
 }
 
+/* Date Selector */
 .date-selector {
     display: flex;
-    gap: 12px;
+    gap: 1rem;
     margin-bottom: 2rem;
     overflow-x: auto;
-    padding: 4px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
-}
-
-.date-selector::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    padding-bottom: 1rem;
 }
 
 .date-option {
     min-width: 100px;
-    height: 90px;
+    padding: 1rem;
     border: 2px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
     cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: white;
     transition: all 0.3s ease;
-    -webkit-user-select: none;
-    user-select: none;
+    background: white;
 }
 
 .date-option:hover {
-    border-color: #4CAF50;
+    border-color: #667eea;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.15);
 }
 
 .date-option.selected {
-    background: linear-gradient(135deg, #4CAF50, #81C784);
-    border-color: transparent;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
 }
 
 .date-day {
-    font-weight: 600;
-    font-size: 1rem;
-    margin-bottom: 4px;
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.5rem;
 }
 
 .date-number {
-    font-size: 0.9rem;
-    opacity: 0.9;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
 }
 
+/* Time Slots */
 .time-slots {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 12px;
-    margin-top: 1.5rem;
-    margin-bottom: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
 }
 
 .time-slot {
-    background: white;
+    padding: 1rem;
     border: 2px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 12px;
+    border-radius: 10px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-weight: 500;
-    -webkit-user-select: none;
-    user-select: none;
+    background: white;
     position: relative;
 }
 
-.time-slot:hover:not(.unavailable) {
-    border-color: #4CAF50;
+.time-slot:not(.unavailable):hover {
+    border-color: #667eea;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.15);
 }
 
 .time-slot.selected {
-    background: linear-gradient(135deg, #4CAF50, #81C784);
-    border-color: transparent;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
 }
 
 .time-slot.unavailable {
-    background: #f5f5f5;
-    border-color: #e0e0e0;
-    color: #999;
-    cursor: not-allowed;
-    opacity: 0.8;
-}
-
-.time-slot.unavailable::after {
-    content: '✕';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 1.2rem;
-    color: #ff4757;
-    opacity: 0.5;
-}
-
-.no-slots-message {
-    text-align: center;
-    color: #666;
-    padding: 2rem;
     background: #f8f9fa;
-    border-radius: 12px;
-    margin: 1rem 0;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.time-range {
+    font-size: 1rem;
+    color: #333;
     font-weight: 500;
+}
+
+.booked-indicator {
+    font-size: 0.8rem;
+    color: #dc3545;
+    display: block;
+    margin-top: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .date-selector {
+        gap: 0.5rem;
+    }
+
+    .date-option {
+        min-width: 80px;
+        padding: 0.75rem;
+    }
+
+    .time-slots {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .time-slot {
+        padding: 0.75rem;
+    }
+
+    .time-range {
+        font-size: 0.9rem;
+    }
 }
 
 /* Navigation Buttons */

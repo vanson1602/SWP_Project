@@ -46,6 +46,43 @@
             right: 20px;
             z-index: 1050;
         }
+        
+        /* Thêm style cho bảng đơn thuốc */
+        .prescription-list {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .prescription-list .table {
+            margin-bottom: 0;
+        }
+        
+        .prescription-list .table th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .prescription-list .table td {
+            vertical-align: middle;
+            padding: 12px;
+        }
+        
+        .prescription-list .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .prescription-list .badge {
+            padding: 6px 10px;
+            font-weight: 500;
+        }
+        
+        .prescription-list small.text-muted {
+            font-size: 85%;
+        }
     </style>
 </head>
 <body>
@@ -300,9 +337,6 @@
                                             <div class="empty-state">
                                                 <i class="bi bi-clipboard-x"></i>
                                                 <p>Chưa có bệnh án cho lịch hẹn này.</p>
-                                                <a href="<c:url value='/doctor/appointments/${appointment.appointmentID}/examination/create' />" class="btn btn-primary mt-2">
-                                                    <i class="bi bi-plus-circle me-2"></i>Tạo bệnh án mới
-                                                </a>
                                             </div>
                                         </c:otherwise>
                                     </c:choose>
@@ -315,52 +349,56 @@
                                     <c:choose>
                                         <c:when test="${not empty examination}">
                                             <c:choose>
-                                                <c:when test="${not empty prescriptions}">
-                                                    <div class="completed-prescription mb-4">
-                                                        <h5 class="text-success mb-3">
-                                                            <i class="bi bi-check-circle-fill me-2"></i>
-                                                            Đơn thuốc đã hoàn thành
-                                                        </h5>
+                                                <c:when test="${not empty examination.prescriptions}">
+                                                    <div class="prescription-list">
                                                         <div class="table-responsive">
                                                             <table class="table table-hover">
                                                                 <thead class="table-light">
                                                                     <tr>
+                                                                        <th>STT</th>
                                                                         <th>Tên thuốc</th>
                                                                         <th>Số lượng</th>
                                                                         <th>Liều lượng</th>
                                                                         <th>Tần suất</th>
-                                                                        <th>Thời gian</th>
-                                                                        <th>Hướng dẫn</th>
+                                                                        <th>Thời gian dùng</th>
+                                                                        <th>Trạng thái</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
-                                                                    <c:forEach var="prescription" items="${prescriptions}">
+                                                                    <c:forEach var="prescription" items="${examination.prescriptions}" varStatus="status">
                                                                         <tr>
-                                                                            <td><strong>${prescription.medication.medicationName}</strong></td>
+                                                                            <td>${status.index + 1}</td>
+                                                                            <td>
+                                                                                <strong>${prescription.medication.medicationName}</strong>
+                                                                            </td>
                                                                             <td>${prescription.quantity}</td>
                                                                             <td>${prescription.dosage}</td>
                                                                             <td>${prescription.frequency}</td>
                                                                             <td>${prescription.duration}</td>
-                                                                            <td>${prescription.instructions}</td>
+                                                                            <td>
+                                                                                <c:choose>
+                                                                                    <c:when test="${prescription.status eq 'COMPLETED'}">
+                                                                                        <span class="badge bg-success">Đã hoàn thành</span>
+                                                                                    </c:when>
+                                                                                    <c:when test="${prescription.status eq 'PENDING'}">
+                                                                                        <span class="badge bg-warning">Chờ xử lý</span>
+                                                                                    </c:when>
+                                                                                    <c:otherwise>
+                                                                                        <span class="badge bg-secondary">${prescription.status}</span>
+                                                                                    </c:otherwise>
+                                                                                </c:choose>
+                                                                            </td>
                                                                         </tr>
                                                                     </c:forEach>
                                                                 </tbody>
                                                             </table>
                                                         </div>
                                                     </div>
-                                                    <div class="text-end mt-3">
-                                                <a href="/doctor/appointments/${appointment.appointmentID}/prescriptions" class="btn btn-primary">
-                                                    <i class="bi bi-plus-circle me-2"></i>Thêm đơn thuốc mới
-                                                </a>
-                                            </div>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <div class="empty-state">
                                                         <i class="bi bi-file-earmark-medical"></i>
                                                         <p>Chưa có đơn thuốc nào được tạo</p>
-                                                        <a href="/doctor/appointments/${appointment.appointmentID}/prescriptions" class="btn btn-primary mt-3">
-                                                            <i class="bi bi-plus-circle me-2"></i>Tạo đơn thuốc mới
-                                                        </a>
                                                     </div>
                                                 </c:otherwise>
                                             </c:choose>
@@ -453,14 +491,20 @@
 
                     <div class="action-card mt-4">
                         <div class="action-buttons d-flex justify-content-around mb-3 gap-2">
-                            <a href="<c:url value='/doctor/appointments/${appointment.appointmentID}/examination/create' />" class="btn-action btn-create">
-                                <i class="bi bi-file-earmark-medical"></i>
-                                Tạo Hồ sơ Khám bệnh
-                            </a>
-                            <!-- <a href="#" class="btn-action btn-prescription">
-                                <i class="bi bi-file-text"></i>
-                                Kê Đơn Thuốc
-                            </a> -->
+                            <c:choose>
+                                <c:when test="${not empty examination}">
+                                    <a href="<c:url value='/doctor/appointments/${appointment.appointmentID}/examination/edit' />" class="btn-action btn-create">
+                                        <i class="bi bi-pencil-square"></i>
+                                        Sửa Hồ sơ Khám bệnh
+                                    </a>
+                                </c:when>
+                                <c:otherwise>
+                                    <a href="<c:url value='/doctor/appointments/${appointment.appointmentID}/examination/create' />" class="btn-action btn-create">
+                                        <i class="bi bi-file-earmark-medical"></i>
+                                        Tạo Hồ sơ Khám bệnh
+                                    </a>
+                                </c:otherwise>
+                            </c:choose>
                             <a href="/doctor/appointments/${appointment.appointmentID}/prescriptions" class="btn-action btn-prescription">
                                 <i class="bi bi-file-text"></i>
                                 Kê Đơn Thuốc
@@ -555,7 +599,16 @@
                 selectedTab.content.classList.add('show', 'active');
 
                 // Handle content for each tab
-                if (targetTabId === 'prescription') {
+                if (targetTabId === 'examination') {
+                    var hasExamination = '${not empty examination}' === 'true';
+                    if (!hasExamination) {
+                        showEmptyState(
+                            selectedTab.content,
+                            'bi-file-earmark-x',
+                            'Chưa có bệnh án cho lịch hẹn này.'
+                        );
+                    }
+                } else if (targetTabId === 'prescription') {
                     var hasExamination = '${not empty examination}' === 'true';
                     if (!hasExamination) {
                         showEmptyState(
@@ -563,19 +616,6 @@
                             'bi-file-earmark-x',
                             'Vui lòng tạo bệnh án trước khi kê đơn thuốc'
                         );
-                    } else {
-                        selectedTab.content.innerHTML = 
-                            '<div class="prescription-content">' +
-                            '<div class="text-end mb-3">' +
-                            '<button class="btn btn-primary" onclick="addNewPrescription()">' +
-                            '<i class="bi bi-plus-circle me-2"></i>Thêm đơn thuốc mới' +
-                            '</button>' +
-                            '</div>' +
-                            '<div class="empty-state">' +
-                            '<i class="bi bi-file-earmark-medical"></i>' +
-                            '<p>Chưa có đơn thuốc nào được tạo</p>' +
-                            '</div>' +
-                            '</div>';
                     }
                 } else if (targetTabId === 'notification') {
                     selectedTab.content.innerHTML = 
@@ -703,11 +743,6 @@
             }, 3000);
         }
 
-        // Function to add new prescription (placeholder)
-        window.addNewPrescription = function() {
-            alert('Tính năng đang được phát triển');
-        };
-
         // Check if URL has #prescription hash
         if (window.location.hash === '#prescription') {
             // Get the prescription tab element
@@ -716,8 +751,8 @@
                 // Create a new bootstrap tab instance and show it
                 const tab = new bootstrap.Tab(prescriptionTab);
                 tab.show();
-    }
-}
+            }
+        }
     });
     </script>
 </body>

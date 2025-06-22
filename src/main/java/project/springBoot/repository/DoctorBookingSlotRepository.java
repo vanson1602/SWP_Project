@@ -28,6 +28,25 @@ public interface DoctorBookingSlotRepository extends JpaRepository<DoctorBooking
                         @Param("startTime") LocalDateTime startTime,
                         @Param("endTime") LocalDateTime endTime);
 
-        @Query("SELECT bs FROM DoctorBookingSlot bs WHERE bs.schedule.doctor.doctorID = :doctorId")
-    List<DoctorBookingSlot> findByScheduleDoctorDoctorID(@Param("doctorId") Long doctorId);           
+        @Query("SELECT bs FROM DoctorBookingSlot bs " +
+               "WHERE bs.schedule.doctor.doctorID = :doctorId " +
+               "AND bs.status = 'Available' " +
+               "ORDER BY bs.startTime")
+        List<DoctorBookingSlot> findByScheduleDoctorDoctorIDAndNotCompleted(
+               @Param("doctorId") Long doctorId);
+
+        @Query("SELECT DISTINCT bs FROM DoctorBookingSlot bs " +
+               "LEFT JOIN FETCH bs.schedule s " +
+               "LEFT JOIN FETCH s.doctor d " +
+               "LEFT JOIN FETCH bs.appointment a " +
+               "LEFT JOIN FETCH a.patient p " +
+               "LEFT JOIN FETCH p.user pu " +
+               "LEFT JOIN FETCH a.appointmentType at " +
+               "WHERE bs.schedule.doctor.doctorID = :doctorId " +
+               "AND bs.startTime BETWEEN :startTime AND :endTime " +
+               "ORDER BY bs.startTime")
+        List<DoctorBookingSlot> findByScheduleDoctorDoctorIDAndDateRange(
+               @Param("doctorId") Long doctorId,
+               @Param("startTime") LocalDateTime startTime,
+               @Param("endTime") LocalDateTime endTime);
 }

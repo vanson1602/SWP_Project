@@ -1,8 +1,21 @@
 package project.springBoot.model;
 
-import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -46,7 +59,7 @@ public class Feedback {
     private boolean isAnonymous = false;
 
     @Column(name = "is_approved")
-    private boolean isApproved = true;
+    private Boolean isApproved = true;
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

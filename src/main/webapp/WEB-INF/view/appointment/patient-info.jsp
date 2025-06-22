@@ -13,12 +13,13 @@
                             <meta charset="UTF-8">
                             <meta name="viewport" content="width=device-width, initial-scale=1.0">
                             <title>Thông tin bệnh nhân - HealthCare+</title>
-                            <link rel="stylesheet"
-                                href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-                            <link rel="stylesheet"
-                                href="${pageContext.request.contextPath}/resources/css/patient-info.css">
                             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
                                 rel="stylesheet">
+                            <link rel="stylesheet"
+                                href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+                            <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common.css">
+                            <link rel="stylesheet"
+                                href="${pageContext.request.contextPath}/resources/css/patient-info.css">
                         </head>
 
                         <body>
@@ -59,7 +60,7 @@
                                         </div>
 
                                         <!-- Patient Information Form -->
-                                        <h3 style="margin-bottom: 1.5rem; color: #333;">Xác nhận thông tin đặt khám</h3>
+                                        <h3 class="section-title">Xác nhận thông tin đặt khám</h3>
                                         <form action="${pageContext.request.contextPath}/appointments/payment"
                                             method="POST" id="patientInfoForm" novalidate>
                                             <input type="hidden" name="slotId" value="${slot.slotID}">
