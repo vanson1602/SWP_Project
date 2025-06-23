@@ -222,6 +222,21 @@
     }
 }
 
+/* Section Titles */
+.section-title {
+    margin-bottom: 1.5rem;
+    color: var(--dark-color);
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.section-subtitle {
+    margin-bottom: 1rem;
+    color: var(--dark-color);
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
 /* Date Selector */
 .date-selector {
     display: flex;
@@ -229,39 +244,60 @@
     margin-bottom: 2rem;
     overflow-x: auto;
     padding-bottom: 1rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--secondary-color) #f0f0f0;
+}
+
+.date-selector::-webkit-scrollbar {
+    height: 6px;
+}
+
+.date-selector::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 3px;
+}
+
+.date-selector::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 3px;
 }
 
 .date-option {
-    min-width: 100px;
+    min-width: 120px;
     padding: 1rem;
     border: 2px solid #e0e0e0;
-    border-radius: 10px;
+    border-radius: 12px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
     background: white;
+    flex-shrink: 0;
 }
 
 .date-option:hover {
-    border-color: #667eea;
+    border-color: var(--secondary-color);
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
 }
 
 .date-option.selected {
-    border-color: #667eea;
-    background: rgba(102, 126, 234, 0.05);
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
 }
 
 .date-day {
-    font-size: 0.9rem;
-    color: #666;
+    font-weight: 600;
     margin-bottom: 0.5rem;
+    font-size: 0.95rem;
 }
 
 .date-number {
     font-size: 1.1rem;
-    font-weight: 600;
-    color: #333;
+    font-weight: 500;
 }
 
 /* Time Slots */
@@ -269,58 +305,118 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 1rem;
-    margin: 1.5rem 0;
+    margin: 1.5rem 0 2rem;
 }
 
 .time-slot {
-    padding: 1rem;
+    background: white;
     border: 2px solid #e0e0e0;
-    border-radius: 10px;
+    border-radius: 12px;
+    padding: 1rem;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: white;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
 }
 
 .time-slot:not(.unavailable):hover {
-    border-color: #667eea;
+    border-color: var(--success-color);
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.15);
 }
 
 .time-slot.selected {
-    border-color: #667eea;
-    background: rgba(102, 126, 234, 0.05);
+    background: linear-gradient(135deg, var(--success-color), #81C784);
+    border-color: transparent;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.time-slot.selected .time-range {
+    color: white;
 }
 
 .time-slot.unavailable {
     background: #f8f9fa;
+    border-color: #e9ecef;
     cursor: not-allowed;
     opacity: 0.7;
 }
 
 .time-range {
     font-size: 1rem;
-    color: #333;
-    font-weight: 500;
+    font-weight: 600;
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.time-slot.unavailable .time-range {
+    color: var(--gray-color);
 }
 
 .booked-indicator {
-    font-size: 0.8rem;
-    color: #dc3545;
-    display: block;
-    margin-top: 0.5rem;
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    color: var(--danger-color);
+    font-size: 1.1rem;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .date-selector {
-        gap: 0.5rem;
+/* Navigation Buttons */
+.nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.nav-buttons .btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    min-width: 140px;
+    justify-content: center;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .time-slots {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     }
 
     .date-option {
-        min-width: 80px;
+        min-width: 110px;
+        padding: 0.875rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .date-selector {
+        gap: 0.75rem;
+    }
+
+    .date-option {
+        min-width: 100px;
         padding: 0.75rem;
+    }
+
+    .date-day {
+        font-size: 0.9rem;
+    }
+
+    .date-number {
+        font-size: 1rem;
     }
 
     .time-slots {
@@ -329,89 +425,41 @@
     }
 
     .time-slot {
+        padding: 0.875rem;
+        min-height: 70px;
+    }
+
+    .time-range {
+        font-size: 0.95rem;
+    }
+
+    .nav-buttons {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .nav-buttons .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .time-slots {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 0.5rem;
+    }
+
+    .time-slot {
         padding: 0.75rem;
+        min-height: 65px;
     }
 
     .time-range {
         font-size: 0.9rem;
     }
-}
-
-/* Navigation Buttons */
-.nav-buttons {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #e0e0e0;
-}
-
-.btn {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #4CAF50, #81C784);
-    color: white;
-    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
-}
-
-.btn-primary:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-.btn-secondary {
-    background: #f5f5f5;
-    color: #666;
-}
-
-.btn-secondary:hover {
-    background: #e0e0e0;
-    transform: translateY(-2px);
-}
-
-@media (max-width: 768px) {
-    .date-selector {
-        gap: 8px;
-        padding: 2px;
-    }
 
     .date-option {
         min-width: 90px;
-        height: 80px;
-        padding: 8px;
-    }
-
-    .time-slots {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        gap: 8px;
-    }
-
-    .time-slot {
-        padding: 10px;
-    }
-
-    .btn {
-        padding: 10px 20px;
-        font-size: 0.95rem;
+        padding: 0.625rem;
     }
 } 

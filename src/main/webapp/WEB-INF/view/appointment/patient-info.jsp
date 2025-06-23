@@ -12,232 +12,241 @@
                         <head>
                             <meta charset="UTF-8">
                             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <title>Thông tin bệnh nhân - HealthCare+</title>
-                            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-                                rel="stylesheet">
+                            <title>Xác nhận thông tin - HealthCare+</title>
                             <link rel="stylesheet"
                                 href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-                            <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common.css">
+                            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+                                rel="stylesheet">
+                            <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/base.css">
+                            <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/homepage.css">
                             <link rel="stylesheet"
                                 href="${pageContext.request.contextPath}/resources/css/patient-info.css">
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
                         </head>
 
                         <body>
-                            <!-- Include shared header -->
-                            <jsp:include page="/WEB-INF/view/shared/header.jsp" />
+                            <jsp:include page="../shared/header.jsp" />
 
                             <!-- Main Content -->
-                            <main class="main-content">
+                            <div class="main-content">
                                 <div class="container">
-                                    <div class="page-title">
-                                        <h1>Đặt lịch khám bệnh</h1>
-                                        <p>Vui lòng xác nhận thông tin đặt khám</p>
-                                    </div>
+                                    <!-- Breadcrumb -->
+                                    <nav aria-label="breadcrumb">
+                                        <ol class="breadcrumb">
+                                            <li class="breadcrumb-item"><a
+                                                    href="${pageContext.request.contextPath}/">Trang chủ</a></li>
+                                            <li class="breadcrumb-item"><a
+                                                    href="${pageContext.request.contextPath}/appointments">Quản lý lịch
+                                                    hẹn</a></li>
+                                            <li class="breadcrumb-item"><a
+                                                    href="${pageContext.request.contextPath}/appointments/booking">Đặt
+                                                    lịch hẹn</a></li>
+                                            <li class="breadcrumb-item"><a
+                                                    href="${pageContext.request.contextPath}/appointments/specialty">Chọn
+                                                    chuyên khoa</a></li>
+                                            <li class="breadcrumb-item"><a
+                                                    href="${pageContext.request.contextPath}/appointments/doctor?specializationId=${param.specializationId}">Chọn
+                                                    bác sĩ</a></li>
+                                            <li class="breadcrumb-item"><a
+                                                    href="${pageContext.request.contextPath}/appointments/time?doctorId=${param.doctorId}">Chọn
+                                                    thời gian</a></li>
+                                            <li class="breadcrumb-item active" aria-current="page">Xác nhận thông tin
+                                            </li>
+                                        </ol>
+                                    </nav>
 
-                                    <div class="content-container">
-                                        <!-- Progress Steps -->
-                                        <div class="progress-steps">
-                                            <div class="step completed">
-                                                <div class="step-number">1</div>
-                                                <span>Chuyên khoa</span>
-                                            </div>
-                                            <div class="step completed">
-                                                <div class="step-number">2</div>
-                                                <span>Bác sĩ</span>
-                                            </div>
-                                            <div class="step completed">
-                                                <div class="step-number">3</div>
-                                                <span>Thời gian</span>
-                                            </div>
-                                            <div class="step active">
-                                                <div class="step-number">4</div>
-                                                <span>Xác nhận</span>
-                                            </div>
-                                            <div class="step">
-                                                <div class="step-number">5</div>
-                                                <span>Thanh toán</span>
-                                            </div>
+                                    <div class="booking-container">
+                                        <div class="page-title text-center mb-5">
+                                            <h1 class="h2 mb-3">Đặt lịch khám bệnh</h1>
+                                            <p class="text-muted">Vui lòng kiểm tra thông tin và chọn loại khám</p>
                                         </div>
 
-                                        <!-- Patient Information Form -->
-                                        <h3 class="section-title">Xác nhận thông tin đặt khám</h3>
-                                        <form action="${pageContext.request.contextPath}/appointments/payment"
-                                            method="POST" id="patientInfoForm" novalidate>
-                                            <input type="hidden" name="slotId" value="${slot.slotID}">
-
-                                            <div class="info-section">
-                                                <h4>Thông tin bệnh nhân</h4>
-                                                <div class="form-row">
-                                                    <div class="form-group">
-                                                        <label>Họ và tên</label>
-                                                        <input type="text" class="form-control"
-                                                            value="${patient.user.firstName} ${patient.user.lastName}"
-                                                            readonly>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Số điện thoại</label>
-                                                        <input type="tel" class="form-control"
-                                                            value="${patient.user.phone}" readonly>
-                                                    </div>
+                                        <div class="content-container">
+                                            <!-- Progress Steps -->
+                                            <div class="progress-steps">
+                                                <div class="step completed">
+                                                    <div class="step-number">1</div>
+                                                    <span>Chuyên khoa</span>
                                                 </div>
-
-                                                <div class="form-row">
-                                                    <div class="form-group">
-                                                        <label>Ngày sinh</label>
-                                                        <input type="text" class="form-control"
-                                                            value="${patient.user.dob}" readonly>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Giới tính</label>
-                                                        <input type="text" class="form-control"
-                                                            value="${patient.user.gender == 'Male' ? 'Nam' : patient.user.gender == 'Female' ? 'Nữ' : 'Khác'}"
-                                                            readonly>
-                                                    </div>
+                                                <div class="step completed">
+                                                    <div class="step-number">2</div>
+                                                    <span>Bác sĩ</span>
                                                 </div>
-
-                                                <div class="form-group">
-                                                    <label>Địa chỉ</label>
-                                                    <input type="text" class="form-control"
-                                                        value="${patient.user.address}" readonly>
+                                                <div class="step completed">
+                                                    <div class="step-number">3</div>
+                                                    <span>Thời gian</span>
                                                 </div>
-
-                                                <div class="form-group">
-                                                    <label>BHYT</label>
-                                                    <input type="text" class="form-control"
-                                                        value="${patient.insuranceNumber}" readonly>
+                                                <div class="step active">
+                                                    <div class="step-number">4</div>
+                                                    <span>Xác nhận</span>
+                                                </div>
+                                                <div class="step">
+                                                    <div class="step-number">5</div>
+                                                    <span>Thanh toán</span>
                                                 </div>
                                             </div>
 
-                                            <!-- Thông tin lịch khám -->
-                                            <div class="info-section">
-                                                <h4>Thông tin lịch khám</h4>
-                                                <div class="form-row">
-                                                    <div class="form-group">
-                                                        <label>Chuyên khoa</label>
-                                                        <input type="text" class="form-control"
-                                                            value="${specialization.specializationName}" readonly>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Bác sĩ</label>
-                                                        <input type="text" class="form-control"
-                                                            value="BS. ${slot.schedule.doctor.user.firstName} ${slot.schedule.doctor.user.lastName}"
-                                                            readonly>
+                                            <!-- Error Alert -->
+                                            <c:if test="${not empty error}">
+                                                <div class="alert alert-danger alert-dismissible fade show"
+                                                    role="alert">
+                                                    ${error}
+                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                            </c:if>
+
+                                            <form id="appointmentForm"
+                                                action="${pageContext.request.contextPath}/appointments/payment"
+                                                method="POST" class="confirmation-form">
+                                                <input type="hidden" name="slotId" value="${slot.slotID}">
+
+                                                <!-- Thông tin bệnh nhân -->
+                                                <div class="info-section">
+                                                    <h4 class="section-title">
+                                                        <i class="bi bi-person-circle me-2"></i>
+                                                        Thông tin bệnh nhân
+                                                    </h4>
+                                                    <div class="info-content">
+                                                        <div class="info-row">
+                                                            <label>Họ và tên:</label>
+                                                            <span>${patient.user.firstName}
+                                                                ${patient.user.lastName}</span>
+                                                        </div>
+                                                        <div class="info-row">
+                                                            <label>Email:</label>
+                                                            <span>${patient.user.email}</span>
+                                                        </div>
+                                                        <div class="info-row">
+                                                            <label>Số điện thoại:</label>
+                                                            <span>${patient.user.phone}</span>
+                                                        </div>
+                                                        <div class="info-row">
+                                                            <label>Ngày sinh:</label>
+                                                            <span>
+                                                                <c:if test="${not empty patient.user.dob}">
+                                                                    ${patient.user.dob.format(dateFormatter)}
+                                                                </c:if>
+                                                                <c:if test="${empty patient.user.dob}">
+                                                                    Chưa cập nhật
+                                                                </c:if>
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
 
-                                                <div class="form-row">
-                                                    <div class="form-group">
-                                                        <label>Loại khám</label>
-                                                        <select name="appointmentTypeId" class="form-control" required>
-                                                            <option value="">-- Chọn loại khám --</option>
-                                                            <c:forEach items="${appointmentTypes}" var="type">
-                                                                <option value="${type.appointmentTypeID}">
-                                                                    ${type.typeName}</option>
-                                                            </c:forEach>
-                                                        </select>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Phí khám</label>
-                                                        <input type="text" class="form-control"
-                                                            value="${slot.schedule.doctor.consultationFee}đ" readonly>
+                                                <!-- Thông tin lịch hẹn -->
+                                                <div class="info-section mt-4">
+                                                    <h4 class="section-title">
+                                                        <i class="bi bi-calendar-check me-2"></i>
+                                                        Thông tin lịch hẹn
+                                                    </h4>
+                                                    <div class="info-content">
+                                                        <div class="info-row">
+                                                            <label>Bác sĩ:</label>
+                                                            <span>BS. ${slot.schedule.doctor.user.firstName}
+                                                                ${slot.schedule.doctor.user.lastName}</span>
+                                                        </div>
+                                                        <div class="info-row">
+                                                            <label>Chuyên khoa:</label>
+                                                            <span>${specialization.specializationName}</span>
+                                                        </div>
+                                                        <div class="info-row">
+                                                            <label>Ngày khám:</label>
+                                                            <span>${slot.startTime.format(dateFormatter)}</span>
+                                                        </div>
+                                                        <div class="info-row">
+                                                            <label>Giờ khám:</label>
+                                                            <span>${slot.startTime.format(timeFormatter)} →
+                                                                ${slot.startTime.plusHours(1).format(timeFormatter)}</span>
+                                                        </div>
+                                                        <div class="info-row">
+                                                            <label>Phí khám:</label>
+                                                            <span
+                                                                class="fee">${slot.schedule.doctor.consultationFee}đ</span>
+                                                        </div>
                                                     </div>
                                                 </div>
 
-                                                <div class="form-row">
-                                                    <div class="form-group">
-                                                        <label>Ngày khám</label>
-                                                        <input type="text" class="form-control"
-                                                            value="${slot.startTime.format(dateFormatter)}" readonly>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Giờ khám</label>
-                                                        <input type="text" class="form-control"
-                                                            value="${slot.startTime.format(timeFormatter)} → ${slot.startTime.plusHours(1).format(timeFormatter)}"
-                                                            readonly>
+                                                <!-- Chọn loại khám -->
+                                                <div class="info-section mt-4">
+                                                    <h4 class="section-title">
+                                                        <i class="bi bi-clipboard2-pulse me-2"></i>
+                                                        Chọn loại khám
+                                                    </h4>
+                                                    <div class="appointment-types">
+                                                        <c:forEach items="${appointmentTypes}" var="type">
+                                                            <div class="appointment-type-card"
+                                                                onclick="selectAppointmentType('${type.appointmentTypeID}', this)">
+                                                                <div class="type-header">
+                                                                    <h5>${type.typeName}</h5>
+                                                                    <div class="type-icon">
+                                                                        <i class="bi bi-check-circle"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <p class="type-description">${type.description}</p>
+                                                            </div>
+                                                        </c:forEach>
+                                                        <input type="hidden" name="appointmentTypeId"
+                                                            id="appointmentTypeId" required>
                                                     </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="form-group">
-                                                <label for="notes">Ghi chú</label>
-                                                <textarea id="notes" name="notes" class="form-control" rows="3"
-                                                    placeholder="Nhập triệu chứng hoặc ghi chú thêm (nếu có)"></textarea>
-                                            </div>
+                                                <!-- Ghi chú -->
+                                                <div class="info-section mt-4">
+                                                    <h4 class="section-title">
+                                                        <i class="bi bi-pencil-square me-2"></i>
+                                                        Ghi chú
+                                                    </h4>
+                                                    <div class="form-group">
+                                                        <textarea name="notes" class="form-control" rows="3"
+                                                            placeholder="Nhập ghi chú về tình trạng bệnh (nếu có)"></textarea>
+                                                    </div>
+                                                </div>
 
-                                            <!-- Navigation Buttons -->
-                                            <div class="nav-buttons">
-                                                <a href="${pageContext.request.contextPath}/appointments/time?doctorId=${slot.schedule.doctor.doctorID}&date=${slot.startTime.toLocalDate()}"
-                                                    class="btn btn-secondary">
-                                                    ← Quay lại
-                                                </a>
-                                                <button type="submit" class="btn btn-primary">
-                                                    Xác nhận và Thanh toán →
-                                                </button>
-                                            </div>
-                                        </form>
+                                                <!-- Navigation Buttons -->
+                                                <div class="nav-buttons mt-4">
+                                                    <a href="${pageContext.request.contextPath}/appointments/time?doctorId=${slot.schedule.doctor.doctorID}"
+                                                        class="btn btn-secondary">
+                                                        <i class="bi bi-arrow-left"></i> Quay lại
+                                                    </a>
+                                                    <button type="submit" class="btn btn-primary" id="continueBtn"
+                                                        disabled>
+                                                        Tiếp tục <i class="bi bi-arrow-right"></i>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
-                            </main>
+                            </div>
 
-                            <style>
-                                .info-section {
-                                    background: #f8f9fa;
-                                    border-radius: 8px;
-                                    padding: 1.5rem;
-                                    margin-bottom: 1.5rem;
-                                }
+                            <!-- Include shared footer -->
+                            <jsp:include page="/WEB-INF/view/shared/footer.jsp" />
 
-                                .info-section h4 {
-                                    color: #2c5282;
-                                    margin-bottom: 1.5rem;
-                                    font-size: 1.1rem;
-                                }
-
-                                .form-row {
-                                    display: grid;
-                                    grid-template-columns: 1fr 1fr;
-                                    gap: 1rem;
-                                    margin-bottom: 1rem;
-                                }
-
-                                .form-control[readonly] {
-                                    background-color: #fff;
-                                    opacity: 1;
-                                }
-                            </style>
-
-                            <!-- JavaScript for form validation -->
                             <script>
-                                document.addEventListener('DOMContentLoaded', function () {
-                                    const form = document.getElementById('patientInfoForm');
-
-                                    form.addEventListener('submit', function (event) {
-                                        event.preventDefault();
-
-                                        if (form.checkValidity()) {
-                                            form.submit();
-                                        } else {
-                                            event.stopPropagation();
-                                            const inputs = form.querySelectorAll('input, select');
-                                            inputs.forEach(input => {
-                                                if (!input.validity.valid) {
-                                                    input.classList.add('is-invalid');
-                                                } else {
-                                                    input.classList.remove('is-invalid');
-                                                }
-                                            });
-                                        }
+                                function selectAppointmentType(typeId, element) {
+                                    // Remove selected class from all cards
+                                    document.querySelectorAll('.appointment-type-card').forEach(card => {
+                                        card.classList.remove('selected');
                                     });
 
-                                    // Remove is-invalid class when user starts typing
-                                    const inputs = form.querySelectorAll('input, select');
-                                    inputs.forEach(input => {
-                                        input.addEventListener('input', function () {
-                                            if (this.validity.valid) {
-                                                this.classList.remove('is-invalid');
-                                            }
-                                        });
-                                    });
+                                    // Add selected class to clicked card
+                                    element.classList.add('selected');
+
+                                    // Update hidden input
+                                    document.getElementById('appointmentTypeId').value = typeId;
+
+                                    // Enable continue button
+                                    document.getElementById('continueBtn').disabled = false;
+                                }
+
+                                // Prevent form submission on Enter key
+                                document.getElementById('appointmentForm').addEventListener('keypress', function (e) {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        return false;
+                                    }
                                 });
                             </script>
                         </body>
