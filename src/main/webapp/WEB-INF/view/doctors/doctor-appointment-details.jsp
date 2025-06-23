@@ -548,28 +548,6 @@
             }
         };
 
-        // Function to show loading spinner
-        // function showLoading(container) {
-        //     var spinner = document.createElement('div');
-        //     spinner.className = 'loading-spinner';
-        //     spinner.innerHTML = 
-        //         '<div class="spinner-border text-primary" role="status">' +
-        //         '<span class="visually-hidden">Đang tải...</span>' +
-        //         '</div>' +
-        //         '<p class="mt-2 text-muted">Đang tải nội dung...</p>';
-        //     container.innerHTML = '';
-        //     container.appendChild(spinner);
-        //     spinner.style.display = 'block';
-        //     return spinner;
-        // }
-
-        // Function to hide loading spinner
-        // function hideLoading(spinner) {
-        //     if (spinner) {
-        //         spinner.style.display = 'none';
-        //     }
-        // }
-
         // Function to show empty state message
         function showEmptyState(container, icon, message) {
             var content = document.createElement('div');

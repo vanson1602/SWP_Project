@@ -227,6 +227,13 @@ public class DoctorController {
                 // Save the examination
                 examinationService.saveExamination(examination);
                 
+                // Update appointment status if examination is completed
+                if ("Completed".equals(examination.getStatus())) {
+                    appointment.setStatus("Completed");
+                    appointment.setModifiedAt(LocalDateTime.now());
+                    appointmentService.saveAppointment(appointment);
+                }
+                
                 // Redirect back to appointment details
                 return "redirect:/doctor/appointments/" + appointmentId;
             }

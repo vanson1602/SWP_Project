@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import jakarta.servlet.http.HttpSession;
+import project.springBoot.model.Patient;
 import project.springBoot.model.User;
+import project.springBoot.repository.PatientRepository;
 import project.springBoot.service.UserService;
 
 @Controller
@@ -31,9 +33,11 @@ public class LoginController {
     @Value("${google.client.secret}")
     private String clientSecret;
     private final UserService userService;
+    private final PatientRepository patientRepository;
 
-    public LoginController(UserService userService) {
+    public LoginController(UserService userService, PatientRepository patientRepository) {
         this.userService = userService;
+        this.patientRepository = patientRepository;
     }
 
     @GetMapping("/login")
@@ -94,6 +98,16 @@ public class LoginController {
                     }
                     return "redirect:/doctor/home";
                 } else {
+                    // Create patient record for existing user if needed
+                    if ("patient".equalsIgnoreCase(user.getRole())) {
+                        Patient patient = patientRepository.findByUser(user);
+                        if (patient == null) {
+                            patient = new Patient();
+                            patient.setUser(user);
+                            patient.setPatientCode("P" + String.format("%06d", user.getUserID()));
+                            patientRepository.save(patient);
+                        }
+                    }
                     return "redirect:/";
                 }
             } else {
@@ -164,6 +178,26 @@ public class LoginController {
                         user.setFirstName(name);
                         user.setRole("patient");
                         userService.handleSaveUser(user);
+                        
+                        // Create patient record if it doesn't exist
+                        Patient patient = patientRepository.findByUser(user);
+                        if (patient == null) {
+                            patient = new Patient();
+                            patient.setUser(user);
+                            patient.setPatientCode("P" + String.format("%06d", user.getUserID()));
+                            patientRepository.save(patient);
+                        }
+                    } else {
+                        // Create patient record for existing user if needed
+                        if ("patient".equalsIgnoreCase(user.getRole())) {
+                            Patient patient = patientRepository.findByUser(user);
+                            if (patient == null) {
+                                patient = new Patient();
+                                patient.setUser(user);
+                                patient.setPatientCode("P" + String.format("%06d", user.getUserID()));
+                                patientRepository.save(patient);
+                            }
+                        }
                     }
 
                     session.setAttribute("currentUser", user);
