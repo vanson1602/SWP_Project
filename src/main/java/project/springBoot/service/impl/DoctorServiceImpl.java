@@ -37,8 +37,20 @@ public class DoctorServiceImpl implements DoctorService {
     public List<DoctorBookingSlot> getAvailableSlots(Long doctorId, LocalDate date) {
         LocalDateTime startTime = date.atStartOfDay();
         LocalDateTime endTime = date.plusDays(1).atStartOfDay();
+        LocalDateTime currentTime = LocalDateTime.now();
 
-        return bookingSlotRepository.findAvailableSlotsByDoctorAndTimeRange(doctorId, startTime, endTime);
+        // Block any past slots that are still marked as available
+        List<DoctorBookingSlot> pastSlots = bookingSlotRepository.findPastAvailableSlots(currentTime);
+        for (DoctorBookingSlot slot : pastSlots) {
+            slot.setStatus("Blocked");
+            slot.setModifiedAt(LocalDateTime.now());
+            bookingSlotRepository.save(slot);
+        }
+
+        // Only return slots that are in the future
+        return bookingSlotRepository.findAvailableSlotsByDoctorAndTimeRange(doctorId,
+                currentTime.isAfter(startTime) ? currentTime : startTime,
+                endTime);
     }
 
     @Override

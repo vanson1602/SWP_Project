@@ -11,6 +11,7 @@ import project.springBoot.model.*;
 import project.springBoot.service.AppointmentService;
 import project.springBoot.service.DoctorService;
 import project.springBoot.service.EmailService;
+import project.springBoot.service.PatientService;
 import project.springBoot.service.SpecializationService;
 import vn.payos.PayOS;
 import vn.payos.type.CheckoutResponseData;
@@ -34,10 +35,22 @@ public class AppointmentController {
     private final SpecializationService specializationService;
     private final PayOS payOS;
     private final EmailService emailService;
+    private final PatientService patientService;
 
     @GetMapping("")
-    public String showAppointmentForm(Model model, Principal principal) {
-        // Hiển thị trang chính đặt lịch
+    public String showAppointmentForm(Model model, Principal principal, HttpSession session) {
+        User user = (User) session.getAttribute("currentUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        Patient patient = patientService.getPatientByUsername(user.getUsername());
+        if (patient == null) {
+            return "redirect:/login";
+        }
+
+        session.setAttribute("currentUser", user);
+        session.setAttribute("currentPatient", patient);
         return "appointment/appointment-page";
     }
 

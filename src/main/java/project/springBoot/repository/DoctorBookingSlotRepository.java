@@ -26,4 +26,12 @@ public interface DoctorBookingSlotRepository extends JpaRepository<DoctorBooking
                         @Param("doctorId") Long doctorId,
                         @Param("startTime") LocalDateTime startTime,
                         @Param("endTime") LocalDateTime endTime);
+
+        @Query("UPDATE DoctorBookingSlot bs SET bs.status = 'Blocked', bs.modifiedAt = CURRENT_TIMESTAMP " +
+                        "WHERE bs.status = 'Available' AND bs.startTime < :currentTime")
+        void blockPastSlots(@Param("currentTime") LocalDateTime currentTime);
+
+        @Query("SELECT bs FROM DoctorBookingSlot bs " +
+                        "WHERE bs.status = 'Available' AND bs.startTime < :currentTime")
+        List<DoctorBookingSlot> findPastAvailableSlots(@Param("currentTime") LocalDateTime currentTime);
 }
