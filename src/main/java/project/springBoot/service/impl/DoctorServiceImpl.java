@@ -9,10 +9,13 @@ import project.springBoot.model.Patient;
 import project.springBoot.repository.*;
 import project.springBoot.service.DoctorService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 import org.hibernate.Hibernate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @Transactional
@@ -22,6 +25,7 @@ public class DoctorServiceImpl implements DoctorService {
     private final DoctorBookingSlotRepository bookingSlotRepository;
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(DoctorServiceImpl.class);
 
     @Override
     public List<Doctor> getDoctorsBySpecialization(Long specializationId) {
@@ -98,5 +102,44 @@ public class DoctorServiceImpl implements DoctorService {
 
         // Save the doctor
         return doctorRepository.save(doctor);
+    }
+
+    private Set<String> parseSpecializations(String[] specializationNames) {
+        if (specializationNames == null || specializationNames.length == 0) {
+            return null;
+        }
+        return new HashSet<>(Arrays.asList(specializationNames));
+    }
+
+    @Override
+    public List<Doctor> findDoctorByName(String keyword, String[] specializationNames, Integer experienceYears,
+            BigDecimal consultationFee) {
+        logger.info("Searching doctors by name with parameters:");
+        logger.info("Keyword: {}", keyword);
+        logger.info("Specializations: {}", Arrays.toString(specializationNames));
+        logger.info("Experience Years: {}", experienceYears);
+        logger.info("Consultation Fee: {}", consultationFee);
+
+        Set<String> specializations = parseSpecializations(specializationNames);
+        List<Doctor> doctors = doctorRepository.findDoctorsAdvanced(keyword, specializations, experienceYears,
+                consultationFee);
+        logger.info("Found {} doctors", doctors.size());
+        return doctors;
+    }
+
+    @Override
+    public List<Doctor> findDoctorBySpecility(String keyword, String[] specializationNames, Integer experienceYears,
+            BigDecimal consultationFee) {
+        logger.info("Searching doctors by specialty with parameters:");
+        logger.info("Keyword: {}", keyword);
+        logger.info("Specializations: {}", Arrays.toString(specializationNames));
+        logger.info("Experience Years: {}", experienceYears);
+        logger.info("Consultation Fee: {}", consultationFee);
+
+        Set<String> specializations = parseSpecializations(specializationNames);
+        List<Doctor> doctors = doctorRepository.findDoctorsAdvanced(keyword, specializations, experienceYears,
+                consultationFee);
+        logger.info("Found {} doctors", doctors.size());
+        return doctors;
     }
 }

@@ -6,51 +6,67 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.ui.Model;
 import project.springBoot.model.Doctor;
-import project.springBoot.repository.DoctorRepository;
+
+import project.springBoot.service.DoctorService;
+
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Arrays;
 
 @Controller
 @RequestMapping("/search")
 public class SearchController {
 
     @Autowired
-    private DoctorRepository doctorRepository;
+    private DoctorService doctorService;
 
     @GetMapping("/specialties")
     public String searchDoctorsBySpec(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String[] specializationName,
+            @RequestParam(required = false) Integer experienceYears,
+            @RequestParam(required = false) BigDecimal consultationFee,
             Model model) {
 
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            String searchTerm = keyword.trim();
+        List<Doctor> doctorsBySpecialty = doctorService.findDoctorBySpecility(keyword, specializationName,
+                experienceYears, consultationFee);
 
-            List<Doctor> doctorsBySpecialty = doctorRepository.findBySpecializationName(searchTerm);
+        model.addAttribute("doctors", doctorsBySpecialty);
+        model.addAttribute("searchKeyword", keyword);
+        model.addAttribute("currentPath", "/search/specialties");
+        model.addAttribute("searchType", "specialty");
+        model.addAttribute("selectedSpecializations",
+                specializationName != null ? Arrays.asList(specializationName) : null);
 
-            model.addAttribute("doctors", doctorsBySpecialty);
-            model.addAttribute("searchKeyword", keyword);
-        }
         return "doctor/searchDoctors";
     }
 
     @GetMapping("/doctors")
     public String searchDoctorByName(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String[] specializationName,
+            @RequestParam(required = false) Integer experienceYears,
+            @RequestParam(required = false) BigDecimal consultationFee,
             Model model) {
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            String searchTerm = keyword.trim();
-            List<Doctor> doctorsByName = doctorRepository.findByName(searchTerm);
-            model.addAttribute("doctors", doctorsByName);
-            model.addAttribute("searchKeyword", keyword);
-        }
+
+        List<Doctor> doctorsByName = doctorService.findDoctorByName(keyword, specializationName, experienceYears,
+                consultationFee);
+        model.addAttribute("doctors", doctorsByName);
+        model.addAttribute("searchKeyword", keyword);
+        model.addAttribute("currentPath", "/search/doctors");
+        model.addAttribute("searchType", "doctor");
+        model.addAttribute("selectedSpecializations",
+                specializationName != null ? Arrays.asList(specializationName) : null);
+
         return "doctor/searchDoctors";
     }
 
     @GetMapping("/doctors/details/{id}")
     public String getDoctorDetails(@PathVariable Long id, Model model) {
-        Doctor doctor = doctorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+        Doctor doctor = doctorService.getDoctorById(id);
         model.addAttribute("doctor", doctor);
         return "doctor/detailsDoctors";
     }
