@@ -3,6 +3,7 @@ package project.springBoot.service;
 import project.springBoot.model.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface AppointmentService {
     Appointment createAppointment(Long patientId, Long slotId, Long specializationId,
@@ -29,4 +30,10 @@ public interface AppointmentService {
     List<Appointment> findByPatientPatientIDOrderByAppointmentDateDesc(Long patientId);
 
     void updatePaymentStatus(Long appointmentId, String status);
+
+    List<Appointment> findByPatientAndStatus(Long patientId, String status);
+
+    Page<Appointment> getAppointmentsByPatientId(long patientId, int page, int size);
+
+    Page<Appointment> getAppointmentsByPatientAndStatus(long patientId, String status, int page, int size);
 }

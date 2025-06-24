@@ -47,30 +47,30 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String handleLogin(@RequestParam String emailorusername,
+    public String handleLogin(@RequestParam String emailOrUsername,
             @RequestParam String password,
             HttpSession session,
             Model model) {
-        System.out.println("Login controller received request for: " + emailorusername);
+        System.out.println("Login controller received request for: " + emailOrUsername);
 
         try {
             // Kiểm tra user có tồn tại không
-            User user = userService.getUserByEmailOrUsername(emailorusername, emailorusername);
+            User user = userService.getUserByEmailOrUsername(emailOrUsername, emailOrUsername);
             if (user == null) {
                 model.addAttribute("error", "Tài khoản không tồn tại!");
-                model.addAttribute("emailorusername", emailorusername);
+                model.addAttribute("emailorusername", emailOrUsername);
                 return "authentication/form-login";
             }
 
             // Kiểm tra đã xác thực email chưa
             if (!user.getIsVerified()) {
                 model.addAttribute("error", "Tài khoản chưa được xác thực! Vui lòng kiểm tra email để xác thực.");
-                model.addAttribute("emailorusername", emailorusername);
+                model.addAttribute("emailorusername", emailOrUsername);
                 return "authentication/form-login";
             }
 
             // Thử đăng nhập
-            user = userService.login(emailorusername, password);
+            user = userService.login(emailOrUsername, password);
             if (user != null) {
                 session.setAttribute("currentUser", user);
                 String role = user.getRole();
@@ -83,14 +83,14 @@ public class LoginController {
                 }
             } else {
                 model.addAttribute("error", "Tên đăng nhập hoăc mật khẩu không chính xác!");
-                model.addAttribute("emailorusername", emailorusername);
+                model.addAttribute("emailorusername", emailOrUsername);
                 return "authentication/form-login";
             }
         } catch (Exception e) {
             System.out.println("Login error: " + e.getMessage());
             e.printStackTrace();
             model.addAttribute("error", "Có lỗi xảy ra trong quá trình đăng nhập!");
-            model.addAttribute("emailorusername", emailorusername);
+            model.addAttribute("emailorusername", emailOrUsername);
             return "authentication/form-login";
         }
     }

@@ -10,8 +10,8 @@
       <title>HealthCare+ - Đặt lịch khám chữa bệnh</title>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-      <link rel="stylesheet" href="/css/homepage.css">
-      <link rel="stylesheet" href="/resources/css/shared.css">
+      <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/base.css">
+      <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/homepage.css">
       <style>
         .search-section {
           background: linear-gradient(135deg, #6f42c1, #8655e0);

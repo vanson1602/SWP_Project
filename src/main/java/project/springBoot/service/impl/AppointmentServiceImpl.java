@@ -1,6 +1,11 @@
 package project.springBoot.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.springBoot.model.*;
@@ -209,6 +214,23 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointmentRepository.save(appointment);
     }
 
+    @Override
+    public List<Appointment> findByPatientAndStatus(Long patientId, String status) {
+        return appointmentRepository.findByPatientAndStatus(patientId, status);
+    }
+
+    @Override
+    public Page<Appointment> getAppointmentsByPatientId(long patientId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").descending());
+        return appointmentRepository.findByPatientId(patientId, pageable);
+    }
+
+    @Override
+    public Page<Appointment> getAppointmentsByPatientAndStatus(long patientId, String status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").descending());
+        return appointmentRepository.findByPatientAndStatus(patientId, status, pageable);
+    }
+
     private void createStatusNotification(Appointment appointment, String status) {
         String title = "";
         String message = "";
@@ -236,5 +258,26 @@ public class AppointmentServiceImpl implements AppointmentService {
         notification.setMessage(message);
         notification.setNotificationType("General");
         notificationRepository.save(notification);
+    }
+
+    @Scheduled(fixedRate = 300000)
+    public void cancelUnpaidAppointments() {
+        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(12);
+        List<Appointment> unpaidAppointments = appointmentRepository.findUnpaidAppointments(cutoffTime);
+
+        for (Appointment appointment : unpaidAppointments) {
+            appointment.setStatus("Cancelled");
+            appointment.setModifiedAt(LocalDateTime.now());
+            appointmentRepository.save(appointment);
+
+            Notification notification = new Notification();
+            notification.setUser(appointment.getPatient().getUser());
+            notification.setAppointment(appointment);
+            notification.setTitle("Lịch Hẹn Bị Hủy");
+            notification.setMessage("Lịch hẹn của bạn đã bị hủy do chưa thanh toán sau 12 giờ.");
+            notification.setNotificationType("Rejection");
+            notification.setPriority("High");
+            notificationRepository.save(notification);
+        }
     }
 }
