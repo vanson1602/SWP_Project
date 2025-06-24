@@ -47,4 +47,10 @@ public class PageController {
         model.addAttribute("user", user);
         return "authentication/form-register";
     }
+
+    @RequestMapping("/doctor")
+    public String getDoctorPage(Model model) {
+        return "doctor/doctorpage";
+    }
+
 }

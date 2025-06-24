@@ -35,7 +35,7 @@
 
                 </ul>
               </div>
-              <div><a class="btn btn-success mt-2" href="/admin/user">Back</a></div>
+              <div><a class="btn btn-success mt-2" href="/api/admin/user">Back</a></div>
             </div>
           </div>
         </div>

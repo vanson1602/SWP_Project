@@ -9,6 +9,7 @@ import project.springBoot.model.DoctorSchedule;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, Long> {
@@ -20,4 +21,17 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
         @Query("SELECT DISTINCT ds.doctor FROM DoctorSchedule ds " +
                         "WHERE ds.workDate = :date AND ds.status = 'Available'")
         List<Doctor> findAvailableDoctorsForDate(@Param("date") LocalDate date);
+
+        List<DoctorSchedule> findByDoctorDoctorID(long doctorId);
+
+        List<DoctorSchedule> findByDoctorDoctorIDOrderByWorkDateAscStartTimeAsc(Long doctorId);
+
+        List<DoctorSchedule> findByStatus(String status);
+
+        @Query("SELECT ds FROM DoctorSchedule ds WHERE ds.doctor.doctorID = :doctorId AND ds.status = :status")
+        List<DoctorSchedule> findByDoctorIdAndStatus(@Param("doctorId") Long doctorId, @Param("status") String status);
+
+        @Query("SELECT ds FROM DoctorSchedule ds LEFT JOIN FETCH ds.bookingSlots WHERE ds.scheduleID = :scheduleId")
+        Optional<DoctorSchedule> findByIdWithSlots(@Param("scheduleId") Long scheduleId);
+
 }

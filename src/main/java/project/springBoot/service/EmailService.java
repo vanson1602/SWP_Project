@@ -1,5 +1,7 @@
 package project.springBoot.service;
 
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -10,8 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import project.springBoot.model.Appointment;
-
-import java.time.format.DateTimeFormatter;
+import project.springBoot.model.DoctorSchedule;
 
 @Service
 public class EmailService {
@@ -103,7 +104,7 @@ public class EmailService {
                         """,
                 appointment.getPatient().getUser().getFullName(),
                 appointment.getAppointmentNumber(),
-                appointment.getBookingSlot().getSchedule().getDoctor().getUser().getFullName(),
+                // appointment.getBookingSlot().getSchedule().getDoctor().getUser().getFullName(),
                 appointment.getAppointmentDate().format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")),
                 appointment.getAppointmentType().getTypeName());
 
@@ -154,7 +155,7 @@ public class EmailService {
                             </div>
                         </div>
                         """,
-                appointment.getBookingSlot().getSchedule().getDoctor().getUser().getFullName(),
+                // appointment.getBookingSlot().getSchedule().getDoctor().getUser().getFullName(),
                 appointment.getAppointmentNumber(),
                 appointment.getPatient().getUser().getFullName(),
                 appointment.getAppointmentDate().format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")),
@@ -172,4 +173,63 @@ public class EmailService {
             throw new RuntimeException("Failed to send notification email: " + e.getMessage(), e);
         }
     }
+
+    public void sendScheduleApprovalEmail(String doctorEmail, DoctorSchedule schedule, boolean approved) {
+        String subject = approved ? "Phê duyệt lịch bận thành công" : "Từ chối lịch bận";
+        String status = approved ? "Busy" : "Available";
+        String action = approved ? "phê duyệt" : "từ chối";
+
+        String message = String.format(
+                """
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border-radius: 8px; background-color: #f9f9f9;">
+                            <h2 style="color: #333; text-align: center;">%s</h2>
+                            <p style="font-size: 16px; color: #555;">Xin chào Bác sĩ %s,</p>
+                            <p style="font-size: 16px; color: #555;">Lịch bận của bạn đã được %s với thông tin như sau:</p>
+                            <div style="background-color: #fff; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                                <table style="width: 100%%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee; width: 35%%;"><strong>Ngày làm việc:</strong></td>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;">%s</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Thời gian bắt đầu:</strong></td>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;">%s</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Thời gian kết thúc:</strong></td>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;">%s</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px;"><strong>Trạng thái:</strong></td>
+                                        <td style="padding: 8px;">%s</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                                <p style="font-size: 14px; color: #777; margin: 5px 0;">Trân trọng,</p>
+                                <p style="font-size: 14px; color: #777; margin: 5px 0;">Heathcare++</p>
+                            </div>
+                        </div>
+                        """,
+                subject,
+                schedule.getDoctor().getUser().getFullName(),
+                action,
+                schedule.getWorkDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                schedule.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                schedule.getEndTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                status);
+
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setTo(doctorEmail);
+            helper.setSubject(subject);
+            helper.setFrom(from);
+            helper.setText(message, true);
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send schedule approval email: " + e.getMessage(), e);
+        }
+    }
+
 }

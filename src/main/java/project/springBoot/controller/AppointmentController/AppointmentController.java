@@ -1,13 +1,23 @@
 package project.springBoot.controller.AppointmentController;
 
-import lombok.RequiredArgsConstructor;
+import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
-import project.springBoot.model.*;
+import lombok.RequiredArgsConstructor;
+import project.springBoot.model.Doctor;
+import project.springBoot.model.DoctorBookingSlot;
+import project.springBoot.model.Specialization;
 import project.springBoot.service.AppointmentService;
 import project.springBoot.service.DoctorService;
 import project.springBoot.service.EmailService;
@@ -120,13 +130,13 @@ public class AppointmentController {
         Specialization specialization = (Specialization) session.getAttribute("selectedSpecialization");
         List<AppointmentType> appointmentTypes = appointmentService.getAllAppointmentTypes();
 
-        model.addAttribute("slot", slot);
-        model.addAttribute("patient", patient);
-        model.addAttribute("specialization", specialization);
-        model.addAttribute("appointmentTypes", appointmentTypes);
+    //     model.addAttribute("slot", slot);
+    //     model.addAttribute("patient", patient);
+    //     model.addAttribute("specialization", specialization);
+    //     model.addAttribute("appointmentTypes", appointmentTypes);
 
-        return "appointment/patient-info";
-    }
+    //     return "appointment/patient-info";
+    // }
 
     @PostMapping("/payment")
     public String confirmAppointment(
@@ -152,9 +162,9 @@ public class AppointmentController {
             System.out.println("Appointment Type ID: " + appointmentTypeId);
             System.out.println("Notes: " + notes);
 
-            Appointment appointment = appointmentService.createAppointment(
-                    patient.getPatientID(), slotId, specialization.getSpecializationID(),
-                    appointmentTypeId, notes);
+    //         Appointment appointment = appointmentService.createAppointment(
+    //                 patient.getPatientID(), slotId, specialization.getSpecializationID(),
+    //                 appointmentTypeId, notes);
 
             model.addAttribute("appointment", appointment);
             session.setAttribute("pendingAppointment", appointment);
@@ -322,18 +332,18 @@ public class AppointmentController {
         return "appointment/my-appointments";
     }
 
-    @PostMapping("/{id}/cancel")
-    public String cancelAppointment(
-            @PathVariable("id") Long appointmentId,
-            @RequestParam String reason,
-            Principal principal,
-            Model model) {
-        try {
-            appointmentService.cancelAppointment(appointmentId, reason);
-            return "redirect:/appointments/my-appointments?success=true";
-        } catch (RuntimeException e) {
-            model.addAttribute("error", e.getMessage());
-            return "redirect:/appointments/my-appointments?error=" + e.getMessage();
-        }
-    }
+    // @PostMapping("/{id}/cancel")
+    // public String cancelAppointment(
+    //         @PathVariable("id") Long appointmentId,
+    //         @RequestParam String reason,
+    //         Principal principal,
+    //         Model model) {
+    //     try {
+    //         appointmentService.cancelAppointment(appointmentId, reason);
+    //         return "redirect:/appointments/my-appointments?success=true";
+    //     } catch (RuntimeException e) {
+    //         model.addAttribute("error", e.getMessage());
+    //         return "redirect:/appointments/my-appointments?error=" + e.getMessage();
+    //     }
+    // }
 }

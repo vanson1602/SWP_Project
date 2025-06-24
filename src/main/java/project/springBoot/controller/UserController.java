@@ -97,13 +97,13 @@ public class UserController {
     @RequestMapping(value = "/admin/update", method = RequestMethod.POST)
     public String updateUser(@ModelAttribute("update") User user) {
         userService.handleUpdateUser(user);
-        return "redirect:/admin/user";
+        return "redirect:/api/admin/user";
     }
 
     @RequestMapping("/admin/user/delete/{id}")
     public String deleteUser(@PathVariable Long id) {
         userService.deleteUserById(id);
-        return "redirect:/admin/user";
+        return "redirect:/api/admin/user";
     }
 
     @PostMapping("/users/update")

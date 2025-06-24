@@ -1,21 +1,22 @@
 package project.springBoot.repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 import project.springBoot.model.DoctorBookingSlot;
 import project.springBoot.model.DoctorSchedule;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Repository
 public interface DoctorBookingSlotRepository extends JpaRepository<DoctorBookingSlot, Long> {
-        List<DoctorBookingSlot> findByScheduleAndStatusAndStartTimeGreaterThanOrderByStartTimeAsc(
-                        DoctorSchedule schedule,
-                        String status,
-                        LocalDateTime startTime);
+    List<DoctorBookingSlot> findByScheduleAndStatusAndStartTimeGreaterThanOrderByStartTimeAsc(
+            DoctorSchedule schedule,
+            String status,
+            LocalDateTime startTime);
 
         @Query("SELECT bs FROM DoctorBookingSlot bs " +
                         "WHERE bs.schedule.doctor.doctorID = :doctorId " +

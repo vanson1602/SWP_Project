@@ -35,7 +35,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void configureViewResolvers(ViewResolverRegistry registry) {
-        registry.viewResolver(viewResolver());
+        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+        resolver.setPrefix("/WEB-INF/view/");
+        resolver.setSuffix(".jsp");
+        resolver.setViewClass(JstlView.class);
+        registry.viewResolver(resolver);
     }
 
     @Bean
@@ -60,7 +64,27 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/css/**").addResourceLocations("/resources/css/");
         registry.addResourceHandler("/resources/**")
                 .addResourceLocations("/resources/");
+        // Static resources
+        registry.addResourceHandler("/resources/**")
+                .addResourceLocations("/resources/", "classpath:/static/")
+                .setCachePeriod(3600)
+                .resourceChain(true);
+                
+        // CSS files
+        registry.addResourceHandler("/css/**")
+                .addResourceLocations("/resources/css/")
+                .setCachePeriod(3600)
+                .resourceChain(true);
+                
+        // Uploaded files
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:uploads/");
+                .addResourceLocations("file:uploads/")
+                .setCachePeriod(3600)
+                .resourceChain(true);
+                
+        // Add webjars if needed
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/")
+                .resourceChain(true);
     }
 }
