@@ -61,4 +61,30 @@ public class DoctorServiceImpl implements DoctorService {
         Hibernate.initialize(doctor.getSpecializations());
         return doctor;
     }
+
+    @Override
+    public Doctor save(Doctor doctor) {
+        if (doctor.getUser() == null) {
+            throw new IllegalArgumentException("Doctor must have an associated user");
+        }
+
+        // Set creation/modification timestamps
+        LocalDateTime now = LocalDateTime.now();
+        doctor.setCreatedAt(now);
+        doctor.setModifiedAt(now);
+
+        // Initialize collections if they're null
+        if (doctor.getSpecializations() == null) {
+            doctor.setSpecializations(new java.util.HashSet<>());
+        }
+        if (doctor.getSchedules() == null) {
+            doctor.setSchedules(new java.util.HashSet<>());
+        }
+        if (doctor.getFeedbacks() == null) {
+            doctor.setFeedbacks(new java.util.HashSet<>());
+        }
+
+        // Save the doctor
+        return doctorRepository.save(doctor);
+    }
 }

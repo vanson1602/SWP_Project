@@ -34,15 +34,16 @@ public class UploadFileImpl implements UploadFileService {
         File fileUpload = convert(file);
         log.info("File upload is : {}", fileUpload);
         try {
-            cloudinary.uploader().upload(fileUpload, 
+            cloudinary.uploader().upload(fileUpload,
                     ObjectUtils.asMap("public_id", publicValue));
-                  
+            cleanDisk(fileUpload);
+
         } catch (IOException e) {
 
             e.printStackTrace();
         }
-        cleanDisk(fileUpload);
-        return cloudinary.url().generate(StringUtils.join(publicValue,".",extension));
+
+        return cloudinary.url().generate(StringUtils.join(publicValue, ".", extension));
     }
 
     private File convert(MultipartFile file) {
@@ -62,6 +63,7 @@ public class UploadFileImpl implements UploadFileService {
         String fileName = getFileName(originalName)[0];
         return StringUtils.join(UUID.randomUUID().toString(), "_", fileName);
     }
+
     public void cleanDisk(File file) {
         log.info("File.toppath", file.toPath());
         try {

@@ -21,7 +21,8 @@
               <div class="card shadow-lg border-0 rounded-4 p-4">
                 <h3 class="mb-3 text-center text-primary"><i class="bi bi-person-plus me-2"></i>Create User</h3>
                 <hr />
-                <form:form method="post" action="/admin/create" modelAttribute="newUser">
+                <form:form method="post" action="/admin/createUser" modelAttribute="newUser"
+                  enctype="multipart/form-data">
                   <div class="mb-3">
                     <label class="form-label">Username</label>
                     <div class="input-group">
@@ -90,6 +91,11 @@
                       <form:option value="receptionist" label="Receptionist" />
                     </form:select>
                   </div>
+                  <div class="mb-3">
+                    <label class="form-label">Image</label>
+                    <input type="file" name="image" class="form-control" accept="image/*" />
+                  </div>
+
                   <div class="d-flex justify-content-end gap-2 mt-3">
                     <button type="submit" class="btn btn-primary px-4">
                       <i class="bi bi-check-circle me-2"></i>Submit
