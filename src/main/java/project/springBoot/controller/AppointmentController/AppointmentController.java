@@ -93,6 +93,7 @@ public class AppointmentController {
             HttpSession session,
             Model model) {
         DoctorBookingSlot slot = doctorService.getSlotById(slotId);
+        System.out.println("Slot: " + slot);
         User user = (User) session.getAttribute("currentUser");
         Patient patient = doctorService.getPatientByUsername(user.getUsername());
         Specialization specialization = (Specialization) session.getAttribute("selectedSpecialization");
@@ -117,8 +118,11 @@ public class AppointmentController {
             User user = (User) session.getAttribute("currentUser");
             Patient patient = doctorService.getPatientByUsername(user.getUsername());
             Specialization specialization = (Specialization) session.getAttribute("selectedSpecialization");
-
+            System.out.println("Specialization: " + specialization);
+            System.out.println("User: " + user);
+            System.out.println("Patient: " + patient);
             DoctorBookingSlot slot = doctorService.getSlotById(slotId);
+
             System.out.println("Slot:" + slot);
             System.out.println("Slot id:" + slotId);
             System.out.println("Specialization ID: " + specialization.getSpecializationID());
@@ -136,7 +140,7 @@ public class AppointmentController {
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             System.out.println("Error: " + e.getMessage());
-            return "appointment/error";
+            return "redirect:/appointments/info?error=" + e.getMessage();
         }
     }
 

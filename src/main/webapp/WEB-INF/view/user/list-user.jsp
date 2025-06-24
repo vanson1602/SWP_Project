@@ -37,7 +37,8 @@
             <div class="col-12 mx-auto">
               <div class="d-flex justify-content-between">
                 <h3>Table User</h3>
-                <a href="/admin/create" class="btn btn-primary">Create User</a>
+                <a href="/admin/createUser" class="btn btn-primary">Create User</a>
+                <a href="/admin/doctor/create" class="btn btn-primary">Create Doctor</a>
               </div>
               <hr />
               <table class="table table-hover">
@@ -52,13 +53,13 @@
                 <tbody>
                   <c:forEach var="user" items="${users}">
                     <tr>
-                      <td>${user.id}</td>
+                      <td>${user.userID}</td>
                       <td>${user.email}</td>
                       <td>${user.firstName}</td>
                       <td>
-                        <a href="/admin/user/${user.id}" class="btn btn-success">View</a>
-                        <a href="/admin/user/update/${user.id}" class="btn btn-warning mx-2">Update</a>
-                        <a href="/admin/user/delete/${user.id}" onclick="return confirm('Are you sure?')"
+                        <a href="/admin/user/${user.userID}" class="btn btn-success">View</a>
+                        <a href="/admin/user/update/${user.userID}" class="btn btn-warning mx-2">Update</a>
+                        <a href="/admin/user/delete/${user.userID}" onclick="return confirm('Are you sure?')"
                           class="btn btn-danger">Delete</a>
                       </td>
                     </tr>

@@ -47,7 +47,7 @@ public class User {
     private String verificationToken;
 
     @Column(name = "isVerified")
-    private boolean isVerified = false;
+    private Boolean isVerified = false;
 
     @Column(name = "reset_token", length = 256)
     private String resetToken;

@@ -59,6 +59,259 @@
         .search-button:hover {
           background-color: #5a32a3;
         }
+
+        /* Modern Card Design */
+        .card {
+          transition: all 0.4s ease;
+          border: none !important;
+          overflow: hidden;
+          background: white;
+          max-width: 260px;
+          margin: 0 auto;
+          border-radius: 8px;
+          box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
+          cursor: pointer;
+          text-decoration: none;
+          display: block;
+          color: inherit;
+        }
+
+        .card:hover {
+          transform: translateY(-5px);
+          box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.1) 0px 8px 32px;
+        }
+
+        .doctor-image-wrapper {
+          width: 100%;
+          height: 160px;
+          position: relative;
+          overflow: hidden;
+          background: #f8f9fa;
+          margin: 12px 12px 0;
+          width: calc(100% - 24px);
+          border-radius: 6px;
+        }
+
+        .card-img-top {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.5s ease;
+          image-rendering: -webkit-optimize-contrast;
+          backface-visibility: hidden;
+          transform: translateZ(0);
+          -webkit-font-smoothing: subpixel-antialiased;
+        }
+
+        .card:hover .card-img-top {
+          transform: scale(1.1);
+        }
+
+        .card-body {
+          padding: 1rem;
+          background: white;
+          position: relative;
+        }
+
+        .card-title {
+          color: #1a1a1a;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          font-size: 1rem;
+          letter-spacing: -0.02em;
+          line-height: 1.4;
+        }
+
+        .specialty-text {
+          color: #6f42c1;
+          font-size: 0.85rem;
+          margin-bottom: 1rem;
+          font-weight: 500;
+          line-height: 1.5;
+        }
+
+        .info-group {
+          display: flex;
+          align-items: center;
+          margin-bottom: 0.5rem;
+          padding: 0.5rem;
+          background: #f8f9fa;
+          border-radius: 6px;
+          transition: all 0.3s ease;
+        }
+
+        .info-group:last-child {
+          margin-bottom: 0;
+        }
+
+        .info-group i {
+          color: #6f42c1;
+          font-size: 1rem;
+          margin-right: 0.75rem;
+          flex-shrink: 0;
+        }
+
+        .info-text {
+          color: #4a4a4a;
+          font-size: 0.85rem;
+          margin: 0;
+          line-height: 1.4;
+        }
+
+        .btn-outline-primary {
+          margin-top: 0.5rem;
+          border: 1.5px solid #6f42c1;
+          color: #6f42c1;
+          padding: 0.75rem 1.25rem;
+          font-weight: 500;
+          transition: all 0.3s ease;
+          border-radius: 6px;
+          font-size: 0.95rem;
+          background: transparent;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          height: 45px;
+
+        }
+
+        .btn-outline-primary:hover {
+          background-color: #6f42c1;
+          border-color: #6f42c1;
+          color: white;
+          transform: translateY(-2px);
+          box-shadow: 0 5px 15px rgba(111, 66, 193, 0.2);
+
+
+        }
+
+        .btn-outline-primary i {
+          font-size: 1rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+          .card {
+            max-width: 100%;
+          }
+
+          .doctor-image-wrapper {
+            height: 180px;
+            margin: 8px 8px 0;
+            width: calc(100% - 16px);
+          }
+        }
+
+        /* Add animation delay for each card */
+        .col-lg-3:nth-child(1) .card {
+          animation-delay: 0.1s;
+        }
+
+        .col-lg-3:nth-child(2) .card {
+          animation-delay: 0.2s;
+        }
+
+        .col-lg-3:nth-child(3) .card {
+          animation-delay: 0.3s;
+        }
+
+        .col-lg-3:nth-child(4) .card {
+          animation-delay: 0.4s;
+        }
+
+        /* Background decoration */
+        .hexagon-bg {
+          position: absolute;
+          width: 30px;
+          height: 30px;
+          background: rgba(111, 66, 193, 0.1);
+          clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+          z-index: -1;
+        }
+
+        .hexagon-1 {
+          top: -15px;
+          left: 10%;
+        }
+
+        .hexagon-2 {
+          bottom: 15px;
+          right: 10%;
+        }
+
+        /* Icon styles */
+        .card-text i {
+          color: #6f42c1;
+        }
+
+        /* Pagination styles */
+        .pagination .page-link {
+          color: #6f42c1;
+          border: none;
+          padding: 0.5rem 1rem;
+          margin: 0 0.2rem;
+          border-radius: 5px;
+        }
+
+        .pagination .page-item.active .page-link {
+          background-color: #6f42c1;
+          color: white;
+        }
+
+        .pagination .page-link:hover {
+          background-color: #f8f9fa;
+          color: #5a32a3;
+        }
+
+        /* Filter styles */
+        .form-check-input:checked {
+          background-color: #6f42c1;
+          border-color: #6f42c1;
+        }
+
+        .form-check-label {
+          color: #4a4a4a;
+          font-size: 0.9rem;
+        }
+
+        .card-title {
+          color: #1a1a1a;
+          font-size: 1.1rem;
+          font-weight: 600;
+        }
+
+        .btn-primary {
+          background-color: #6f42c1;
+          border-color: #6f42c1;
+        }
+
+        .btn-primary:hover {
+          background-color: #5a32a3;
+          border-color: #5a32a3;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+          .col-lg-3 {
+            margin-bottom: 2rem;
+          }
+        }
+
+        /* Additional styles for new layout */
+        .container-fluid {
+          max-width: 1800px;
+        }
+
+        .sticky-top {
+          z-index: 100;
+        }
+
+        @media (max-width: 992px) {
+          .sticky-top {
+            position: static !important;
+          }
+        }
       </style>
     </head>
 
@@ -66,19 +319,74 @@
     <jsp:include page="../shared/header.jsp" />
 
 
-    <section class="search-section">
+    <!-- Dịch vụ nổi bật -->
+    <section class="py-4">
+      <div class="container">
+        <h2 class="fw-bold mb-4 text-center">Dịch vụ nổi bật</h2>
+        <div class="row g-3">
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 p-3">
+              <div
+                class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center mx-auto mb-2"
+                style="width: 50px; height: 50px;">
+                <i class="bi bi-calendar-check fs-5"></i>
+              </div>
+              <h5 class="fw-semibold mb-2 text-center">Đặt lịch khám</h5>
+              <p class="text-muted small mb-0 text-center">Đặt lịch hẹn với bác sĩ chuyên khoa phù hợp</p>
+            </div>
+          </div>
+
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 p-3">
+              <div
+                class="bg-danger text-white rounded-circle d-flex justify-content-center align-items-center mx-auto mb-2"
+                style="width: 50px; height: 50px;">
+                <i class="bi bi-person-badge fs-5"></i>
+              </div>
+              <h5 class="fw-semibold mb-2 text-center">Tìm bác sĩ</h5>
+              <p class="text-muted small mb-0 text-center">Tìm kiếm bác sĩ theo chuyên khoa và địa điểm</p>
+            </div>
+          </div>
+
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 p-3">
+              <div
+                class="bg-info text-white rounded-circle d-flex justify-content-center align-items-center mx-auto mb-2"
+                style="width: 50px; height: 50px;">
+                <i class="bi bi-chat-dots fs-5"></i>
+              </div>
+              <h5 class="fw-semibold mb-2 text-center">Tư vấn online</h5>
+              <p class="text-muted small mb-0 text-center">Tư vấn sức khỏe trực tuyến 24/7</p>
+            </div>
+          </div>
+
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 p-3">
+              <div
+                class="bg-success text-white rounded-circle d-flex justify-content-center align-items-center mx-auto mb-2"
+                style="width: 50px; height: 50px;">
+                <i class="bi bi-file-earmark-medical fs-5"></i>
+              </div>
+              <h5 class="fw-semibold mb-2 text-center">Hồ sơ sức khỏe</h5>
+              <p class="text-muted small mb-0 text-center">Quản lý hồ sơ bệnh án điện tử</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="search-section py-4">
       <div class="container">
         <div class="search-tabs">
-          <div class="d-flex justify-content-start gap-4 mb-3">
+          <div class="d-flex justify-content-start gap-3 mb-3">
             <a href="#" class="search-tab active" data-tab="specialty">Tìm theo chuyên khoa</a>
             <a href="#" class="search-tab" data-tab="doctor">Tìm theo tên bác sĩ</a>
           </div>
 
-
           <form action="/search/specialties" method="GET" class="search-form" id="specialtyForm">
-            <div class="row g-3">
+            <div class="row g-2">
               <div class="col-md-9">
-                <label class="form-label">Chuyên khoa</label>
+                <label class="form-label small mb-1">Chuyên khoa</label>
                 <input type="text" name="keyword" class="form-control" placeholder="Nhập tên chuyên khoa" required>
               </div>
               <div class="col-md-3 d-flex align-items-end">
@@ -89,11 +397,10 @@
             </div>
           </form>
 
-
           <form action="/search/doctors" method="GET" class="search-form d-none" id="doctorForm">
-            <div class="row g-3">
+            <div class="row g-2">
               <div class="col-md-9">
-                <label class="form-label">Tên bác sĩ</label>
+                <label class="form-label small mb-1">Tên bác sĩ</label>
                 <input type="text" name="keyword" class="form-control" placeholder="Nhập tên bác sĩ" required>
               </div>
               <div class="col-md-3 d-flex align-items-end">
@@ -110,107 +417,50 @@
     <!-- Hero Section -->
 
 
-    <!-- Dịch vụ nổi bật -->
-    <section class="py-5 bg-light">
-      <div class="container text-center">
-        <h2 class="fw-bold mb-5">Dịch vụ nổi bật</h2>
-        <div class="row g-4">
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100 shadow-sm border-0 p-3">
-              <div
-                class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center mx-auto mb-3"
-                style="width: 60px; height: 60px;">
-                <i class="bi bi-calendar-check fs-4"></i>
-              </div>
-              <h5 class="fw-semibold">Đặt lịch khám</h5>
-              <p class="text-muted small">Đặt lịch hẹn với bác sĩ chuyên khoa phù hợp</p>
-            </div>
-          </div>
-
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100 shadow-sm border-0 p-3">
-              <div
-                class="bg-danger text-white rounded-circle d-flex justify-content-center align-items-center mx-auto mb-3"
-                style="width: 60px; height: 60px;">
-                <i class="bi bi-person-badge fs-4"></i>
-              </div>
-              <h5 class="fw-semibold">Tìm bác sĩ</h5>
-              <p class="text-muted small">Tìm kiếm bác sĩ theo chuyên khoa và địa điểm</p>
-            </div>
-          </div>
-
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100 shadow-sm border-0 p-3">
-              <div
-                class="bg-info text-white rounded-circle d-flex justify-content-center align-items-center mx-auto mb-3"
-                style="width: 60px; height: 60px;">
-                <i class="bi bi-chat-dots fs-4"></i>
-              </div>
-              <h5 class="fw-semibold">Tư vấn online</h5>
-              <p class="text-muted small">Tư vấn sức khỏe trực tuyến 24/7</p>
-            </div>
-          </div>
-
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100 shadow-sm border-0 p-3">
-              <div
-                class="bg-success text-white rounded-circle d-flex justify-content-center align-items-center mx-auto mb-3"
-                style="width: 60px; height: 60px;">
-                <i class="bi bi-file-earmark-medical fs-4"></i>
-              </div>
-              <h5 class="fw-semibold">Hồ sơ sức khỏe</h5>
-              <p class="text-muted small">Quản lý hồ sơ bệnh án điện tử</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- Danh sách bác sĩ -->
-    <section class="py-5">
+    <section class="py-4">
       <div class="container">
-        <h2 class="fw-bold text-center mb-5">Đội ngũ bác sĩ</h2>
-        <div class="row g-4">
+        <h2 class="fw-bold text-center mb-4">Đội ngũ bác sĩ</h2>
+        <div class="row g-3">
           <c:forEach items="${doctors}" var="doctor">
-            <div class="col-lg-3 col-md-4 col-sm-6">
-              <div class="card h-100 shadow-sm border-0">
-                <div class="position-relative">
+            <div class="col-lg-4 col-md-6">
+              <a href="/search/doctors/details/${doctor.doctorID}" class="card h-100">
+                <div class="doctor-image-wrapper">
                   <c:choose>
                     <c:when test="${not empty doctor.user.avatarUrl}">
-                      <img src="${doctor.user.avatarUrl}" class="card-img-top" alt="Doctor's photo"
-                        style="height: 200px; object-fit: cover;">
+                      <img src="${doctor.user.avatarUrl}" class="card-img-top"
+                        alt="BS. ${doctor.user.firstName} ${doctor.user.lastName}">
                     </c:when>
                     <c:otherwise>
-                      <img src="/resources/images/defaultImg.jpg" class="card-img-top" alt="Default doctor photo"
-                        style="height: 200px; object-fit: cover;">
+                      <img src="/resources/images/defaultImg.jpg" class="card-img-top" alt="Default doctor photo">
                     </c:otherwise>
                   </c:choose>
                 </div>
                 <div class="card-body">
-                  <h5 class="card-title mb-1">BS. ${doctor.user.firstName} ${doctor.user.lastName}</h5>
-                  <div class="text-muted small mb-2">
+                  <h5 class="card-title mb-2">BS. ${doctor.user.firstName} ${doctor.user.lastName}</h5>
+                  <div class="specialty-text mb-3">
                     <c:forEach items="${doctor.specializations}" var="spec" varStatus="status">
                       ${spec.specializationName}${!status.last ? ', ' : ''}
                     </c:forEach>
                   </div>
-                  <p class="card-text small mb-2">
-                    <i class="bi bi-briefcase-fill me-1"></i> ${doctor.experienceYears} năm kinh nghiệm
-                  </p>
-                  <p class="card-text small mb-3">
-                    <i class="bi bi-cash me-1"></i> Phí tư vấn: ${doctor.consultationFee} VNĐ
-                  </p>
-                  <a href="/search/doctors/details/${doctor.doctorID}" class="btn btn-outline-primary w-100">Xem
-                    chi
-                    tiết</a>
+                  <div class="info-group mb-2">
+                    <i class="bi bi-briefcase-fill"></i>
+                    <p class="info-text">${doctor.experienceYears} năm kinh nghiệm</p>
+                  </div>
+                  <div class="info-group">
+                    <i class="bi bi-cash"></i>
+                    <p class="info-text">Phí tư vấn: ${doctor.consultationFee} VNĐ</p>
+                  </div>
                 </div>
-              </div>
+              </a>
             </div>
           </c:forEach>
         </div>
 
         <!-- Pagination -->
         <c:if test="${totalPages > 1}">
-          <nav class="mt-5">
+          <nav class="mt-4">
             <ul class="pagination justify-content-center">
               <li class="page-item ${currentPage == 0 ? 'disabled' : ''}">
                 <a class="page-link" href="/?page=${currentPage - 1}">Trước</a>

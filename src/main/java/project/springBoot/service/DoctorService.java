@@ -16,4 +16,14 @@ public interface DoctorService {
     Patient getPatientByUsername(String username);
 
     Doctor getDoctorById(Long doctorId);
+
+    Doctor save(Doctor doctor);
+
+
+
+
+    
+    
+
+
 }

@@ -63,7 +63,7 @@ public class LoginController {
             }
 
             // Kiểm tra đã xác thực email chưa
-            if (!user.isVerified()) {
+            if (!user.getIsVerified()) {
                 model.addAttribute("error", "Tài khoản chưa được xác thực! Vui lòng kiểm tra email để xác thực.");
                 model.addAttribute("emailorusername", emailorusername);
                 return "authentication/form-login";
