@@ -34,5 +34,9 @@ public class DoctorBookingSlotService {
         bookingSlotRepository.deleteById(id);
     }
 
-    
+    public void deleteByScheduleId(Long scheduleId) {
+        List<DoctorBookingSlot> slots = getBookingSlotsByScheduleId(scheduleId);
+        bookingSlotRepository.deleteAll(slots);
+    }
+
 }

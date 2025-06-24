@@ -9,6 +9,19 @@
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+            <style>
+                .btn-back {
+                    background-color: #6c757d;
+                    color: #fff;
+                    border-radius: 6px;
+                    padding: 8px 20px;
+                }
+
+                .btn-back:hover {
+                    background-color: #5c636a;
+                }
+            </style>
+
         </head>
 
         <body class="bg-light">
@@ -34,6 +47,7 @@
                                         <th>Ngày làm việc</th>
                                         <th>Thời gian bắt đầu</th>
                                         <th>Thời gian kết thúc</th>
+                                        <th>Slots</th>
                                         <th>Hành động</th>
                                     </tr>
                                 </thead>
@@ -52,6 +66,22 @@
                                             </td>
                                             <td>
                                                 <c:out value="${schedule.endTime}" />
+                                            </td>
+                                            <td>
+                                                <c:if test="${not empty schedule.bookingSlots}">
+                                                    <c:forEach var="slot" items="${schedule.bookingSlots}">
+                                                        <div class="slot-row">
+                                                            ${slot.startTime.hour}:${String.format("%02d",
+                                                            slot.startTime.minute)} -
+                                                            ${slot.endTime.hour}:${String.format("%02d",
+                                                            slot.endTime.minute)}
+                                                            (${slot.status})
+                                                        </div>
+                                                    </c:forEach>
+                                                </c:if>
+                                                <c:if test="${empty schedule.bookingSlots}">
+                                                    <div class="slot-row">No slots available</div>
+                                                </c:if>
                                             </td>
                                             <td class="text-center">
                                                 <button class="btn btn-success btn-sm me-2"
@@ -114,6 +144,9 @@
                     });
                 }
             </script>
+            <div class="d-flex justify-content-center mt-4" style="margin-bottom: 2%;">
+                <a href="/admin" class="btn btn-back">← Back to Dashboard</a>
+            </div>
         </body>
 
         </html>

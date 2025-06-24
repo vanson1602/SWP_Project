@@ -76,6 +76,7 @@
                                     <th>Max Patients</th>
                                     <th>Clinic Room</th>
                                     <th>Notes</th>
+                                    <th>Slots</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -90,6 +91,22 @@
                                         <td>${schedule.maxPatients}</td>
                                         <td>${schedule.clinicRoom}</td>
                                         <td>${schedule.notes}</td>
+                                        <td>
+                                            <c:if test="${not empty schedule.bookingSlots}">
+                                                <c:forEach var="slot" items="${schedule.bookingSlots}">
+                                                    <div class="slot-row">
+                                                        ${slot.startTime.hour}:${String.format("%02d",
+                                                        slot.startTime.minute)} -
+                                                        ${slot.endTime.hour}:${String.format("%02d",
+                                                        slot.endTime.minute)}
+                                                        (${slot.status})
+                                                    </div>
+                                                </c:forEach>
+                                            </c:if>
+                                            <c:if test="${empty schedule.bookingSlots}">
+                                                <div class="slot-row">No slots available</div>
+                                            </c:if>
+                                        </td>
                                         <td>
                                             <a href="/admin/schedules/edit/${schedule.scheduleID}"
                                                 class="btn btn-edit btn-sm">Edit</a>

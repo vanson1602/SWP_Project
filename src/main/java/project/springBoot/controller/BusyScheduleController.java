@@ -37,7 +37,6 @@ public class BusyScheduleController {
     private DoctorService doctorService;
 
     @GetMapping("/schedule")
-    @PreAuthorize("hasRole('DOCTOR')")
     public String viewBusyScheduleForm(Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null || !"DOCTOR".equalsIgnoreCase(currentUser.getRole())) {
@@ -57,7 +56,6 @@ public class BusyScheduleController {
     }
 
     @PostMapping("/submit-busy-schedule")
-    @PreAuthorize("hasRole('DOCTOR')")
     @ResponseBody
     public Map<String, Object> submitBusySchedule(@RequestBody DoctorScheduleRequest request, HttpSession session) {
         Map<String, Object> response = new HashMap<>();

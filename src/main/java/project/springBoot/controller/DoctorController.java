@@ -400,6 +400,10 @@ public class DoctorController {
         }
 
         List<DoctorSchedule> schedules = doctorScheduleService.getSchedulesByDoctorSorted(doctorId);
+        for (DoctorSchedule schedule : schedules) {
+            schedule.setBookingSlots(
+                    doctorScheduleService.getScheduleWithSlots(schedule.getScheduleID()).getBookingSlots());
+        }
         model.addAttribute("schedules", schedules);
         model.addAttribute("currentUser", currentUser);
         return "doctors/doctor-schedule";

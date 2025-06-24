@@ -13,21 +13,23 @@ import project.springBoot.model.DoctorSchedule;
 
 @Repository
 public interface DoctorBookingSlotRepository extends JpaRepository<DoctorBookingSlot, Long> {
-        List<DoctorBookingSlot> findByScheduleAndStatusAndStartTimeGreaterThanOrderByStartTimeAsc(
-                        DoctorSchedule schedule,
-                        String status,
-                        LocalDateTime startTime);
+    List<DoctorBookingSlot> findByScheduleAndStatusAndStartTimeGreaterThanOrderByStartTimeAsc(
+            DoctorSchedule schedule,
+            String status,
+            LocalDateTime startTime);
 
-        @Query("SELECT bs FROM DoctorBookingSlot bs " +
-                        "WHERE bs.schedule.doctor.doctorID = :doctorId " +
-                        "AND bs.startTime BETWEEN :startTime AND :endTime " +
-                        "AND bs.status = 'Available' " +
-                        "ORDER BY bs.startTime")
-        List<DoctorBookingSlot> findAvailableSlotsByDoctorAndTimeRange(
-                        @Param("doctorId") Long doctorId,
-                        @Param("startTime") LocalDateTime startTime,
-                        @Param("endTime") LocalDateTime endTime);
+    @Query("SELECT bs FROM DoctorBookingSlot bs " +
+            "WHERE bs.schedule.doctor.doctorID = :doctorId " +
+            "AND bs.startTime BETWEEN :startTime AND :endTime " +
+            "AND bs.status = 'Available' " +
+            "ORDER BY bs.startTime")
+    List<DoctorBookingSlot> findAvailableSlotsByDoctorAndTimeRange(
+            @Param("doctorId") Long doctorId,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime);
 
-        @Query("SELECT bs FROM DoctorBookingSlot bs WHERE bs.schedule.doctor.doctorID = :doctorId")
-    List<DoctorBookingSlot> findByScheduleDoctorDoctorID(@Param("doctorId") Long doctorId);           
+    @Query("SELECT bs FROM DoctorBookingSlot bs WHERE bs.schedule.doctor.doctorID = :doctorId")
+    List<DoctorBookingSlot> findByScheduleDoctorDoctorID(@Param("doctorId") Long doctorId);
+
+    List<DoctorBookingSlot> findByScheduleScheduleID(Long scheduleId);
 }

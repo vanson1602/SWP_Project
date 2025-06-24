@@ -6,6 +6,7 @@ import project.springBoot.model.User;
 import project.springBoot.repository.DoctorRepository;
 import project.springBoot.service.DoctorScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,8 +35,18 @@ public class AdminScheduleController {
 
     @GetMapping("/list")
     public String getAllSchedules(Model model) {
-        List<DoctorSchedule> schedules = doctorScheduleService.getAllSchedules();
-        model.addAttribute("schedules", schedules);
+        try {
+            List<DoctorSchedule> schedules = doctorScheduleService.getAllSchedules();
+            for (DoctorSchedule schedule : schedules) {
+                schedule.setBookingSlots(
+                        doctorScheduleService.getScheduleWithSlots(schedule.getScheduleID()).getBookingSlots());
+            }
+            model.addAttribute("schedules", schedules);
+        } catch (Exception e) {
+            System.out.println("Error loading schedules: " + e.getMessage());
+            model.addAttribute("error", "Failed to load schedules: " + e.getMessage());
+            return "error";
+        }
         return "admin/schedules/list";
     }
 
@@ -43,32 +54,76 @@ public class AdminScheduleController {
     public String showAddForm(Model model) {
         List<Doctor> doctors = doctorRepository.findAll();
         model.addAttribute("schedule", new DoctorSchedule());
-        model.addAttribute("doctors", doctorRepository.findAll()); // truyền danh sách bác sĩ
+        model.addAttribute("doctors", doctors);
         return "admin/schedules/add";
     }
 
     @PostMapping("/save")
-    public String saveSchedule(@ModelAttribute DoctorSchedule schedule) {
-        doctorScheduleService.createSchedule(schedule);
-        return "redirect:/admin/schedules/doctors";
+    public String saveSchedule(@ModelAttribute DoctorSchedule schedule, Model model) {
+        List<Doctor> doctors = doctorRepository.findAll();
+        model.addAttribute("doctors", doctors);
+        try {
+            List<DoctorSchedule> existingSchedules = doctorScheduleService
+                    .getSchedulesByDoctorId(schedule.getDoctor().getDoctorID());
+            for (DoctorSchedule existing : existingSchedules) {
+                if (existing.getWorkDate().equals(schedule.getWorkDate())) {
+                    model.addAttribute("error",
+                            "Schedule creation failed: A schedule for this doctor on the selected date already exists. Please choose a different date.");
+                    model.addAttribute("schedule", schedule);
+                    return "admin/schedules/add";
+                }
+            }
+            doctorScheduleService.createSchedule(schedule);
+        } catch (DataIntegrityViolationException e) {
+            model.addAttribute("error",
+                    "Schedule creation failed: A schedule for this doctor on the selected date already exists. Please choose a different date.");
+            model.addAttribute("schedule", schedule);
+            return "admin/schedules/add";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", "Schedule creation failed: " + e.getMessage());
+            model.addAttribute("schedule", schedule);
+            return "admin/schedules/add";
+        } catch (Exception e) {
+            model.addAttribute("error", "Schedule creation failed due to an unexpected error: " + e.getMessage());
+            model.addAttribute("schedule", schedule);
+            return "admin/schedules/add";
+        }
+        return "redirect:/admin/schedules/list";
     }
 
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable int id, Model model) {
+    public String showEditForm(@PathVariable long id, Model model) {
         DoctorSchedule schedule = doctorScheduleService.getScheduleById(id);
+        schedule.setBookingSlots(doctorScheduleService.getScheduleWithSlots(id).getBookingSlots());
         model.addAttribute("schedule", schedule);
         return "admin/schedules/edit";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteSchedule(@PathVariable int id) {
+    public String deleteSchedule(@PathVariable long id) {
         doctorScheduleService.deleteSchedule(id);
         return "redirect:/admin/schedules/list";
     }
 
     @PostMapping("/update")
-    public String updateSchedule(@ModelAttribute DoctorSchedule schedule) {
-        doctorScheduleService.updateSchedule(schedule.getScheduleID(), schedule);
+    public String updateSchedule(@ModelAttribute DoctorSchedule schedule, Model model) {
+        try {
+            doctorScheduleService.updateSchedule(schedule.getScheduleID(), schedule);
+        } catch (DataIntegrityViolationException e) {
+            model.addAttribute("error",
+                    "Schedule update failed: A schedule for this doctor on the selected date already exists. Please choose a different date.");
+            model.addAttribute("schedule", schedule);
+            return "admin/schedules/edit";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", "Schedule update failed: " + e.getMessage());
+
+            model.addAttribute("schedule", schedule);
+            return "admin/schedules/edit";
+        } catch (Exception e) {
+            model.addAttribute("error", "Schedule update failed due to an unexpected error: " + e.getMessage());
+            model.addAttribute("schedule", schedule);
+            return "admin/schedules/edit";
+        }
         return "redirect:/admin/schedules/list";
     }
 
@@ -80,8 +135,12 @@ public class AdminScheduleController {
     }
 
     @GetMapping("/doctor/{doctorId}")
-    public String getSchedulesByDoctor(@PathVariable int doctorId, Model model) {
+    public String getSchedulesByDoctor(@PathVariable long doctorId, Model model) {
         List<DoctorSchedule> schedules = doctorScheduleService.getSchedulesByDoctorId(doctorId);
+        for (DoctorSchedule schedule : schedules) {
+            schedule.setBookingSlots(
+                    doctorScheduleService.getScheduleWithSlots(schedule.getScheduleID()).getBookingSlots());
+        }
         Doctor doctor = doctorRepository.findByDoctorID(doctorId);
         model.addAttribute("schedules", schedules);
         model.addAttribute("doctor", doctor);
@@ -95,7 +154,10 @@ public class AdminScheduleController {
             return "redirect:/login";
         }
         List<DoctorSchedule> pendingSchedules = doctorScheduleService.getPendingSchedules();
-        System.out.println("Pending Schedules count: " + pendingSchedules.size());
+        for (DoctorSchedule schedule : pendingSchedules) {
+            schedule.setBookingSlots(
+                    doctorScheduleService.getScheduleWithSlots(schedule.getScheduleID()).getBookingSlots());
+        }
         model.addAttribute("pendingSchedules", pendingSchedules);
         model.addAttribute("currentUser", currentUser);
         return "admin/admin-schedules";
