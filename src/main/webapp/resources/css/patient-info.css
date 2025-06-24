@@ -11,7 +11,7 @@
 }
 
 .page-title h1 {
-    color: #7749F8;
+    color: #343a40;
     font-size: 2rem;
     margin-bottom: 0.5rem;
 }
@@ -94,8 +94,8 @@
 }
 
 .step.active .step-number {
-    background: #7749F8;
-    border-color: #7749F8;
+    background: #667eea;
+    border-color: #667eea;
     color: white;
 }
 
@@ -324,13 +324,14 @@ textarea.form-control {
 }
 
 .btn-secondary {
-    background: #6c757d;
-    border-color: #6c757d;
+    background: 2px solid #7749F8;
+    border-color: #7749F8;
 }
 
-.btn-secondary:hover {
-    background: #5a6268;
-    border-color: #545b62;
+.btn-secondary:hover {    
+    background: rgba(119, 73, 248, 0.1);
+    color: #7749F8;
+    transform: translateY(-2px);
 }
 
 /* Sweet Alert Customization */

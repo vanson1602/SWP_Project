@@ -262,7 +262,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Scheduled(fixedRate = 300000)
     public void cancelUnpaidAppointments() {
-        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(12);
+        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(3);
         List<Appointment> unpaidAppointments = appointmentRepository.findUnpaidAppointments(cutoffTime);
 
         for (Appointment appointment : unpaidAppointments) {
