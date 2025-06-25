@@ -26,7 +26,7 @@
               <ul class="navbar-nav gap-4 fw-semibold fs-5">
 
                 <li class="nav-item">
-                  <a class="nav-link" href="/api/admin/user">List All User</a>
+                  <a class="nav-link" href="/admin/user">List All User</a>
                 </li>
               </ul>
             </div>
@@ -37,7 +37,7 @@
             <div class="col-12 mx-auto">
               <div class="d-flex justify-content-between">
                 <h3>Table User</h3>
-                <a href="/api/admin/create" class="btn btn-primary">Create User</a>
+                <a href="/admin/create" class="btn btn-primary">Create User</a>
               </div>
               <hr />
               <table class="table table-hover">
