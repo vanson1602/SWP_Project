@@ -205,15 +205,16 @@
                                         <!-- Specialization Filter -->
                                         <div class="filter-group">
                                             <h6>Chuyên khoa</h6>
-                                            <c:forEach var="spec"
-                                                items="${['General Medicine', 'Surgery', 'Pediatrics', 'Cardiology', 'Neurology', 'Orthopedics', 'Oncology', 'Dermatology', 'Gastroenterology', 'Endocrinology']}">
+                                            <c:forEach var="specialization" items="${specializations}">
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="checkbox"
-                                                        name="specializationName" value="${spec}"
-                                                        id="spec_${spec.hashCode()}"
-                                                        ${selectedSpecializations.contains(spec) ? 'checked' : '' }>
+                                                        name="specializationName"
+                                                        value="${specialization.specializationName}"
+                                                        id="spec_${specialization.specializationID}"
+                                                        ${selectedSpecializations.contains(specialization.specializationName)
+                                                        ? 'checked' : '' }>
                                                     <label class="form-check-label"
-                                                        for="spec_${spec.hashCode()}">${spec}</label>
+                                                        for="spec_${specialization.specializationID}">${specialization.specializationName}</label>
                                                 </div>
                                             </c:forEach>
                                         </div>
@@ -323,3 +324,5 @@
             </body>
 
             </html>
+
+            <script>
