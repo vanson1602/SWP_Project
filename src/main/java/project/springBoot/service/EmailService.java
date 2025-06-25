@@ -66,14 +66,14 @@ public class EmailService {
         }
     }
 
-    public void sendAppointmentConfirmationEmail(String email, Appointment appointment) {
+    public void sendAppointmentBookingConfirmationEmail(String email, Appointment appointment) {
         String subject = "Xác nhận đặt lịch khám thành công";
         String message = String.format(
                 """
                         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border-radius: 8px; background-color: #f9f9f9;">
                             <h2 style="color: #333; text-align: center;">Xác nhận đặt lịch khám</h2>
                             <p style="font-size: 16px; color: #555;">Xin chào %s,</p>
-                            <p style="font-size: 16px; color: #555;">Lịch hẹn khám của bạn đã được xác nhận thành công với thông tin như sau:</p>
+                            <p style="font-size: 16px; color: #555;">Cảm ơn bạn đã đặt lịch khám tại Healthcare++. Lịch hẹn của bạn đã được tạo thành công với thông tin như sau:</p>
                             <div style="background-color: #fff; padding: 15px; border-radius: 5px; margin: 20px 0;">
                                 <table style="width: 100%%; border-collapse: collapse;">
                                     <tr>
@@ -89,22 +89,93 @@ public class EmailService {
                                         <td style="padding: 8px; border-bottom: 1px solid #eee;">%s</td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 8px;"><strong>Loại khám:</strong></td>
-                                        <td style="padding: 8px;">%s</td>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Loại khám:</strong></td>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;">%s</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px;"><strong>Trạng thái:</strong></td>
+                                        <td style="padding: 8px; color: #e67e22;">Chờ thanh toán</td>
                                     </tr>
                                 </table>
                             </div>
-                            <p style="font-size: 14px; color: #555;">Vui lòng đến đúng giờ để được phục vụ tốt nhất.</p>
-                            <p style="font-size: 14px; color: #555;">Nếu bạn cần hủy hoặc thay đổi lịch hẹn, vui lòng thông báo trước ít nhất 24 giờ.</p>
+                            <div style="background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #ffc107;">
+                                <p style="font-size: 14px; color: #856404; margin: 0;"><strong>Lưu ý quan trọng:</strong></p>
+                                <p style="font-size: 14px; color: #856404; margin: 5px 0;">• Vui lòng hoàn tất thanh toán để xác nhận lịch hẹn</p>
+                                <p style="font-size: 14px; color: #856404; margin: 5px 0;">• Lịch hẹn sẽ tự động hủy nếu không thanh toán trong 24 giờ</p>
+                                <p style="font-size: 14px; color: #856404; margin: 5px 0;">• Đến đúng giờ để được phục vụ tốt nhất</p>
+                            </div>
                             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
                                 <p style="font-size: 14px; color: #777; margin: 5px 0;">Trân trọng,</p>
-                                <p style="font-size: 14px; color: #777; margin: 5px 0;">Heathcare++</p>
+                                <p style="font-size: 14px; color: #777; margin: 5px 0;">Healthcare++</p>
                             </div>
                         </div>
                         """,
                 appointment.getPatient().getUser().getFullName(),
                 appointment.getAppointmentNumber(),
-                // appointment.getBookingSlot().getSchedule().getDoctor().getUser().getFullName(),
+                appointment.getDoctor().getUser().getFullName(),
+                appointment.getAppointmentDate().format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")),
+                appointment.getAppointmentType().getTypeName());
+
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setTo(email);
+            helper.setSubject(subject);
+            helper.setFrom(from);
+            helper.setText(message, true);
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send booking confirmation email: " + e.getMessage(), e);
+        }
+    }
+
+    public void sendAppointmentConfirmationEmail(String email, Appointment appointment) {
+        String subject = "Xác nhận thanh toán và lịch hẹn thành công";
+        String message = String.format(
+                """
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border-radius: 8px; background-color: #f9f9f9;">
+                            <h2 style="color: #333; text-align: center;">Xác nhận lịch hẹn đã được thanh toán</h2>
+                            <p style="font-size: 16px; color: #555;">Xin chào %s,</p>
+                            <p style="font-size: 16px; color: #555;">Cảm ơn bạn đã hoàn tất thanh toán. Lịch hẹn khám của bạn đã được xác nhận thành công với thông tin như sau:</p>
+                            <div style="background-color: #fff; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                                <table style="width: 100%%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee; width: 35%%;"><strong>Mã lịch hẹn:</strong></td>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;">%s</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Bác sĩ:</strong></td>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;">%s</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Ngày giờ khám:</strong></td>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;">%s</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Loại khám:</strong></td>
+                                        <td style="padding: 8px; border-bottom: 1px solid #eee;">%s</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px;"><strong>Trạng thái:</strong></td>
+                                        <td style="padding: 8px; color: #28a745;">Đã xác nhận</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div style="background-color: #d1ecf1; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #17a2b8;">
+                                <p style="font-size: 14px; color: #0c5460; margin: 0;"><strong>Thông tin quan trọng:</strong></p>
+                                <p style="font-size: 14px; color: #0c5460; margin: 5px 0;">• Vui lòng đến đúng giờ để được phục vụ tốt nhất</p>
+                                <p style="font-size: 14px; color: #0c5460; margin: 5px 0;">• Nếu cần hủy hoặc thay đổi lịch hẹn, vui lòng thông báo trước ít nhất 24 giờ</p>
+                                <p style="font-size: 14px; color: #0c5460; margin: 5px 0;">• Mang theo giấy tờ tùy thân khi đến khám</p>
+                            </div>
+                            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                                <p style="font-size: 14px; color: #777; margin: 5px 0;">Trân trọng,</p>
+                                <p style="font-size: 14px; color: #777; margin: 5px 0;">Healthcare++</p>
+                            </div>
+                        </div>
+                        """,
+                appointment.getPatient().getUser().getFullName(),
+                appointment.getAppointmentNumber(),
+                appointment.getDoctor().getUser().getFullName(),
                 appointment.getAppointmentDate().format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")),
                 appointment.getAppointmentType().getTypeName());
 
@@ -151,11 +222,11 @@ public class EmailService {
                             </div>
                             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
                                 <p style="font-size: 14px; color: #777; margin: 5px 0;">Trân trọng,</p>
-                                <p style="font-size: 14px; color: #777; margin: 5px 0;">Heathcare++</p>
+                                <p style="font-size: 14px; color: #777; margin: 5px 0;">Healthcare++</p>
                             </div>
                         </div>
                         """,
-                // appointment.getBookingSlot().getSchedule().getDoctor().getUser().getFullName(),
+                appointment.getDoctor().getUser().getFullName(),
                 appointment.getAppointmentNumber(),
                 appointment.getPatient().getUser().getFullName(),
                 appointment.getAppointmentDate().format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")),
@@ -169,7 +240,7 @@ public class EmailService {
             helper.setFrom(from);
             helper.setText(message, true);
             mailSender.send(mimeMessage);
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Failed to send notification email: " + e.getMessage(), e);
         }
     }

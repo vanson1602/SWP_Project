@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -337,18 +338,18 @@ public class AppointmentController {
         return "appointment/my-appointments";
     }
 
-    // @PostMapping("/{id}/cancel")
-    // public String cancelAppointment(
-    // @PathVariable("id") Long appointmentId,
-    // @RequestParam String reason,
-    // Principal principal,
-    // Model model) {
-    // try {
-    // appointmentService.cancelAppointment(appointmentId, reason);
-    // return "redirect:/appointments/my-appointments?success=true";
-    // } catch (RuntimeException e) {
-    // model.addAttribute("error", e.getMessage());
-    // return "redirect:/appointments/my-appointments?error=" + e.getMessage();
-    // }
-    // }
+    @PostMapping("/{id}/cancel")
+    public String cancelAppointment(
+            @PathVariable("id") Long appointmentId,
+            @RequestParam String reason,
+            Principal principal,
+            Model model) {
+        try {
+            appointmentService.cancelAppointment(appointmentId, reason);
+            return "redirect:/appointments/my-appointments?success=true";
+        } catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            return "redirect:/appointments/my-appointments?error=" + e.getMessage();
+        }
+    }
 }

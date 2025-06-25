@@ -81,6 +81,20 @@ public class AppointmentServiceImpl implements AppointmentService {
         doctorNotification.setRead(false);
         notificationRepository.save(doctorNotification);
 
+        try {
+            String patientEmail = patient.getUser().getEmail();
+            emailService.sendAppointmentBookingConfirmationEmail(patientEmail, appointment);
+        } catch (Exception e) {
+            System.err.println("Failed to send booking confirmation email: " + e.getMessage());
+        }
+
+        try {
+            String doctorEmail = slot.getSchedule().getDoctor().getUser().getEmail();
+            emailService.sendDoctorAppointmentNotificationEmail(doctorEmail, appointment);
+        } catch (Exception e) {
+            System.err.println("Failed to send doctor notification email: " + e.getMessage());
+        }
+
         return appointment;
     }
 
