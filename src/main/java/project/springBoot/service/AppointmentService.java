@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Page;
 
+import project.springBoot.model.Appointment;
+import project.springBoot.model.AppointmentType;
+
 public interface AppointmentService {
     Appointment createAppointment(Long patientId, Long slotId, Long specializationId,
             Long appointmentTypeId, String notes);
@@ -35,4 +38,9 @@ public interface AppointmentService {
     Page<Appointment> getAppointmentsByPatientId(long patientId, int page, int size);
 
     Page<Appointment> getAppointmentsByPatientAndStatus(long patientId, String status, int page, int size);
+
+    List<Appointment> getAppointmentsByDoctorAndDateRange(Long doctorId, LocalDateTime startDate,
+            LocalDateTime endDate);
+
+    Appointment findByIdAppointment(Long appointmentId);
 }

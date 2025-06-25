@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -74,9 +75,9 @@ public class Appointment {
     private List<Examination> examinations = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<DoctorBookingSlot> bookingSlots = new ArrayList<>();
-
+    @OneToOne(mappedBy = "appointment", fetch = FetchType.LAZY)
+    private DoctorBookingSlot bookingSlot;
+    
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

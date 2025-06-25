@@ -1,5 +1,6 @@
 package project.springBoot.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,9 @@ public class DoctorBookingSlotService {
         return bookingSlotRepository.findAll(); // Placeholder
     }
 
-    public List<DoctorBookingSlot> getBookingSlotsByDoctorId(Long doctorId) {
-        return bookingSlotRepository.findByScheduleDoctorDoctorID(doctorId);
+    public List<DoctorBookingSlot> getBookingSlotsByDoctorId(Long doctorId, LocalDateTime startTime,
+            LocalDateTime endTime) {
+        return bookingSlotRepository.findByScheduleDoctorDoctorIDAndDateRange(doctorId, startTime, endTime);
     }
 
     public DoctorBookingSlot save(DoctorBookingSlot slot) {
@@ -37,6 +39,10 @@ public class DoctorBookingSlotService {
     public void deleteByScheduleId(Long scheduleId) {
         List<DoctorBookingSlot> slots = getBookingSlotsByScheduleId(scheduleId);
         bookingSlotRepository.deleteAll(slots);
+    }
+
+    public List<DoctorBookingSlot> getBookingSlotsByDoctorId(Long doctorId) {
+        return bookingSlotRepository.findByScheduleDoctorDoctorIDAndNotCompleted(doctorId);
     }
 
 }

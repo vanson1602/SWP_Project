@@ -141,7 +141,7 @@ public class AdminScheduleController {
             schedule.setBookingSlots(
                     doctorScheduleService.getScheduleWithSlots(schedule.getScheduleID()).getBookingSlots());
         }
-        Doctor doctor = doctorRepository.findByDoctorID(doctorId);
+        Doctor doctor = doctorRepository.findByIdDoctor(doctorId);
         model.addAttribute("schedules", schedules);
         model.addAttribute("doctor", doctor);
         return "admin/schedules/doctor_schedules";

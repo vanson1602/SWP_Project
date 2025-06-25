@@ -117,7 +117,7 @@ public class UserService {
     }
 
     public Long getDoctorIdByUserId(long userId) {
-        return doctorRepository.findByUserUserID(userId)
+        return doctorRepository.findByUserId(userId)
                 .map(Doctor::getDoctorID)
                 .orElse(null);
     }

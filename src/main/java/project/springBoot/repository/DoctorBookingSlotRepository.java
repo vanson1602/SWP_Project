@@ -13,10 +13,10 @@ import project.springBoot.model.DoctorSchedule;
 
 @Repository
 public interface DoctorBookingSlotRepository extends JpaRepository<DoctorBookingSlot, Long> {
-    List<DoctorBookingSlot> findByScheduleAndStatusAndStartTimeGreaterThanOrderByStartTimeAsc(
-            DoctorSchedule schedule,
-            String status,
-            LocalDateTime startTime);
+        List<DoctorBookingSlot> findByScheduleAndStatusAndStartTimeGreaterThanOrderByStartTimeAsc(
+                        DoctorSchedule schedule,
+                        String status,
+                        LocalDateTime startTime);
 
         @Query("SELECT bs FROM DoctorBookingSlot bs " +
                         "WHERE bs.schedule.doctor.doctorID = :doctorId " +
@@ -35,4 +35,26 @@ public interface DoctorBookingSlotRepository extends JpaRepository<DoctorBooking
         @Query("SELECT bs FROM DoctorBookingSlot bs " +
                         "WHERE bs.status = 'Available' AND bs.startTime < :currentTime")
         List<DoctorBookingSlot> findPastAvailableSlots(@Param("currentTime") LocalDateTime currentTime);
+
+        @Query("SELECT DISTINCT bs FROM DoctorBookingSlot bs " +
+                        "LEFT JOIN FETCH bs.schedule s " +
+                        "LEFT JOIN FETCH s.doctor d " +
+                        "LEFT JOIN FETCH bs.appointment a " +
+                        "LEFT JOIN FETCH a.patient p " +
+                        "LEFT JOIN FETCH p.user pu " +
+                        "LEFT JOIN FETCH a.appointmentType at " +
+                        "WHERE bs.schedule.doctor.doctorID = :doctorId " +
+                        "AND bs.startTime BETWEEN :startTime AND :endTime " +
+                        "ORDER BY bs.startTime")
+        List<DoctorBookingSlot> findByScheduleDoctorDoctorIDAndDateRange(
+                        @Param("doctorId") Long doctorId,
+                        @Param("startTime") LocalDateTime startTime,
+                        @Param("endTime") LocalDateTime endTime);
+
+        @Query("SELECT bs FROM DoctorBookingSlot bs " +
+                        "WHERE bs.schedule.doctor.doctorID = :doctorId " +
+                        "AND bs.status = 'Available' " +
+                        "ORDER BY bs.startTime")
+        List<DoctorBookingSlot> findByScheduleDoctorDoctorIDAndNotCompleted(
+                        @Param("doctorId") Long doctorId);
 }

@@ -34,7 +34,8 @@ public class NotificationDTO {
             dto.setAppointmentDateTime(notification.getAppointment().getBookingSlot().getStartTime());
             dto.setAppointmentType(notification.getAppointment().getAppointmentType().getTypeName());
             dto.setDoctorName(
-                    notification.getAppointment().getBookingSlot().getSchedule().getDoctor().getUser().getFullName());
+                    notification.getAppointment().getBookingSlot().getSchedule().getDoctor().getUser()
+                            .getFullName());
         }
 
         return dto;

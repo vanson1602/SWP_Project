@@ -1,5 +1,8 @@
 package project.springBoot.repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -47,4 +50,10 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
         Doctor save(Doctor doctor);
 
         List<Doctor> findAll();
+
+        @Query("SELECT d FROM Doctor d WHERE d.user.userID = :userId")
+        Optional<Doctor> findByUserId(@Param("userId") long userId);
+
+        @Query("SELECT d FROM Doctor d WHERE d.doctorID = :doctorId")
+        Doctor findByIdDoctor(@Param("doctorId") long doctorId);
 }

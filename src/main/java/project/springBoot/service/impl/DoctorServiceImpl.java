@@ -81,24 +81,20 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     public Optional<Doctor> findByUserId(long userId) {
-        return doctorRepository.findByUserUserID(userId);
+        return doctorRepository.findByUserId(userId);
     }
 
     @Override
     public Doctor getDoctorByUserId(long userId) {
-        return doctorRepository.findByUserUserID(userId).orElse(null);
+        return doctorRepository.findByUserId(userId).orElse(null);
     }
 
-    @Override
-    public Doctor save(Doctor doctor) {
-        return doctorRepository.save(doctor);
-    }
 
     @Override
     public Doctor findById(Long id) {
         return doctorRepository.findById(id).orElse(null);
     }
-}
+
 
     @Override
     public Doctor save(Doctor doctor) {

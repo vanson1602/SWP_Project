@@ -117,7 +117,7 @@ public class DoctorController {
         if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/access-denied";
         }
-        Appointment appointment = appointmentService.findById(appointmentId);
+        Appointment appointment = appointmentService.findByIdAppointment(appointmentId);
         if (appointment != null) {
             // Get the latest examination for this appointment
             Examination latestExamination = null;
@@ -163,7 +163,7 @@ public class DoctorController {
         if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/access-denied";
         }
-        Appointment appointment = appointmentService.findById(appointmentId);
+        Appointment appointment = appointmentService.findByIdAppointment(appointmentId);
         if (appointment != null) {
             examination.setAppointment(appointment);
             MedicalRecord medicalRecord = medicalRecordService.findById(appointment.getPatient().getPatientID());
@@ -191,7 +191,7 @@ public class DoctorController {
             System.out.println("doctorId is null for user: " + currentUser.getUsername());
             return "redirect:/login";
         }
-        Appointment appointment = appointmentService.findById(appointmentId);
+        Appointment appointment = appointmentService.findByIdAppointment(appointmentId);
         if (appointment != null) {
             Examination examination = null;
             if (!appointment.getExaminations().isEmpty()) {
@@ -233,7 +233,7 @@ public class DoctorController {
         try {
             System.out.println("Received request data: " + requestData);
 
-            Appointment appointment = appointmentService.findById(appointmentId);
+            Appointment appointment = appointmentService.findByIdAppointment(appointmentId);
             if (appointment == null) {
                 throw new IllegalArgumentException("Không tìm thấy lịch khám");
             }
