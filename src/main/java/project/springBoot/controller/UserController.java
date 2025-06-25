@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
+import project.springBoot.model.Doctor;
 import project.springBoot.model.User;
 import project.springBoot.service.UploadFileService;
 import project.springBoot.service.UserService;
@@ -137,6 +139,12 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error updating user: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/admin/doctor/create")
+    public String getCreateDoctorPage(Model model) {
+        model.addAttribute("newDoctor", new Doctor());
+        return "doctor/create-doctor";
     }
 
 }
