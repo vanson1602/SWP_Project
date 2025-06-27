@@ -172,4 +172,5 @@ public class EmailService {
             throw new RuntimeException("Failed to send notification email: " + e.getMessage(), e);
         }
     }
+
 }
