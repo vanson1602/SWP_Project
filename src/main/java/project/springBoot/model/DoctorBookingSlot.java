@@ -54,4 +54,8 @@ public class DoctorBookingSlot {
                 ", appointmentID=" + (appointment != null ? appointment.getAppointmentID() : null) +
                 ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
+
+    public boolean isAvailable() {
+        return this.status != null && this.status.equals("Available");
+    }
 }

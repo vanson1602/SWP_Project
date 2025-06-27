@@ -1,6 +1,7 @@
 package project.springBoot.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.springBoot.model.Notification;
@@ -22,8 +23,24 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Notification> getRecentNotifications(Long userId) {
-        return notificationRepository.findTop10ByUserUserIDOrderByCreatedAtDesc(userId);
+        List<Notification> notifications = notificationRepository.findTop10ByUserUserIDOrderByCreatedAtDesc(userId);
+
+        // Initialize lazy-loaded relationships
+        for (Notification notification : notifications) {
+            if (notification.getAppointment() != null) {
+                Hibernate.initialize(notification.getAppointment());
+                Hibernate.initialize(notification.getAppointment().getBookingSlot());
+                Hibernate.initialize(notification.getAppointment().getBookingSlot().getSchedule());
+                Hibernate.initialize(notification.getAppointment().getBookingSlot().getSchedule().getDoctor());
+                Hibernate
+                        .initialize(notification.getAppointment().getBookingSlot().getSchedule().getDoctor().getUser());
+                Hibernate.initialize(notification.getAppointment().getAppointmentType());
+            }
+        }
+
+        return notifications;
     }
 
     @Override
