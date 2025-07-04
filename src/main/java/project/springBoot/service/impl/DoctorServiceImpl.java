@@ -19,6 +19,14 @@ import project.springBoot.repository.PatientRepository;
 import project.springBoot.repository.UserRepository;
 import project.springBoot.service.DoctorService;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import org.hibernate.Hibernate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -27,6 +35,7 @@ public class DoctorServiceImpl implements DoctorService {
     private final DoctorBookingSlotRepository bookingSlotRepository;
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(DoctorServiceImpl.class);
 
     @Override
     public List<Doctor> getDoctorsBySpecialization(Long specializationId) {
@@ -42,8 +51,20 @@ public class DoctorServiceImpl implements DoctorService {
     public List<DoctorBookingSlot> getAvailableSlots(Long doctorId, LocalDate date) {
         LocalDateTime startTime = date.atStartOfDay();
         LocalDateTime endTime = date.plusDays(1).atStartOfDay();
+        LocalDateTime currentTime = LocalDateTime.now();
 
-        return bookingSlotRepository.findAvailableSlotsByDoctorAndTimeRange(doctorId, startTime, endTime);
+        // Block any past slots that are still marked as available
+        List<DoctorBookingSlot> pastSlots = bookingSlotRepository.findPastAvailableSlots(currentTime);
+        for (DoctorBookingSlot slot : pastSlots) {
+            slot.setStatus("Blocked");
+            slot.setModifiedAt(LocalDateTime.now());
+            bookingSlotRepository.save(slot);
+        }
+
+        // Only return slots that are in the future
+        return bookingSlotRepository.findAvailableSlotsByDoctorAndTimeRange(doctorId,
+                currentTime.isAfter(startTime) ? currentTime : startTime,
+                endTime);
     }
 
     @Override
@@ -69,21 +90,83 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     public Optional<Doctor> findByUserId(long userId) {
-        return doctorRepository.findByUserUserID(userId);
+        return doctorRepository.findByUserId(userId);
     }
 
     @Override
     public Doctor getDoctorByUserId(long userId) {
-        return doctorRepository.findByUserUserID(userId).orElse(null);
+        return doctorRepository.findByUserId(userId).orElse(null);
     }
 
-    @Override
-    public Doctor save(Doctor doctor) {
-        return doctorRepository.save(doctor);
-    }
 
     @Override
     public Doctor findById(Long id) {
         return doctorRepository.findById(id).orElse(null);
+    }
+
+
+    @Override
+    public Doctor save(Doctor doctor) {
+        if (doctor.getUser() == null) {
+            throw new IllegalArgumentException("Doctor must have an associated user");
+        }
+
+        // Set creation/modification timestamps
+        LocalDateTime now = LocalDateTime.now();
+        doctor.setCreatedAt(now);
+        doctor.setModifiedAt(now);
+
+        // Initialize collections if they're null
+        if (doctor.getSpecializations() == null) {
+            doctor.setSpecializations(new java.util.HashSet<>());
+        }
+        if (doctor.getSchedules() == null) {
+            doctor.setSchedules(new java.util.HashSet<>());
+        }
+        if (doctor.getFeedbacks() == null) {
+            doctor.setFeedbacks(new java.util.HashSet<>());
+        }
+
+        // Save the doctor
+        return doctorRepository.save(doctor);
+    }
+
+    private Set<String> parseSpecializations(String[] specializationNames) {
+        if (specializationNames == null || specializationNames.length == 0) {
+            return null;
+        }
+        return new HashSet<>(Arrays.asList(specializationNames));
+    }
+
+    @Override
+    public List<Doctor> findDoctorByName(String keyword, String[] specializationNames, Integer experienceYears,
+            BigDecimal consultationFee) {
+        logger.info("Searching doctors by name with parameters:");
+        logger.info("Keyword: {}", keyword);
+        logger.info("Specializations: {}", Arrays.toString(specializationNames));
+        logger.info("Experience Years: {}", experienceYears);
+        logger.info("Consultation Fee: {}", consultationFee);
+
+        Set<String> specializations = parseSpecializations(specializationNames);
+        List<Doctor> doctors = doctorRepository.findDoctorsAdvanced(keyword, specializations, experienceYears,
+                consultationFee);
+        logger.info("Found {} doctors", doctors.size());
+        return doctors;
+    }
+
+    @Override
+    public List<Doctor> findDoctorBySpecility(String keyword, String[] specializationNames, Integer experienceYears,
+            BigDecimal consultationFee) {
+        logger.info("Searching doctors by specialty with parameters:");
+        logger.info("Keyword: {}", keyword);
+        logger.info("Specializations: {}", Arrays.toString(specializationNames));
+        logger.info("Experience Years: {}", experienceYears);
+        logger.info("Consultation Fee: {}", consultationFee);
+
+        Set<String> specializations = parseSpecializations(specializationNames);
+        List<Doctor> doctors = doctorRepository.findDoctorsAdvanced(keyword, specializations, experienceYears,
+                consultationFee);
+        logger.info("Found {} doctors", doctors.size());
+        return doctors;
     }
 }

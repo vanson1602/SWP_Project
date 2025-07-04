@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="/css/homepage.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <title>HealthCare+ - Tạo Hồ sơ Khám bệnh</title>
+    <title>HealthCare+ - <c:choose><c:when test="${not empty examination.examinationID}">Sửa Hồ sơ Khám bệnh</c:when><c:otherwise>Tạo Hồ sơ Khám bệnh</c:otherwise></c:choose></title>
     <style>
         .exam-form-container {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -257,66 +257,21 @@
                 font-size: 1rem;
             }
             
+            .row {
+                margin-bottom: 1rem;
+            }
+            
+            .col-md-6 .form-group {
+                margin-bottom: 1rem;
+            }
+            
         }
     </style>
 </head>
 
 <body>
     <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <nav class="nav">
-                <!-- Logo -->
-                <a href="<c:url value='/doctor/home' />" class="logo">
-                    <div class="logo-icon">⚕️</div>
-                    HealthCare+
-                </a>
-
-                <!-- Mobile Menu Button -->
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
-                    <i class="bi bi-list"></i>
-                </button>
-
-                <!-- Navigation Links -->
-                <ul class="nav-links" id="navLinks">
-                    <li><a href="<c:url value='/doctor/home' />"><i class="bi bi-house-door"></i> Trang chủ</a></li>
-                    <li><a href="/doctor/doctors"><i class="bi bi-person-badge"></i> Bác sĩ</a></li>
-                    <li><a href="/doctor/specialties"><i class="bi bi-clipboard2-pulse"></i> Chuyên khoa</a></li>
-                    <li><a href="<c:url value='/doctor/appointments' />" class="active"><i class="bi bi-calendar-check"></i> Lịch hẹn</a></li>
-                </ul>
-
-                <!-- User Menu -->
-                <div class="user-menu">
-                    <c:choose>
-                        <c:when test="${not empty currentUser}">
-                            <button class="notification-btn">
-                                <i class="bi bi-bell"></i>
-                                <span class="notification-badge">2</span>
-                            </button>
-                            <div class="dropdown">
-                                <button class="profile-btn" id="profileDropdownBtn">
-                                    <i class="bi bi-person-circle"></i>
-                                    ${currentUser.firstName} ${currentUser.lastName}
-                                </button>
-                                <ul class="dropdown-menu" id="profileDropdown">
-                                    <li><a class="dropdown-item" href="/doctor/profile"><i class="bi bi-person"></i> Trang cá nhân</a></li>
-                                    <li><a class="dropdown-item" href="/doctor/settings"><i class="bi bi-gear"></i> Cài đặt</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="/doctor/logout"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
-                                </ul>
-                            </div>
-                        </c:when>
-                        <c:otherwise>
-                            <a href="<c:url value='/doctor/login' />" class="profile-btn">
-                                <i class="bi bi-box-arrow-in-right"></i>
-                                Đăng nhập
-                            </a>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-            </nav>
-        </div>
-    </header>
+    <jsp:include page="../shared/header-doctor.jsp" />
 
     <!-- Custom JavaScript -->
     <script>
@@ -407,81 +362,93 @@
                         </div>
                     </div>
 
-                    <!-- Huyết áp tâm thu -->
-                    <div class="form-group">
-                        <label for="bloodPressureSystolic" class="form-label">
-                            <i class="bi bi-heart-pulse text-danger"></i>
-                            Huyết áp tâm thu (mmHg)
-                        </label>
-                        <div class="number-input-group">
-                            <button type="button" class="number-btn btn-decrease" onclick="decreaseValue('bloodPressureSystolic')">-</button>
-                            <form:input path="bloodPressureSystolic" type="number" class="number-input" min="0" max="300" id="bloodPressureSystolic" required="true"/>
-                            <button type="button" class="number-btn btn-increase" onclick="increaseValue('bloodPressureSystolic')">+</button>
+                    <!-- Huyết áp -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="bloodPressureSystolic" class="form-label">
+                                    <i class="bi bi-heart-pulse text-danger"></i>
+                                    Huyết áp tâm thu (mmHg)
+                                </label>
+                                <div class="number-input-group">
+                                    <button type="button" class="number-btn btn-decrease" onclick="decreaseValue('bloodPressureSystolic')">-</button>
+                                    <form:input path="bloodPressureSystolic" type="number" class="number-input" min="0" max="300" id="bloodPressureSystolic" required="true"/>
+                                    <button type="button" class="number-btn btn-increase" onclick="increaseValue('bloodPressureSystolic')">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="bloodPressureDiastolic" class="form-label">
+                                    <i class="bi bi-heart-pulse text-danger"></i>
+                                    Huyết áp tâm trương (mmHg)
+                                </label>
+                                <div class="number-input-group">
+                                    <button type="button" class="number-btn btn-decrease" onclick="decreaseValue('bloodPressureDiastolic')">-</button>
+                                    <form:input path="bloodPressureDiastolic" type="number" class="number-input" min="0" max="300" id="bloodPressureDiastolic" required="true"/>
+                                    <button type="button" class="number-btn btn-increase" onclick="increaseValue('bloodPressureDiastolic')">+</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Huyết áp tâm trương -->
-                    <div class="form-group">
-                        <label for="bloodPressureDiastolic" class="form-label">
-                            <i class="bi bi-heart-pulse text-danger"></i>
-                            Huyết áp tâm trương (mmHg)
-                        </label>
-                        <div class="number-input-group">
-                            <button type="button" class="number-btn btn-decrease" onclick="decreaseValue('bloodPressureDiastolic')">-</button>
-                            <form:input path="bloodPressureDiastolic" type="number" class="number-input" min="0" max="300" id="bloodPressureDiastolic" required="true"/>
-                            <button type="button" class="number-btn btn-increase" onclick="increaseValue('bloodPressureDiastolic')">+</button>
+                    <!-- Nhịp tim và Nhiệt độ -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="heartRate" class="form-label">
+                                    <i class="bi bi-heart-pulse text-danger"></i>
+                                    Nhịp tim (bpm)
+                                </label>
+                                <div class="number-input-group">
+                                    <button type="button" class="number-btn btn-decrease" onclick="decreaseValue('heartRate')">-</button>
+                                    <form:input path="heartRate" type="number" class="number-input" min="0" max="300" id="heartRate" required="true"/>
+                                    <button type="button" class="number-btn btn-increase" onclick="increaseValue('heartRate')">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="temperature" class="form-label">
+                                    <i class="bi bi-thermometer-half text-warning"></i>
+                                    Nhiệt độ (độ C)
+                                </label>
+                                <div class="number-input-group">
+                                    <button type="button" class="number-btn btn-decrease" onclick="decreaseValue('temperature', 0.1)">-</button>
+                                    <form:input path="temperature" type="number" class="number-input" step="0.1" min="30" max="45" id="temperature" required="true"/>
+                                    <button type="button" class="number-btn btn-increase" onclick="increaseValue('temperature', 0.1)">+</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Nhịp tim -->
-                    <div class="form-group">
-                        <label for="heartRate" class="form-label">
-                            <i class="bi bi-heart-pulse text-danger"></i>
-                            Nhịp tim (bpm)
-                        </label>
-                        <div class="number-input-group">
-                            <button type="button" class="number-btn btn-decrease" onclick="decreaseValue('heartRate')">-</button>
-                            <form:input path="heartRate" type="number" class="number-input" min="0" max="300" id="heartRate" required="true"/>
-                            <button type="button" class="number-btn btn-increase" onclick="increaseValue('heartRate')">+</button>
+                    <!-- Nhịp thở và Độ bão hòa oxy -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="respiratoryRate" class="form-label">
+                                    <i class="bi bi-lungs text-info"></i>
+                                    Nhịp thở (lần/phút)
+                                </label>
+                                <div class="number-input-group">
+                                    <button type="button" class="number-btn btn-decrease" onclick="decreaseValue('respiratoryRate')">-</button>
+                                    <form:input path="respiratoryRate" type="number" class="number-input" min="0" max="100" id="respiratoryRate" required="true"/>
+                                    <button type="button" class="number-btn btn-increase" onclick="increaseValue('respiratoryRate')">+</button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-                    <!-- Nhiệt độ -->
-                    <div class="form-group">
-                        <label for="temperature" class="form-label">
-                            <i class="bi bi-thermometer-half text-warning"></i>
-                            Nhiệt độ (độ C)
-                        </label>
-                        <div class="number-input-group">
-                            <button type="button" class="number-btn btn-decrease" onclick="decreaseValue('temperature', 0.1)">-</button>
-                            <form:input path="temperature" type="number" class="number-input" step="0.1" min="30" max="45" id="temperature" required="true"/>
-                            <button type="button" class="number-btn btn-increase" onclick="increaseValue('temperature', 0.1)">+</button>
-                        </div>
-                    </div>
-
-                    <!-- Nhịp thở -->
-                    <div class="form-group">
-                        <label for="respiratoryRate" class="form-label">
-                            <i class="bi bi-lungs text-info"></i>
-                            Nhịp thở (lần/phút)
-                        </label>
-                        <div class="number-input-group">
-                            <button type="button" class="number-btn btn-decrease" onclick="decreaseValue('respiratoryRate')">-</button>
-                            <form:input path="respiratoryRate" type="number" class="number-input" min="0" max="100" id="respiratoryRate" required="true"/>
-                            <button type="button" class="number-btn btn-increase" onclick="increaseValue('respiratoryRate')">+</button>
-                        </div>
-                    </div>
-
-                    <!-- Độ bão hòa oxy -->
-                    <div class="form-group">
-                        <label for="oxygenSaturation" class="form-label">
-                            <i class="bi bi-droplet text-info"></i>
-                            Độ bão hòa oxy (%)
-                        </label>
-                        <div class="number-input-group">
-                            <button type="button" class="number-btn btn-decrease" onclick="decreaseValue('oxygenSaturation', 0.1)">-</button>
-                            <form:input path="oxygenSaturation" type="number" class="number-input" step="0.1" min="0" max="100" id="oxygenSaturation" required="true"/>
-                            <button type="button" class="number-btn btn-increase" onclick="increaseValue('oxygenSaturation', 0.1)">+</button>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="oxygenSaturation" class="form-label">
+                                    <i class="bi bi-droplet text-info"></i>
+                                    Độ bão hòa oxy (%)
+                                </label>
+                                <div class="number-input-group">
+                                    <button type="button" class="number-btn btn-decrease" onclick="decreaseValue('oxygenSaturation', 0.1)">-</button>
+                                    <form:input path="oxygenSaturation" type="number" class="number-input" step="0.1" min="0" max="100" id="oxygenSaturation" required="true"/>
+                                    <button type="button" class="number-btn btn-increase" onclick="increaseValue('oxygenSaturation', 0.1)">+</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

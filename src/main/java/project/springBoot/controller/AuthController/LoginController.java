@@ -18,9 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import jakarta.servlet.http.HttpSession;
-import project.springBoot.model.Patient;
 import project.springBoot.model.User;
-import project.springBoot.repository.PatientRepository;
 import project.springBoot.service.UserService;
 
 @Controller
@@ -33,11 +31,9 @@ public class LoginController {
     @Value("${google.client.secret}")
     private String clientSecret;
     private final UserService userService;
-    private final PatientRepository patientRepository;
 
-    public LoginController(UserService userService, PatientRepository patientRepository) {
+    public LoginController(UserService userService) {
         this.userService = userService;
-        this.patientRepository = patientRepository;
     }
 
     @GetMapping("/login")
@@ -56,30 +52,30 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String handleLogin(@RequestParam String emailorusername,
+    public String handleLogin(@RequestParam String emailOrUsername,
             @RequestParam String password,
             HttpSession session,
             Model model) {
-        System.out.println("Login controller received request for: " + emailorusername);
+        System.out.println("Login controller received request for: " + emailOrUsername);
 
         try {
             // Kiểm tra user có tồn tại không
-            User user = userService.getUserByEmailOrUsername(emailorusername, emailorusername);
+            User user = userService.getUserByEmailOrUsername(emailOrUsername, emailOrUsername);
             if (user == null) {
                 model.addAttribute("error", "Tài khoản không tồn tại!");
-                model.addAttribute("emailorusername", emailorusername);
+                model.addAttribute("emailorusername", emailOrUsername);
                 return "authentication/form-login";
             }
 
             // Kiểm tra đã xác thực email chưa
-            if (!user.isVerified()) {
+            if (!user.getIsVerified()) {
                 model.addAttribute("error", "Tài khoản chưa được xác thực! Vui lòng kiểm tra email để xác thực.");
-                model.addAttribute("emailorusername", emailorusername);
+                model.addAttribute("emailorusername", emailOrUsername);
                 return "authentication/form-login";
             }
 
             // Thử đăng nhập
-            user = userService.login(emailorusername, password);
+            user = userService.login(emailOrUsername, password);
             if (user != null) {
                 session.setAttribute("currentUser", user);
                 String role = user.getRole();
@@ -98,28 +94,18 @@ public class LoginController {
                     }
                     return "redirect:/doctor/home";
                 } else {
-                    // Create patient record for existing user if needed
-                    if ("patient".equalsIgnoreCase(user.getRole())) {
-                        Patient patient = patientRepository.findByUser(user);
-                        if (patient == null) {
-                            patient = new Patient();
-                            patient.setUser(user);
-                            patient.setPatientCode("P" + String.format("%06d", user.getUserID()));
-                            patientRepository.save(patient);
-                        }
-                    }
                     return "redirect:/";
                 }
             } else {
                 model.addAttribute("error", "Tên đăng nhập hoăc mật khẩu không chính xác!");
-                model.addAttribute("emailorusername", emailorusername);
+                model.addAttribute("emailorusername", emailOrUsername);
                 return "authentication/form-login";
             }
         } catch (Exception e) {
             System.out.println("Login error: " + e.getMessage());
             e.printStackTrace();
             model.addAttribute("error", "Có lỗi xảy ra trong quá trình đăng nhập!");
-            model.addAttribute("emailorusername", emailorusername);
+            model.addAttribute("emailorusername", emailOrUsername);
             return "authentication/form-login";
         }
     }
@@ -178,26 +164,6 @@ public class LoginController {
                         user.setFirstName(name);
                         user.setRole("patient");
                         userService.handleSaveUser(user);
-                        
-                        // Create patient record if it doesn't exist
-                        Patient patient = patientRepository.findByUser(user);
-                        if (patient == null) {
-                            patient = new Patient();
-                            patient.setUser(user);
-                            patient.setPatientCode("P" + String.format("%06d", user.getUserID()));
-                            patientRepository.save(patient);
-                        }
-                    } else {
-                        // Create patient record for existing user if needed
-                        if ("patient".equalsIgnoreCase(user.getRole())) {
-                            Patient patient = patientRepository.findByUser(user);
-                            if (patient == null) {
-                                patient = new Patient();
-                                patient.setUser(user);
-                                patient.setPatientCode("P" + String.format("%06d", user.getUserID()));
-                                patientRepository.save(patient);
-                            }
-                        }
                     }
 
                     session.setAttribute("currentUser", user);
@@ -210,7 +176,7 @@ public class LoginController {
                         return "redirect:/";
                     } else if ("doctor".equalsIgnoreCase(role)) {
                         return "redirect:/doctor/home";
-                    }else {
+                    } else {
                         return "redirect:/";
                     }
                 }

@@ -19,18 +19,9 @@ public class DoctorBookingSlotService {
         return bookingSlotRepository.findAll(); // Placeholder
     }
 
-    public List<DoctorBookingSlot> getBookingSlotsByDoctorId(Long doctorId) {
-        return bookingSlotRepository.findByScheduleDoctorDoctorIDAndNotCompleted(doctorId);
-    }
-
-    public List<DoctorBookingSlot> getBookingSlotsByDoctorAndDateRange(Long doctorId, LocalDateTime startTime, LocalDateTime endTime) {
+    public List<DoctorBookingSlot> getBookingSlotsByDoctorId(Long doctorId, LocalDateTime startTime,
+            LocalDateTime endTime) {
         return bookingSlotRepository.findByScheduleDoctorDoctorIDAndDateRange(doctorId, startTime, endTime);
-    }
-
-    public List<DoctorBookingSlot> getTodayBookingSlotsByDoctorId(Long doctorId) {
-        LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        LocalDateTime endOfDay = startOfDay.plusDays(1);
-        return bookingSlotRepository.findByScheduleDoctorDoctorIDAndDateRange(doctorId, startOfDay, endOfDay);
     }
 
     public DoctorBookingSlot save(DoctorBookingSlot slot) {
@@ -45,5 +36,13 @@ public class DoctorBookingSlotService {
         bookingSlotRepository.deleteById(id);
     }
 
-    
+    public void deleteByScheduleId(Long scheduleId) {
+        List<DoctorBookingSlot> slots = getBookingSlotsByScheduleId(scheduleId);
+        bookingSlotRepository.deleteAll(slots);
+    }
+
+    public List<DoctorBookingSlot> getBookingSlotsByDoctorId(Long doctorId) {
+        return bookingSlotRepository.findByScheduleDoctorDoctorIDAndNotCompleted(doctorId);
+    }
+
 }

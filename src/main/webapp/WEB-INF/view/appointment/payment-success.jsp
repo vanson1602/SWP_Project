@@ -145,10 +145,10 @@
                 <p>Cảm ơn bạn đã đặt lịch khám tại HealthCare+. Chúng tôi đã gửi email xác nhận đến địa chỉ email của
                     bạn.</p>
                 <div class="btn-group">
-                    <a href="${pageContext.request.contextPath}/appointments/my-appointments" class="btn btn-primary">
+                    <a href="/appointments/my-appointments" class="btn btn-primary">
                         <i class="bi bi-calendar2-check"></i> Xem lịch hẹn của tôi
                     </a>
-                    <a href="${pageContext.request.contextPath}/" class="btn btn-outline-primary">
+                    <a href="/" class="btn btn-outline-primary">
                         <i class="bi bi-house"></i> Về trang chủ
                     </a>
                 </div>

@@ -18,7 +18,7 @@ public interface DoctorBookingSlotRepository extends JpaRepository<DoctorBooking
                         String status,
                         LocalDateTime startTime);
 
-        @Query("SELECT bs FROM DoctorBookingSlot bs " +
+                        @Query("SELECT bs FROM DoctorBookingSlot bs " +
                         "WHERE bs.schedule.doctor.doctorID = :doctorId " +
                         "AND bs.startTime BETWEEN :startTime AND :endTime " +
                         "AND bs.status = 'Available' " +
@@ -28,25 +28,33 @@ public interface DoctorBookingSlotRepository extends JpaRepository<DoctorBooking
                         @Param("startTime") LocalDateTime startTime,
                         @Param("endTime") LocalDateTime endTime);
 
+        @Query("UPDATE DoctorBookingSlot bs SET bs.status = 'Blocked', bs.modifiedAt = CURRENT_TIMESTAMP " +
+                        "WHERE bs.status = 'Available' AND bs.startTime < :currentTime")
+        void blockPastSlots(@Param("currentTime") LocalDateTime currentTime);
+
         @Query("SELECT bs FROM DoctorBookingSlot bs " +
-               "WHERE bs.schedule.doctor.doctorID = :doctorId " +
-               "AND bs.status = 'Available' " +
-               "ORDER BY bs.startTime")
-        List<DoctorBookingSlot> findByScheduleDoctorDoctorIDAndNotCompleted(
-               @Param("doctorId") Long doctorId);
+                        "WHERE bs.status = 'Available' AND bs.startTime < :currentTime")
+        List<DoctorBookingSlot> findPastAvailableSlots(@Param("currentTime") LocalDateTime currentTime);
 
         @Query("SELECT DISTINCT bs FROM DoctorBookingSlot bs " +
-               "LEFT JOIN FETCH bs.schedule s " +
-               "LEFT JOIN FETCH s.doctor d " +
-               "LEFT JOIN FETCH bs.appointment a " +
-               "LEFT JOIN FETCH a.patient p " +
-               "LEFT JOIN FETCH p.user pu " +
-               "LEFT JOIN FETCH a.appointmentType at " +
-               "WHERE bs.schedule.doctor.doctorID = :doctorId " +
-               "AND bs.startTime BETWEEN :startTime AND :endTime " +
-               "ORDER BY bs.startTime")
+                        "LEFT JOIN FETCH bs.schedule s " +
+                        "LEFT JOIN FETCH s.doctor d " +
+                        "LEFT JOIN FETCH bs.appointment a " +
+                        "LEFT JOIN FETCH a.patient p " +
+                        "LEFT JOIN FETCH p.user pu " +
+                        "LEFT JOIN FETCH a.appointmentType at " +
+                        "WHERE bs.schedule.doctor.doctorID = :doctorId " +
+                        "AND bs.startTime BETWEEN :startTime AND :endTime " +
+                        "ORDER BY bs.startTime")
         List<DoctorBookingSlot> findByScheduleDoctorDoctorIDAndDateRange(
-               @Param("doctorId") Long doctorId,
-               @Param("startTime") LocalDateTime startTime,
-               @Param("endTime") LocalDateTime endTime);
+                        @Param("doctorId") Long doctorId,
+                        @Param("startTime") LocalDateTime startTime,
+                        @Param("endTime") LocalDateTime endTime);
+
+        @Query("SELECT bs FROM DoctorBookingSlot bs " +
+                        "WHERE bs.schedule.doctor.doctorID = :doctorId " +
+                        "AND bs.status = 'Available' " +
+                        "ORDER BY bs.startTime")
+        List<DoctorBookingSlot> findByScheduleDoctorDoctorIDAndNotCompleted(
+                        @Param("doctorId") Long doctorId);
 }

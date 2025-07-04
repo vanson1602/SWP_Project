@@ -22,6 +22,7 @@ import jakarta.servlet.http.HttpSession;
 import project.springBoot.model.Appointment;
 import project.springBoot.model.Doctor;
 import project.springBoot.model.DoctorBookingSlot;
+import project.springBoot.model.DoctorSchedule;
 import project.springBoot.model.Examination;
 import project.springBoot.model.MedicalRecord;
 import project.springBoot.model.Medication;
@@ -29,6 +30,7 @@ import project.springBoot.model.Prescription;
 import project.springBoot.model.User;
 import project.springBoot.service.AppointmentService;
 import project.springBoot.service.DoctorBookingSlotService;
+import project.springBoot.service.DoctorScheduleService;
 import project.springBoot.service.DoctorService;
 import project.springBoot.service.ExaminationService;
 import project.springBoot.service.ICDCodeService;
@@ -58,6 +60,8 @@ public class DoctorController {
     private PrescriptionService prescriptionService;
     @Autowired
     private DoctorService doctorService;
+    @Autowired
+    private DoctorScheduleService doctorScheduleService;
 
     @GetMapping("/doctor/home")
     public String getDoctorHomePage(Model model, HttpSession session) {
@@ -65,7 +69,7 @@ public class DoctorController {
         if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/login";
         }
-        
+
         Long doctorId = (Long) session.getAttribute("doctorId");
         if (doctorId == null) {
             // Try to get doctorId from user if it's missing in session
@@ -77,7 +81,7 @@ public class DoctorController {
                 return "redirect:/access-denied";
             }
         }
-        
+
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("doctorId", doctorId);
         return "doctors/doctor-home";
@@ -95,19 +99,13 @@ public class DoctorController {
             return "redirect:/login";
         }
         System.out.println("Fetching appointments and slots for doctorId: " + doctorId);
-        
-        // Get today's booking slots
-        LocalDateTime startOfToday = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        LocalDateTime endOfToday = startOfToday.plusDays(1);
-        List<DoctorBookingSlot> todayBookingSlots = bookingSlotService.getBookingSlotsByDoctorAndDateRange(doctorId, startOfToday, endOfToday);
-        
-        // Get tomorrow's booking slots
-        LocalDateTime startOfTomorrow = startOfToday.plusDays(1);
-        LocalDateTime endOfTomorrow = startOfTomorrow.plusDays(1);
-        List<DoctorBookingSlot> tomorrowBookingSlots = bookingSlotService.getBookingSlotsByDoctorAndDateRange(doctorId, startOfTomorrow, endOfTomorrow);
-        
-        model.addAttribute("todayBookingSlots", todayBookingSlots);
-        model.addAttribute("tomorrowBookingSlots", tomorrowBookingSlots);
+        LocalDateTime startDate = LocalDateTime.now();
+        LocalDateTime endDate = startDate.plusDays(7);
+        List<Appointment> appointments = appointmentService.getAppointmentsByDoctorAndDateRangeIncludingCompleted(doctorId, startDate,
+                endDate);
+        List<DoctorBookingSlot> bookingSlots = bookingSlotService.getBookingSlotsByDoctorId(doctorId);
+        model.addAttribute("appointments", appointments);
+        model.addAttribute("bookingSlots", bookingSlots);
         model.addAttribute("currentUser", currentUser);
         return "doctors/doctor-appointments";
     }
@@ -118,7 +116,7 @@ public class DoctorController {
         if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/access-denied";
         }
-        Appointment appointment = appointmentService.findById(appointmentId);
+        Appointment appointment = appointmentService.findByIdAppointment(appointmentId);
         if (appointment != null) {
             // Get the latest examination for this appointment
             Examination latestExamination = null;
@@ -157,34 +155,6 @@ public class DoctorController {
         return "doctors/doctor-create-exam";
     }
 
-    @GetMapping("/doctor/appointments/{appointmentId}/examination/edit")
-    public String getEditExamForm(@PathVariable Long appointmentId, Model model, HttpSession session) {
-        User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
-            return "redirect:/access-denied";
-        }
-        
-        Appointment appointment = appointmentService.findById(appointmentId);
-        if (appointment == null) {
-            return "redirect:/doctor/appointments";
-        }
-
-        // Get the latest examination for this appointment
-        Examination examination = appointment.getExaminations().stream()
-                .max((e1, e2) -> e1.getExaminationDate().compareTo(e2.getExaminationDate()))
-                .orElse(null);
-
-        if (examination == null) {
-            return "redirect:/doctor/appointments/" + appointmentId;
-        }
-
-        model.addAttribute("appointmentId", appointmentId);
-        model.addAttribute("examination", examination);
-        model.addAttribute("icdCodes", icdCodeService.getAllActiveCodes());
-        model.addAttribute("currentUser", currentUser);
-        return "doctors/doctor-create-exam";
-    }
-
     @PostMapping("/doctor/appointments/{appointmentId}/examination/save")
     public String saveExamination(@PathVariable Long appointmentId, Examination examination, Model model,
             HttpSession session) {
@@ -192,62 +162,79 @@ public class DoctorController {
         if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/access-denied";
         }
-        
-        try {
-            Appointment appointment = appointmentService.findById(appointmentId);
-            if (appointment != null) {
-                examination.setAppointment(appointment);
-                
-                // If this is an update (examination has ID)
-                if (examination.getExaminationID() > 0) {
-                    Examination existingExam = examinationService.getExaminationById(examination.getExaminationID());
-                    if (existingExam != null) {
-                        // Keep the original examination date, relationships and prescriptions
-                        examination.setExaminationDate(existingExam.getExaminationDate());
-                        examination.setMedicalRecord(existingExam.getMedicalRecord());
-                        examination.setDoctor(existingExam.getDoctor());
-                        examination.setPrescriptions(existingExam.getPrescriptions());
-                        examination.setModifiedAt(LocalDateTime.now());
-                    }
-                } else {
-                    // This is a new examination
-                    examination.setExaminationDate(LocalDateTime.now());
-                    examination.setDoctor(doctorService.findById((Long) session.getAttribute("doctorId")));
-                    
-                    // Create or get medical record
-                    MedicalRecord medicalRecord = medicalRecordService.findById(appointment.getPatient().getPatientID());
-                    if (medicalRecord == null) {
-                        medicalRecord = new MedicalRecord();
-                        medicalRecord.setPatient(appointment.getPatient());
-                        medicalRecord = medicalRecordService.save(medicalRecord);
-                    }
-                    examination.setMedicalRecord(medicalRecord);
-                }
-                
-                // Save the examination
-                examinationService.saveExamination(examination);
-                
-                // Update appointment status if examination is completed
-                if ("Completed".equals(examination.getStatus())) {
-                    appointment.setStatus("Completed");
-                    appointment.setModifiedAt(LocalDateTime.now());
-                    appointmentService.saveAppointment(appointment);
-                }
-                
-                // Redirect back to appointment details
-                return "redirect:/doctor/appointments/" + appointmentId;
+        Appointment appointment = appointmentService.findByIdAppointment(appointmentId);
+        if (appointment != null) {
+            examination.setAppointment(appointment);
+            MedicalRecord medicalRecord = medicalRecordService.findById(appointment.getPatient().getPatientID());
+            if (medicalRecord != null) {
+                examination.setMedicalRecord(medicalRecord);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            model.addAttribute("error", "Có lỗi xảy ra khi lưu hồ sơ khám bệnh");
-            return "doctors/doctor-create-exam";
+            examination.setDoctor(appointment.getDoctor());
+            
+            // Only set examination date if this is a new examination (create mode)
+            if (examination.getExaminationID() == 0) {
+                examination.setExaminationDate(LocalDateTime.now());
+                examination.setCreatedAt(LocalDateTime.now());
+            } else {
+                // This is an update - preserve existing prescriptions to avoid deletion
+                Examination existingExamination = examinationService.getExaminationById(examination.getExaminationID());
+                if (existingExamination != null && existingExamination.getPrescriptions() != null) {
+                    examination.setPrescriptions(existingExamination.getPrescriptions());
+                }
+                examination.setModifiedAt(LocalDateTime.now());
+            }
+            
+            examinationService.saveExamination(examination);
+            
+            // Update appointment status to "Completed" after creating/updating examination
+            if (examination.getExaminationID() == 0 || !appointment.getStatus().equals("Completed")) {
+                appointmentService.updateAppointmentStatus(appointment.getAppointmentID(), "Completed", 
+                    "Khám bệnh hoàn tất vào " + LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+            }
+            
+            System.out.println("Examination saved for appointmentId: " + appointmentId + ", examinationId: " + examination.getExaminationID());
+            return "redirect:/doctor/appointments/" + appointmentId;
+        }
+        return "redirect:/doctor/appointments";
+    }
+
+    @GetMapping("/doctor/appointments/{appointmentId}/examination/edit")
+    public String getEditExamForm(@PathVariable Long appointmentId, Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
+            return "redirect:/access-denied";
         }
         
-        return "redirect:/doctor/appointments/" + appointmentId;
+        Appointment appointment = appointmentService.findByIdAppointment(appointmentId);
+        if (appointment == null) {
+            return "redirect:/doctor/appointments";
+        }
+        
+        // Get the latest examination for this appointment
+        Examination examination = null;
+        if (!appointment.getExaminations().isEmpty()) {
+            examination = appointment.getExaminations().stream()
+                    .max((e1, e2) -> e1.getExaminationDate().compareTo(e2.getExaminationDate()))
+                    .orElse(null);
+        }
+        
+        if (examination == null) {
+            // If no examination exists, redirect to create
+            return "redirect:/doctor/appointments/" + appointmentId + "/examination/create";
+        }
+        
+        model.addAttribute("appointmentId", appointmentId);
+        model.addAttribute("examination", examination);
+        model.addAttribute("isEdit", true);
+        model.addAttribute("icdCodes", icdCodeService.getAllActiveCodes());
+        
+        System.out.println("Rendering edit-exam form for appointmentId: " + appointmentId + ", examinationId: " + examination.getExaminationID());
+        return "doctors/doctor-create-exam";
     }
 
     @GetMapping("/doctor/appointments/{appointmentId}/prescriptions")
-    public String getPrescriptionPage(@PathVariable Long appointmentId, @RequestParam(required = false) Long edit, Model model, HttpSession session) {
+    public String getPrescriptionPage(@PathVariable Long appointmentId, @RequestParam(required = false) Long edit,
+            Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/login";
@@ -257,7 +244,7 @@ public class DoctorController {
             System.out.println("doctorId is null for user: " + currentUser.getUsername());
             return "redirect:/login";
         }
-        Appointment appointment = appointmentService.findById(appointmentId);
+        Appointment appointment = appointmentService.findByIdAppointment(appointmentId);
         if (appointment != null) {
             Examination examination = null;
             if (!appointment.getExaminations().isEmpty()) {
@@ -273,7 +260,8 @@ public class DoctorController {
             Prescription prescription = new Prescription();
             if (edit != null) {
                 prescription = prescriptionService.findById(edit);
-                if (prescription == null || prescription.getExamination().getExaminationID() != examination.getExaminationID()) {
+                if (prescription == null
+                        || prescription.getExamination().getExaminationID() != examination.getExaminationID()) {
                     model.addAttribute("error", "Đơn thuốc không tồn tại hoặc không thuộc buổi khám này.");
                 }
             }
@@ -293,12 +281,12 @@ public class DoctorController {
     @PostMapping("/doctor/appointments/{appointmentId}/prescriptions/save")
     @ResponseBody
     public Map<String, Object> savePrescription(@PathVariable("appointmentId") Long appointmentId,
-                                              @RequestBody Map<String, Object> requestData) {
+            @RequestBody Map<String, Object> requestData) {
         Map<String, Object> response = new HashMap<>();
         try {
             System.out.println("Received request data: " + requestData);
-            
-            Appointment appointment = appointmentService.findById(appointmentId);
+
+            Appointment appointment = appointmentService.findByIdAppointment(appointmentId);
             if (appointment == null) {
                 throw new IllegalArgumentException("Không tìm thấy lịch khám");
             }
@@ -314,26 +302,26 @@ public class DoctorController {
 
             // Create new prescription
             Prescription prescription = new Prescription();
-            
+
             // Set basic fields
             if (requestData.get("prescription_id") != null) {
                 prescription.setPrescriptionID(Long.parseLong(requestData.get("prescription_id").toString()));
             }
-            
+
             // Get medication
             Long medicationId = Long.parseLong(requestData.get("medication_id").toString());
             Medication medication = medicationService.findById(medicationId);
             if (medication == null) {
                 throw new IllegalArgumentException("Không tìm thấy thuốc");
             }
-            
+
             // Set quantity and validate stock
             int quantity = Integer.parseInt(requestData.get("quantity").toString());
             if (quantity > medication.getStockQuantity()) {
                 throw new IllegalArgumentException("Số lượng yêu cầu vượt quá số lượng tồn kho");
             }
             prescription.setQuantity(quantity);
-            
+
             // Update medication stock
             medication.setStockQuantity(medication.getStockQuantity() - quantity);
             medicationService.save(medication);
@@ -341,7 +329,7 @@ public class DoctorController {
             // Set other fields
             prescription.setMedication(medication);
             prescription.setExamination(examination);
-            
+
             // Set doctor directly from prescribed_by
             Long doctorId = Long.parseLong(requestData.get("prescribed_by").toString());
             Doctor doctor = doctorService.findById(doctorId);
@@ -349,14 +337,16 @@ public class DoctorController {
                 throw new IllegalArgumentException("Không tìm thấy bác sĩ");
             }
             prescription.setPrescribedBy(doctor);
-            
+
             prescription.setDosage(requestData.get("dosage").toString());
             prescription.setFrequency(requestData.get("frequency").toString());
-            prescription.setDuration(requestData.get("duration") != null ? requestData.get("duration").toString() : null);
-            prescription.setInstructions(requestData.get("instructions") != null ? requestData.get("instructions").toString() : null);
+            prescription
+                    .setDuration(requestData.get("duration") != null ? requestData.get("duration").toString() : null);
+            prescription.setInstructions(
+                    requestData.get("instructions") != null ? requestData.get("instructions").toString() : null);
             prescription.setIsRefillable(Boolean.parseBoolean(requestData.get("is_refillable").toString()));
             prescription.setStatus("PENDING");
-            
+
             if (prescription.getPrescriptionID() == null) {
                 prescription.setCreatedAt(LocalDateTime.now());
             }
@@ -383,7 +373,7 @@ public class DoctorController {
     @PostMapping("/doctor/appointments/{appointmentId}/prescriptions/complete")
     @ResponseBody
     public Map<String, Object> completePrescriptions(@PathVariable("appointmentId") Long appointmentId,
-                                                   @RequestBody Map<String, List<Long>> request) {
+            @RequestBody Map<String, List<Long>> request) {
         Map<String, Object> response = new HashMap<>();
         try {
             List<Long> prescriptionIds = request.get("prescriptionIds");
@@ -393,7 +383,7 @@ public class DoctorController {
 
             // Update status of prescriptions
             prescriptionService.completePrescriptions(prescriptionIds);
-            
+
             response.put("success", true);
             response.put("message", "Đơn thuốc đã được hoàn thành");
         } catch (Exception e) {
@@ -404,9 +394,9 @@ public class DoctorController {
     }
 
     @PostMapping("/doctor/appointments/{appointmentId}/prescriptions/{prescriptionId}/delete")
-    public ResponseEntity<Map<String, Object>> deletePrescription(@PathVariable Long appointmentId, 
-                                                                @PathVariable Long prescriptionId, 
-                                                                HttpSession session) {
+    public ResponseEntity<Map<String, Object>> deletePrescription(@PathVariable Long appointmentId,
+            @PathVariable Long prescriptionId,
+            HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
@@ -444,4 +434,32 @@ public class DoctorController {
         session.invalidate();
         return "redirect:/";
     }
+
+    @GetMapping("/doctor/schedules")
+    public String viewDoctorSchedule(Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
+            return "redirect:/login";
+        }
+
+        Long doctorId = (Long) session.getAttribute("doctorId");
+        if (doctorId == null) {
+            doctorId = userService.getDoctorIdByUserId(currentUser.getUserID());
+            if (doctorId != null) {
+                session.setAttribute("doctorId", doctorId);
+            } else {
+                return "redirect:/access-denied";
+            }
+        }
+
+        List<DoctorSchedule> schedules = doctorScheduleService.getSchedulesByDoctorSorted(doctorId);
+        for (DoctorSchedule schedule : schedules) {
+            schedule.setBookingSlots(
+                    doctorScheduleService.getScheduleWithSlots(schedule.getScheduleID()).getBookingSlots());
+        }
+        model.addAttribute("schedules", schedules);
+        model.addAttribute("currentUser", currentUser);
+        return "doctors/doctor-schedule";
+    }
+
 }

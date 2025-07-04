@@ -3,6 +3,11 @@ package project.springBoot.service.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,12 +79,26 @@ public class AppointmentServiceImpl implements AppointmentService {
         doctorNotification.setRead(false);
         notificationRepository.save(doctorNotification);
 
+        try {
+            String patientEmail = patient.getUser().getEmail();
+            emailService.sendAppointmentBookingConfirmationEmail(patientEmail, appointment);
+        } catch (Exception e) {
+            System.err.println("Failed to send booking confirmation email: " + e.getMessage());
+        }
+
+        try {
+            String doctorEmail = slot.getSchedule().getDoctor().getUser().getEmail();
+            emailService.sendDoctorAppointmentNotificationEmail(doctorEmail, appointment);
+        } catch (Exception e) {
+            System.err.println("Failed to send doctor notification email: " + e.getMessage());
+        }
+
         return appointment;
     }
 
     @Override
     public Appointment updateAppointmentStatus(Long appointmentId, String status, String notes) {
-        Appointment appointment = appointmentRepository.findByIdWithDetails(appointmentId)
+        Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
         appointment.setStatus(status);
@@ -90,19 +109,10 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         if ("Cancelled".equals(status) || "Rejected".equals(status)) {
             DoctorBookingSlot slot = appointment.getBookingSlot();
-            if (slot != null) {
-                slot.setStatus("Available");
-                slot.setAppointment(null);
-                bookingSlotRepository.save(slot);
-            }
+            slot.setStatus("Available");
+            slot.setAppointment(null);
+            bookingSlotRepository.save(slot);
         } else if ("Confirmed".equals(status)) {
-            DoctorBookingSlot slot = appointment.getBookingSlot();
-            if (slot != null) {
-                slot.setStatus("Booked");
-                slot.setAppointment(appointment);
-                bookingSlotRepository.save(slot);
-            }
-
             Notification patientNotification = new Notification();
             patientNotification.setUser(appointment.getPatient().getUser());
             patientNotification.setTitle("Xác nhận lịch hẹn");
@@ -227,6 +237,23 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointmentRepository.save(appointment);
     }
 
+    @Override
+    public List<Appointment> findByPatientAndStatus(Long patientId, String status) {
+        return appointmentRepository.findByPatientAndStatus(patientId, status);
+    }
+
+    @Override
+    public Page<Appointment> getAppointmentsByPatientId(long patientId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").descending());
+        return appointmentRepository.findByPatientId(patientId, pageable);
+    }
+
+    @Override
+    public Page<Appointment> getAppointmentsByPatientAndStatus(long patientId, String status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").descending());
+        return appointmentRepository.findByPatientAndStatus(patientId, status, pageable);
+    }
+
     private void createStatusNotification(Appointment appointment, String status) {
         String title = "";
         String message = "";
@@ -256,26 +283,40 @@ public class AppointmentServiceImpl implements AppointmentService {
         notificationRepository.save(notification);
     }
 
-    @Override
-    public List<Appointment> getAppointmentsByDoctorAndDateRange(Long doctorId, LocalDateTime startDate, LocalDateTime endDate) {
+    @Scheduled(fixedRate = 300000)
+    public void cancelUnpaidAppointments() {
+        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(3);
+        List<Appointment> unpaidAppointments = appointmentRepository.findUnpaidAppointments(cutoffTime);
+
+        for (Appointment appointment : unpaidAppointments) {
+            appointment.setStatus("Cancelled");
+            appointment.setModifiedAt(LocalDateTime.now());
+            appointmentRepository.save(appointment);
+
+            Notification notification = new Notification();
+            notification.setUser(appointment.getPatient().getUser());
+            notification.setAppointment(appointment);
+            notification.setTitle("Lịch Hẹn Bị Hủy");
+            notification.setMessage("Lịch hẹn của bạn đã bị hủy do chưa thanh toán sau 12 giờ.");
+            notification.setNotificationType("Rejection");
+            notification.setPriority("High");
+            notificationRepository.save(notification);
+        }
+    }
+
+    public List<Appointment> getAppointmentsByDoctorAndDateRange(Long doctorId, LocalDateTime startDate,
+            LocalDateTime endDate) {
         return appointmentRepository.findByDoctorAndDateRangeAndNotCompleted(doctorId, startDate, endDate);
     }
 
     @Override
-    public Appointment findById(Long id) {
-        return appointmentRepository.findById(id).orElse(null);
+    public List<Appointment> getAppointmentsByDoctorAndDateRangeIncludingCompleted(Long doctorId, LocalDateTime startDate,
+            LocalDateTime endDate) {
+        return appointmentRepository.findByDoctorAndDateRange(doctorId, startDate, endDate);
     }
 
     @Override
-    public Appointment saveAppointment(Appointment appointment) {
-        return appointmentRepository.save(appointment);
+    public Appointment findByIdAppointment(Long appointmentId) {
+        return appointmentRepository.findById(appointmentId).orElse(null);
     }
-
-    
-
-    @Override
-    public List<Appointment> findByDoctorId(long doctorId) {
-        return appointmentRepository.findByDoctorDoctorID(doctorId);
-    }
-    
 }

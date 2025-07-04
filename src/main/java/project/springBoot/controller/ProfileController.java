@@ -1,5 +1,8 @@
 package project.springBoot.controller;
 
+import java.time.LocalDateTime;
+
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,33 +15,26 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
-import project.springBoot.model.User;
-import project.springBoot.service.UserService;
-import org.mindrot.jbcrypt.BCrypt;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import java.time.LocalDateTime;
+import project.springBoot.model.User;
+import project.springBoot.service.UploadFileService;
+import project.springBoot.service.UserService;
 
 @Slf4j
 @Controller
 public class ProfileController {
 
     private final UserService userService;
+    private final UploadFileService uploadFileService;
 
     private static final String UPLOAD_DIR = "uploads/avatars/";
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
     private static final String[] ALLOWED_EXTENSIONS = { ".jpg", ".jpeg", ".png", ".gif" };
 
     @Autowired
-    public ProfileController(UserService userService) {
+    public ProfileController(UserService userService, UploadFileService uploadFileService) {
         this.userService = userService;
+        this.uploadFileService = uploadFileService;
     }
 
     @RequestMapping("/profile")
@@ -79,7 +75,7 @@ public class ProfileController {
         user.setPassword(currentUser.getPassword());
         user.setAvatarUrl(currentUser.getAvatarUrl());
         user.setVerificationToken(currentUser.getVerificationToken());
-        user.setVerified(currentUser.isVerified());
+        user.setIsVerified(currentUser.getIsVerified());
         user.setResetToken(currentUser.getResetToken());
         user.setResetTokenExpiry(currentUser.getResetTokenExpiry());
         user.setLastLogin(currentUser.getLastLogin());
@@ -91,7 +87,7 @@ public class ProfileController {
         // Handle avatar upload if provided
         if (file != null && !file.isEmpty()) {
             try {
-                String avatarUrl = handleAvatarUpload(file, user);
+                String avatarUrl = uploadFileService.uploadImage(file);
                 if (avatarUrl != null) {
                     user.setAvatarUrl(avatarUrl);
                 }
@@ -155,48 +151,4 @@ public class ProfileController {
         }
     }
 
-    private String handleAvatarUpload(MultipartFile file, User user) {
-        if (file == null || file.isEmpty()) {
-            return null;
-        }
-
-        // Validate file size
-        if (file.getSize() > MAX_FILE_SIZE) {
-            throw new IllegalArgumentException("File size exceeds maximum limit of 5MB");
-        }
-
-        // Validate file extension
-        String originalFilename = file.getOriginalFilename();
-        String extension = originalFilename != null
-                ? originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase()
-                : "";
-        boolean isValidExtension = Arrays.asList(ALLOWED_EXTENSIONS).contains(extension);
-        if (!isValidExtension) {
-            throw new IllegalArgumentException(
-                    "Invalid file type. Allowed types: " + String.join(", ", ALLOWED_EXTENSIONS));
-        }
-
-        try {
-            // Create upload directory if it doesn't exist
-            Path uploadPath = Paths.get(UPLOAD_DIR);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            // Generate unique filename
-            String filename = String.format("avatar_%d_%s%s",
-                    user.getUserID(),
-                    UUID.randomUUID().toString().substring(0, 8),
-                    extension);
-
-            // Save file
-            Path filePath = uploadPath.resolve(filename);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            return "/uploads/avatars/" + filename;
-
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to store avatar file", e);
-        }
-    }
 }

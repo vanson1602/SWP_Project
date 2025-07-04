@@ -1,16 +1,8 @@
 package project.springBoot.controller;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,33 +21,44 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
+import project.springBoot.model.Doctor;
 import project.springBoot.model.User;
+import project.springBoot.service.UploadFileService;
 import project.springBoot.service.UserService;
 
 @Slf4j
 @Controller
 public class UserController {
     private final UserService userService;
+    private final UploadFileService uploadFileService;
 
-    @Autowired
-    private static final String UPLOAD_DIR = "uploads/avatars/";
-    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
-    private static final String[] ALLOWED_EXTENSIONS = { ".jpg", ".jpeg", ".png", ".gif" };
-
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UploadFileService uploadFileService) {
         this.userService = userService;
+        this.uploadFileService = uploadFileService;
     }
 
-    @RequestMapping("/admin/create")
+    @RequestMapping("/admin/createUser")
     public String getCreateUserPage(Model model) {
         model.addAttribute("newUser", new User());
         return "user/create-user";
     }
 
     @RequestMapping(value = "/admin/create", method = RequestMethod.POST)
-    public String getCreatePage(Model model, @ModelAttribute("newUser") User user) {
-        this.userService.handleSaveUser(user);
-        return "redirect:user";
+    public String getCreatePage(Model model, @ModelAttribute("newUser") User user,
+            @RequestParam("image") MultipartFile image) {
+        try {
+            if (!image.isEmpty()) {
+                String imageUrl = uploadFileService.uploadImage(image);
+                user.setAvatarUrl(imageUrl);
+                System.out.println("Image URL: " + imageUrl);
+            }
+            this.userService.handleSaveUser(user);
+            System.out.println("User: " + user);
+            return "redirect:user";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/admin/create";
+        }
     }
 
     @RequestMapping("/admin/user")
@@ -105,7 +109,7 @@ public class UserController {
             currentUser.setDob(updatedUser.getDob());
 
             if (file != null && !file.isEmpty()) {
-                String avatarUrl = handleAvatarUpload(file, currentUser);
+                String avatarUrl = uploadFileService.uploadImage(file);
                 if (avatarUrl != null) {
                     currentUser.setAvatarUrl(avatarUrl);
                 }
@@ -123,43 +127,10 @@ public class UserController {
         }
     }
 
-    private String handleAvatarUpload(MultipartFile file, User user) {
-        if (file == null || file.isEmpty()) {
-            return null;
-        }
-
-        if (file.getSize() > MAX_FILE_SIZE) {
-            throw new IllegalArgumentException("File size exceeds maximum limit of 5MB");
-        }
-
-        String originalFilename = file.getOriginalFilename();
-        String extension = originalFilename != null
-                ? originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase()
-                : "";
-        boolean isValidExtension = Arrays.asList(ALLOWED_EXTENSIONS).contains(extension);
-        if (!isValidExtension) {
-            throw new IllegalArgumentException(
-                    "Invalid file type. Allowed types: " + String.join(", ", ALLOWED_EXTENSIONS));
-        }
-
-        try {
-            Path uploadPath = Paths.get(UPLOAD_DIR);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            String filename = String.format("avatar_%d_%s%s",
-                    user.getUserID(),
-                    UUID.randomUUID().toString().substring(0, 8),
-                    extension);
-
-            Path filePath = uploadPath.resolve(filename);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            return "/uploads/avatars/" + filename;
-
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to store avatar file", e);
-        }
+    @GetMapping("/admin/doctor/create")
+    public String getCreateDoctorPage(Model model) {
+        model.addAttribute("newDoctor", new Doctor());
+        return "doctor/create-doctor";
     }
+
 }

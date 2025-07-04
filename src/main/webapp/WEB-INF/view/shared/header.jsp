@@ -1,6 +1,12 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+        <!-- Required scripts for notifications -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/vi.js"></script>
+        <link rel="stylesheet" href="/resources/css/notifications.css">
+        <script src="/resources/js/notifications.js"></script>
+
         <!-- Header -->
         <header class="header">
             <div class="container">
@@ -40,15 +46,23 @@
                     <div class="user-menu">
                         <c:choose>
                             <c:when test="${not empty sessionScope.currentUser}">
+                                <!-- Notification Dropdown -->
                                 <div class="notification-wrapper">
-                                    <button class="notification-btn">
+                                    <button type="button" class="notification-btn" id="notificationBtn">
                                         <i class="bi bi-bell"></i>
                                         <span class="notification-badge">0</span>
                                     </button>
-                                    <div class="notification-dropdown">
-                                        <!-- Notifications will be loaded here -->
+                                    <div class="notification-dropdown" id="notificationDropdown">
+                                        <div class="notification-header">
+                                            <h3>Thông báo</h3>
+                                        </div>
+                                        <div class="notification-list">
+                                            <!-- Notifications will be loaded here -->
+                                        </div>
                                     </div>
                                 </div>
+
+                                <!-- User Dropdown -->
                                 <div class="dropdown">
                                     <button class="profile-btn" id="profileDropdownBtn">
                                         <i class="bi bi-person-circle"></i>
@@ -103,6 +117,11 @@
                 color: #333;
                 font-weight: bold;
                 font-size: 1.5rem;
+                transition: color 0.3s;
+            }
+
+            .logo:hover {
+                color: #007bff;
             }
 
             .logo-icon {
@@ -164,11 +183,17 @@
                 cursor: pointer;
                 padding: 0.5rem 1rem;
                 border-radius: 0.5rem;
-                transition: background-color 0.3s;
+                transition: all 0.3s ease;
+                text-decoration: none;
             }
 
             .profile-btn:hover {
-                background-color: #f8f9fa;
+                color: #007bff;
+            }
+
+            .profile-btn i {
+                font-size: 1.2rem;
+                transition: color 0.3s ease;
             }
 
             .dropdown {
@@ -199,16 +224,23 @@
                 padding: 0.5rem 1rem;
                 color: #333;
                 text-decoration: none;
-                transition: background-color 0.3s;
+                transition: all 0.3s ease;
             }
 
             .dropdown-item:hover {
                 background-color: #f8f9fa;
+                color: #007bff;
+            }
+
+            .dropdown-item i {
+                font-size: 1.1rem;
             }
 
             .dropdown-divider {
+                height: 1px;
+                background-color: #e9ecef;
+                border: none;
                 margin: 0.5rem 0;
-                border-top: 1px solid #eee;
             }
 
             @media (max-width: 768px) {
@@ -223,8 +255,8 @@
                     left: 0;
                     right: 0;
                     background-color: #fff;
-                    flex-direction: column;
                     padding: 1rem;
+                    flex-direction: column;
                     gap: 1rem;
                     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
                 }
@@ -232,24 +264,10 @@
                 .nav-links.show {
                     display: flex;
                 }
-
-                .nav-links a {
-                    padding: 0.5rem;
-                }
-
-                .user-menu {
-                    gap: 0.5rem;
-                }
-
-                .profile-btn span {
-                    display: none;
-                }
             }
         </style>
 
         <!-- Header JavaScript -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/vi.js"></script>
         <script>
             // Set moment.js locale to Vietnamese
             moment.locale('vi');
@@ -272,7 +290,3 @@
                 document.getElementById('profileDropdown')?.classList.remove('show');
             });
         </script>
-
-        <!-- Add notification CSS and JS -->
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/notifications.css">
-        <script src="${pageContext.request.contextPath}/resources/js/notifications.js"></script>

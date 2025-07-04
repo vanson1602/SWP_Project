@@ -46,10 +46,17 @@ public class UserService {
     public User handleUpdateUser(User user) {
         User existingUser = userRepository.findById(user.getUserID());
         if (existingUser != null) {
-            // Only hash the password if it's different from the existing one
-            if (!user.getPassword().equals(existingUser.getPassword()) && !isPasswordEncoded(user.getPassword())) {
-                String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-                user.setPassword(hashed);
+            // Nếu password không được gửi lên từ form (null hoặc rỗng) thì giữ nguyên
+            if (user.getPassword() == null || user.getPassword().isEmpty()) {
+                user.setPassword(existingUser.getPassword());
+            } else {
+                // Nếu người dùng có thay đổi password (không trùng hoặc chưa mã hoá), thì mã
+                // hoá lại
+                if (!isPasswordEncoded(user.getPassword()) ||
+                        !BCrypt.checkpw(user.getPassword(), existingUser.getPassword())) {
+                    String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+                    user.setPassword(hashed);
+                }
             }
         }
         return this.userRepository.save(user);
@@ -65,11 +72,11 @@ public class UserService {
         System.out.println("Found user: " + user);
 
         if (user != null) {
-            System.out.println("User verified status: " + user.isVerified());
+            System.out.println("User verified status: " + user.getIsVerified());
             System.out.println("Stored password hash: " + user.getPassword());
             System.out.println("Input password: " + password);
 
-            if (!user.isVerified()) {
+            if (!user.getIsVerified()) {
                 System.out.println("User is not verified");
                 return null;
             }
@@ -109,7 +116,7 @@ public class UserService {
     }
 
     public Long getDoctorIdByUserId(long userId) {
-        return doctorRepository.findByUserUserID(userId)
+        return doctorRepository.findByUserId(userId)
                 .map(Doctor::getDoctorID)
                 .orElse(null);
     }

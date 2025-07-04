@@ -1,9 +1,9 @@
 package project.springBoot.repository;
 
-
-
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,8 +25,7 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     @Query("SELECT d FROM Doctor d LEFT JOIN FETCH d.specializations WHERE d.doctorID = :id")
     Optional<Doctor> findByIdWithSpecializations(Long id);
 
-
-        @Query("SELECT d FROM Doctor d " +
+    @Query("SELECT d FROM Doctor d " +
                         "JOIN d.specializations s " +
                         "JOIN d.user u " +
                         "WHERE LOWER(s.specializationName) LIKE LOWER(CONCAT('%', :specializationName, '%')) " +
@@ -50,6 +49,35 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
                         "AND u.state = true")
         List<Doctor> findByName(@Param("name") String name);
 
+        Doctor save(Doctor doctor);
+
         List<Doctor> findAll();
-        Optional<Doctor> findByUserUserID(long userId);
+
+        @Query("""
+                            SELECT DISTINCT d FROM Doctor d
+                            JOIN d.user u
+                            JOIN d.specializations s
+                            WHERE
+                                (:keyword IS NULL OR
+                                    (LOWER(CONCAT(u.firstName, ' ', u.lastName)) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                                    OR LOWER(s.specializationName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+                                )
+                            AND (:specializationNames IS NULL OR s.specializationName IN :specializationNames)
+                            AND (:experienceYears IS NULL OR d.experienceYears >= :experienceYears)
+                            AND (:consultationFee IS NULL OR d.consultationFee <= :consultationFee)
+                            AND s.isActive = true
+                            AND u.state = true
+                        """)
+        List<Doctor> findDoctorsAdvanced(
+                        @Param("keyword") String keyword,
+                        @Param("specializationNames") Set<String> specializationNames,
+                        @Param("experienceYears") Integer experienceYears,
+                        @Param("consultationFee") BigDecimal consultationFee);
+
+        @Query("SELECT d FROM Doctor d WHERE d.user.userID = :userId")
+        Optional<Doctor> findByUserId(@Param("userId") long userId);
+
+        @Query("SELECT d FROM Doctor d WHERE d.doctorID = :doctorId")
+        Doctor findByIdDoctor(@Param("doctorId") long doctorId);
+
 }

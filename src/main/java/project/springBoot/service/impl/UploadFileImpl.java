@@ -7,9 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.apache.commons.lang3.StringUtils;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
@@ -34,15 +34,16 @@ public class UploadFileImpl implements UploadFileService {
         File fileUpload = convert(file);
         log.info("File upload is : {}", fileUpload);
         try {
-            cloudinary.uploader().upload(fileUpload, 
+            cloudinary.uploader().upload(fileUpload,
                     ObjectUtils.asMap("public_id", publicValue));
-                  
+            cleanDisk(fileUpload);
+
         } catch (IOException e) {
 
             e.printStackTrace();
         }
-        cleanDisk(fileUpload);
-        return cloudinary.url().generate(StringUtils.join(publicValue,".",extension));
+
+        return cloudinary.url().generate(StringUtils.join(publicValue, ".", extension));
     }
 
     private File convert(MultipartFile file) {
