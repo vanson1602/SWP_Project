@@ -20,11 +20,13 @@ public class InvoiceDetail {
     @JoinColumn(name = "invoiceID", nullable = false)
     private Invoice invoice;
 
-    @Column(name = "item_type", length = 20)
-    private String itemType;
+    @ManyToOne
+    @JoinColumn(name = "serviceID")
+    private Service service;
 
-    @Column(name = "item_id", nullable = false)
-    private Integer itemId;
+    @ManyToOne
+    @JoinColumn(name = "medicationID")
+    private Medication medication;
 
     @Column(nullable = false, length = 255)
     private String description;
@@ -46,17 +48,35 @@ public class InvoiceDetail {
 
     @PrePersist
     @PreUpdate
-    private void validateEnumLikeFields() {
-        if (itemType != null && !itemType.matches("Service|Medication|Other")) {
-            throw new IllegalArgumentException("Invalid item type: " + itemType);
+    private void validateRelationships() {
+        // For consultation fee, we allow both service and medication to be null
+        if (description != null && description.startsWith("Phí tư vấn")) {
+            if (service != null || medication != null) {
+                throw new IllegalArgumentException("Consultation fee should not have service or medication");
+            }
+        } else {
+            // For other items, ensure only one of service or medication is set
+            if ((service != null && medication != null) || (service == null && medication == null)) {
+                throw new IllegalArgumentException(
+                        "Exactly one of service or medication must be set for non-consultation items");
+            }
+        }
+
+        // Calculate total price
+        if (quantity != null && unitPrice != null) {
+            totalPrice = unitPrice.multiply(new BigDecimal(quantity));
         }
     }
 
     @Override
     public String toString() {
+        String itemInfo = service != null ? "Service: " + service.getServiceID()
+                : medication != null ? "Medication: " + medication.getMedicationID()
+                        : "Consultation Fee";
+
         return "InvoiceDetail [invoiceDetailID=" + invoiceDetailID +
                 ", invoiceID=" + (invoice != null ? invoice.getInvoiceID() : null) +
-                ", itemType=" + itemType + ", itemId=" + itemId + ", description=" + description +
+                ", " + itemInfo + ", description=" + description +
                 ", quantity=" + quantity + ", unitPrice=" + unitPrice + ", totalPrice=" + totalPrice +
                 ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
