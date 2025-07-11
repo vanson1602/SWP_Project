@@ -107,4 +107,8 @@ public class Doctor {
                 .filter(f -> f.getRating() != null && f.getIsApproved() != null && f.getIsApproved())
                 .count();
     }
+
+    public Long getDoctorID() {
+    return doctorID;
+    }
 }

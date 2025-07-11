@@ -2,6 +2,7 @@ package project.springBoot.controller;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,7 +102,8 @@ public class DoctorController {
         System.out.println("Fetching appointments and slots for doctorId: " + doctorId);
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = startDate.plusDays(7);
-        List<Appointment> appointments = appointmentService.getAppointmentsByDoctorAndDateRangeIncludingCompleted(doctorId, startDate,
+        List<Appointment> appointments = appointmentService.getAppointmentsByDoctorAndDateRangeIncludingCompleted(
+                doctorId, startDate,
                 endDate);
         List<DoctorBookingSlot> bookingSlots = bookingSlotService.getBookingSlotsByDoctorId(doctorId);
         model.addAttribute("appointments", appointments);
@@ -170,7 +172,7 @@ public class DoctorController {
                 examination.setMedicalRecord(medicalRecord);
             }
             examination.setDoctor(appointment.getDoctor());
-            
+
             // Only set examination date if this is a new examination (create mode)
             if (examination.getExaminationID() == 0) {
                 examination.setExaminationDate(LocalDateTime.now());
@@ -183,16 +185,18 @@ public class DoctorController {
                 }
                 examination.setModifiedAt(LocalDateTime.now());
             }
-            
+
             examinationService.saveExamination(examination);
-            
+
             // Update appointment status to "Completed" after creating/updating examination
             if (examination.getExaminationID() == 0 || !appointment.getStatus().equals("Completed")) {
-                appointmentService.updateAppointmentStatus(appointment.getAppointmentID(), "Completed", 
-                    "Khám bệnh hoàn tất vào " + LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+                appointmentService.updateAppointmentStatus(appointment.getAppointmentID(), "Completed",
+                        "Khám bệnh hoàn tất vào " + LocalDateTime.now()
+                                .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
             }
-            
-            System.out.println("Examination saved for appointmentId: " + appointmentId + ", examinationId: " + examination.getExaminationID());
+
+            System.out.println("Examination saved for appointmentId: " + appointmentId + ", examinationId: "
+                    + examination.getExaminationID());
             return "redirect:/doctor/appointments/" + appointmentId;
         }
         return "redirect:/doctor/appointments";
@@ -204,12 +208,12 @@ public class DoctorController {
         if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/access-denied";
         }
-        
+
         Appointment appointment = appointmentService.findByIdAppointment(appointmentId);
         if (appointment == null) {
             return "redirect:/doctor/appointments";
         }
-        
+
         // Get the latest examination for this appointment
         Examination examination = null;
         if (!appointment.getExaminations().isEmpty()) {
@@ -217,18 +221,19 @@ public class DoctorController {
                     .max((e1, e2) -> e1.getExaminationDate().compareTo(e2.getExaminationDate()))
                     .orElse(null);
         }
-        
+
         if (examination == null) {
             // If no examination exists, redirect to create
             return "redirect:/doctor/appointments/" + appointmentId + "/examination/create";
         }
-        
+
         model.addAttribute("appointmentId", appointmentId);
         model.addAttribute("examination", examination);
         model.addAttribute("isEdit", true);
         model.addAttribute("icdCodes", icdCodeService.getAllActiveCodes());
-        
-        System.out.println("Rendering edit-exam form for appointmentId: " + appointmentId + ", examinationId: " + examination.getExaminationID());
+
+        System.out.println("Rendering edit-exam form for appointmentId: " + appointmentId + ", examinationId: "
+                + examination.getExaminationID());
         return "doctors/doctor-create-exam";
     }
 
@@ -462,4 +467,44 @@ public class DoctorController {
         return "doctors/doctor-schedule";
     }
 
+    @GetMapping("doctor/appointments/patient/history/{patientID}")
+    public String historyPatient(Model model, HttpSession session, @PathVariable Long patientID) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
+            return "redirect:/login";
+        }
+        List<Appointment> appointments = appointmentService.findAppointmentByPatientID(patientID);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter startTime = DateTimeFormatter.ofPattern("HH:mm");
+        List<String> endTimes = new ArrayList<>();
+        for (Appointment a : appointments) {
+            if (a.getBookingSlot() != null && a.getBookingSlot().getStartTime() != null) {
+                LocalDateTime start = a.getBookingSlot().getStartTime();
+                LocalDateTime end = start.plusHours(1); // cộng thêm 1 tiếng
+                endTimes.add(end.format(startTime));
+            } else {
+                endTimes.add("N/A");
+            }
+        }
+        model.addAttribute("startTime", startTime);
+        model.addAttribute("endTimes", endTimes);
+        model.addAttribute("formatter", formatter);
+        model.addAttribute("appointment", appointments);
+        return "doctors/doctor-history-patient";
+    }
+
+    @GetMapping("history/medicalRecord/{appointmentID}")
+    public String medicalRecordDetails(Model model, HttpSession session, @PathVariable Long appointmentID) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
+            return "redirect:/login";
+        }
+        Examination examination = examinationService.getExaminationByAppointmentId(appointmentID);
+        DateTimeFormatter date = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter time = DateTimeFormatter.ofPattern("HH:mm");
+        model.addAttribute("examination", examination);
+        model.addAttribute("time", time);
+        model.addAttribute("date", date);
+        return "doctors/doctor-medical-record-details";
+    }
 }

@@ -315,7 +315,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public List<Appointment> getAppointmentsByDoctorAndDateRangeIncludingCompleted(Long doctorId, LocalDateTime startDate,
+    public List<Appointment> getAppointmentsByDoctorAndDateRangeIncludingCompleted(Long doctorId,
+            LocalDateTime startDate,
             LocalDateTime endDate) {
         return appointmentRepository.findByDoctorAndDateRange(doctorId, startDate, endDate);
     }
@@ -441,5 +442,10 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public List<Map<String, Object>> getDoctorRevenueReport(LocalDateTime startDate, LocalDateTime endDate) {
         return appointmentRepository.getRevenueByDoctor(startDate, endDate);
+    }
+
+    @Override
+    public List<Appointment> findAppointmentByPatientID(Long patientId) {
+        return appointmentRepository.findAppointmentByPatient_PatientID(patientId);
     }
 }

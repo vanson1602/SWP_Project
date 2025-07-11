@@ -32,7 +32,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                         @Param("status") String status,
                         @Param("date") LocalDateTime date);
 
-                        @Query("SELECT DISTINCT a FROM Appointment a " +
+        @Query("SELECT DISTINCT a FROM Appointment a " +
                         "LEFT JOIN FETCH a.patient p " +
                         "LEFT JOIN FETCH p.user pu " +
                         "LEFT JOIN FETCH a.bookingSlot bs " +
@@ -99,7 +99,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                         @Param("doctorId") Long doctorId,
                         @Param("startDate") LocalDateTime startDate,
                         @Param("endDate") LocalDateTime endDate);
-
     
     @Query("SELECT COUNT(a) FROM Appointment a WHERE a.appointmentDate BETWEEN :start AND :end")
     long countByAppointmentDateBetween(LocalDateTime start, LocalDateTime end);
@@ -183,4 +182,15 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Map<String, Object>> getAppointmentStatusDistributionBetween(@Param("startDate") LocalDateTime startDate, 
                                                                      @Param("endDate") LocalDateTime endDate);
 
+        @Query("SELECT a FROM Appointment a " +
+                        "LEFT JOIN FETCH a.patient p " +
+                        "LEFT JOIN FETCH p.user pu " +
+                        "LEFT JOIN FETCH a.bookingSlot bs " +
+                        "LEFT JOIN FETCH bs.schedule s " +
+                        "LEFT JOIN FETCH s.doctor d " +
+                        "LEFT JOIN FETCH d.user du " +
+                        "LEFT JOIN FETCH d.specializations " +
+                        "WHERE p.patientID = :patientId " +
+                        "ORDER BY a.appointmentDate DESC")
+        List<Appointment> findAppointmentByPatient_PatientID(Long patientId);
 }

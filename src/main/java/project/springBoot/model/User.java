@@ -142,4 +142,16 @@ public class User {
     public String getFullName() {
         return firstName + " " + lastName;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public long getUserID() {
+        return userID;
+    }
 }
