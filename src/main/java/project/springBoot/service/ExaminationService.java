@@ -25,19 +25,19 @@ public class ExaminationService {
 
     public Examination getLatestExaminationByPatientId(Long patientId) {
         logger.debug("Fetching latest examination for patient ID: {}", patientId);
-        
+
         // First try to get a valid (completed) examination
         Examination examination = examinationRepository.findLatestValidExamination(patientId);
         if (examination != null) {
-            logger.debug("Found valid examination ID: {} with status: {} and appointment status: {}", 
-                examination.getExaminationID(), 
-                examination.getStatus(),
-                examination.getAppointment().getStatus());
+            logger.debug("Found valid examination ID: {} with status: {} and appointment status: {}",
+                    examination.getExaminationID(),
+                    examination.getStatus(),
+                    examination.getAppointment().getStatus());
             return examination;
         } else {
             logger.debug("No valid (completed) examination found for patient ID: {}", patientId);
         }
-        
+
         // If no valid examination found, try to get any examination
         examination = examinationRepository.findLatestExamination(patientId);
         if (examination != null) {
@@ -55,14 +55,18 @@ public class ExaminationService {
             logger.info("Total examinations found (including non-completed): {}", allExams.size());
             if (!allExams.isEmpty()) {
                 for (var exam : allExams) {
-                    logger.info("Examination ID: {}, Status: {}, Appointment Status: {}, Date: {}", 
-                        exam.getExaminationID(),
-                        exam.getStatus(),
-                        exam.getAppointment().getStatus(),
-                        exam.getExaminationDate());
+                    logger.info("Examination ID: {}, Status: {}, Appointment Status: {}, Date: {}",
+                            exam.getExaminationID(),
+                            exam.getStatus(),
+                            exam.getAppointment().getStatus(),
+                            exam.getExaminationDate());
                 }
             }
         }
         return null;
+    }
+
+    public Examination getExaminationByAppointmentId(Long appointmentID) {
+        return examinationRepository.findByAppointmentAppointmentID(appointmentID);
     }
 }
