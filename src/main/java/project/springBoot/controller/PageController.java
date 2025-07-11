@@ -20,7 +20,7 @@ public class PageController {
 
     @RequestMapping("/")
     public String getHomePage(Model model, @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size) {
+            @RequestParam(defaultValue = "6") int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Doctor> doctorPage = doctorRepository.findAllActiveDoctors(pageable);
 

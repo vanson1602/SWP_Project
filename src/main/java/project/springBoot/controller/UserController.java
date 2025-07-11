@@ -23,18 +23,21 @@ import org.springframework.web.multipart.MultipartFile;
 import lombok.extern.slf4j.Slf4j;
 import project.springBoot.model.Doctor;
 import project.springBoot.model.User;
+import project.springBoot.service.AppointmentService;
 import project.springBoot.service.UploadFileService;
 import project.springBoot.service.UserService;
 
 @Slf4j
-@Controller
+@Controller 
 public class UserController {
     private final UserService userService;
     private final UploadFileService uploadFileService;
+    private final AppointmentService appointmentService;
 
-    public UserController(UserService userService, UploadFileService uploadFileService) {
+    public UserController(UserService userService, UploadFileService uploadFileService, AppointmentService appointmentService) {
         this.userService = userService;
         this.uploadFileService = uploadFileService;
+        this.appointmentService = appointmentService;
     }
 
     @RequestMapping("/admin/createUser")
@@ -132,5 +135,4 @@ public class UserController {
         model.addAttribute("newDoctor", new Doctor());
         return "doctor/create-doctor";
     }
-
 }

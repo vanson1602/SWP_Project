@@ -2,11 +2,13 @@ package project.springBoot.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 
 import project.springBoot.model.Appointment;
 import project.springBoot.model.AppointmentType;
+import project.springBoot.model.Invoice;
 
 public interface AppointmentService {
     Appointment createAppointment(Long patientId, Long slotId, Long specializationId,
@@ -47,4 +49,30 @@ public interface AppointmentService {
             LocalDateTime endDate);
 
     Appointment findByIdAppointment(Long appointmentId);
+
+    long countTotalPatients();
+    long countTodaysAppointments();
+    double getTotalRevenue(); // Updated to use consultation_fee
+    List<Map<String, Object>> getMonthlyAppointments(int months);
+    Map<String, Long> getAppointmentStatusDistribution();
+    List<Appointment> findTop5ByStatusOrderByCreatedAtDesc(String status);
+
+    List<Map<String, Object>> getRevenueReport(LocalDateTime startDate, LocalDateTime endDate);
+    List<Map<String, Object>> getMonthlyAppointmentReport(LocalDateTime startDate, LocalDateTime endDate);
+    Map<String, Object> getDashboardStatistics();
+
+    // Dashboard filter methods
+    long getDistinctAppointmentsCompletedBetween(LocalDateTime start, LocalDateTime end);
+    long getDistinctPatientsCompletedBetween(LocalDateTime start, LocalDateTime end);
+    double getRevenueBetween(LocalDateTime start, LocalDateTime end);
+
+    List<Map<String, Object>> getDailyAppointmentReport(LocalDateTime startDate, LocalDateTime endDate);
+    
+    Map<String, Long> getAppointmentStatusDistributionBetween(LocalDateTime startDate, LocalDateTime endDate);
+
+
+
+    List<Invoice> getInvoicesInDateRange(LocalDateTime startDate, LocalDateTime endDate);
+
+    List<Map<String, Object>> getDoctorRevenueReport(LocalDateTime startDate, LocalDateTime endDate);
 }
