@@ -129,4 +129,21 @@ public class Examination {
                 ", examinationDate=" + examinationDate + ", status=" + status +
                 ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
+
+    public long getExaminationID() {
+        return examinationID;
+    }
+    
+    public void setExaminationID(long examinationID) {
+        this.examinationID = examinationID;
+    }
+
+    public LocalDateTime getExaminationDate() {
+        return examinationDate;
+    }
+    
+    public void setExaminationDate(LocalDateTime examinationDate) {
+        this.examinationDate = examinationDate;
+    }
+
 }

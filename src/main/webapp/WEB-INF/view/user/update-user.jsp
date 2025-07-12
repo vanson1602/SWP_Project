@@ -14,20 +14,23 @@
         <title>Edit User</title>
       </head>
 
-      <body>
-        <div class="container mt-5">
-          <div class="row">
-            <div class="col-12 mx-auto">
-              <div class="d-flex justify-content-between">
-                <h3>Edit User With ID = ${user.userID}</h3>
-              </div>
-              <hr />
-              <div class="card" style="width: 60%">
-                <div class="card-header">User information</div>
-                <div class="card-body">
-                  <form:form modelAttribute="user" method="post" action="/api/admin/update">
-                    <form:hidden path="userID" />
-                    <form:hidden path="username" />
+  <body>
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-12 mx-auto">
+          <div class="d-flex justify-content-between">
+            <h3>Edit User With ID = ${user.id}</h3>
+          </div>
+          <hr />
+          <div class="card" style="width: 60%">
+            <div class="card-header">User information</div>
+            <div class="card-body">
+              <form:form
+                modelAttribute="user"
+                method="post"
+                action="/admin/update"
+              >
+                <form:hidden path="id" />
 
                     <div class="mb-3">
                       <label class="form-label">Email</label>
@@ -49,16 +52,19 @@
                       <form:input path="role" cssClass="form-control" />
                     </div>
 
-                    <div class="d-flex justify-content-between">
-                      <a href="${pageContext.request.contextPath}/api/admin/user" class="btn btn-secondary">Cancel</a>
-                      <button type="submit" class="btn btn-primary">Update</button>
-                    </div>
-                  </form:form>
+                <div class="d-flex justify-content-between">
+                  <a
+                    href="${pageContext.request.contextPath}/admin/user"
+                    class="btn btn-secondary"
+                    >Cancel</a
+                  >
+                  <button type="submit" class="btn btn-primary">Update</button>
                 </div>
-              </div>
+              </form:form>
             </div>
           </div>
         </div>
-      </body>
-
-      </html>
+      </div>
+    </div>
+  </body>
+</html>

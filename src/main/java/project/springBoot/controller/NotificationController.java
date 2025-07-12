@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import jakarta.servlet.http.HttpSession;
-import lombok.RequiredArgsConstructor;
 import project.springBoot.model.Notification;
 import project.springBoot.model.NotificationDTO;
 import project.springBoot.model.User;
@@ -20,9 +22,16 @@ import project.springBoot.service.NotificationService;
 
 @Controller
 @RequestMapping("/notifications")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class NotificationController {
     private final NotificationService notificationService;
+    private final ObjectMapper objectMapper;
+
+    public NotificationController(NotificationService notificationService, ObjectMapper objectMapper) {
+        this.notificationService = notificationService;
+        this.objectMapper = objectMapper;
+        this.objectMapper.registerModule(new JavaTimeModule());
+    }
 
     @GetMapping("/unread-count")
     @ResponseBody

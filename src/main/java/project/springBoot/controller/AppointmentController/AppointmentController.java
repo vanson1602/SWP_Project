@@ -4,8 +4,10 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,14 +35,6 @@ import vn.payos.PayOS;
 import vn.payos.type.CheckoutResponseData;
 import vn.payos.type.ItemData;
 import vn.payos.type.PaymentData;
-import org.springframework.data.domain.Page;
-
-import java.security.Principal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -130,6 +124,7 @@ public class AppointmentController {
             HttpSession session,
             Model model) {
         DoctorBookingSlot slot = doctorService.getSlotById(slotId);
+        System.out.println("Slot: " + slot);
         System.out.println("Slot: " + slot);
         User user = (User) session.getAttribute("currentUser");
         Patient patient = doctorService.getPatientByUsername(user.getUsername());

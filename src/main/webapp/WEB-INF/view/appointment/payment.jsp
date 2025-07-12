@@ -19,6 +19,7 @@
                                 rel="stylesheet">
                             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/homepage.css">
                             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/shared.css">
+                            <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common.css">
                             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/payment.css">
                         </head>
 
@@ -89,10 +90,29 @@
                                                         <i class="bi bi-receipt me-2"></i>
                                                         Thông tin thanh toán
                                                     </h4>
-                                                    <div class="summary-content">
-                                                        <div class="summary-item">
-                                                            <span>Bác sĩ:</span>
-                                                            <span>BS.
+                                                    
+                                            <!-- Appointment Summary -->
+                                            <div class="card mb-4">
+                                                <div class="card-header">
+                                                    <h5 class="mb-0 text-white">Chi tiết lịch hẹn</h5>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <p><strong>Mã lịch hẹn:</strong>
+                                                                ${appointment.appointmentNumber}</p>
+                                                            <p><strong>Bệnh nhân:</strong>
+                                                                ${appointment.patient.user.firstName}
+                                                                ${appointment.patient.user.lastName}</p>
+                                                            <p><strong>Ngày khám:</strong>
+                                                                ${appointment.appointmentDate.format(dateFormatter)}</p>
+                                                            <p><strong>Giờ khám:</strong>
+                                                                ${appointment.appointmentDate.format(timeFormatter)} →
+                                                                ${appointment.appointmentDate.plusHours(1).format(timeFormatter)}
+                                                            </p>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p><strong>Bác sĩ:</strong> BS.
                                                                 ${appointment.bookingSlot.schedule.doctor.user.firstName}
                                                                 ${appointment.bookingSlot.schedule.doctor.user.lastName}</span>
                                                         </div>
@@ -120,47 +140,39 @@
                                                 </div>
 
                                                 <!-- Payment Methods -->
-                                                <div class="payment-methods mb-4">
-                                                    <h4 class="section-title">
-                                                        <i class="bi bi-credit-card me-2"></i>
-                                                        Phương thức thanh toán
-                                                    </h4>
-                                                    <div class="methods-grid">
-                                                        <div class="payment-method disabled">
-                                                            <img src="${pageContext.request.contextPath}/resources/images/vnpay-logo.png"
-                                                                alt="VNPAY">
-                                                            <span>Thanh toán qua VNPAY</span>
-                                                            <small class="text-muted">(Đang bảo trì)</small>
-                                                        </div>
-                                                        <div class="payment-method"
-                                                            onclick="selectPaymentMethod('PAYOS')">
-                                                            <img src="${pageContext.request.contextPath}/resources/images/payos-logo.png"
-                                                                alt="PAYOS">
-                                                            <span>Thanh toán qua PAYOS</span>
+                                                <form id="paymentForm"
+                                                      action="${pageContext.request.contextPath}/appointments/process-payment"
+                                                      method="POST">
+                                                    <input type="hidden" name="paymentMethod" id="paymentMethod">
+                                                    <input type="hidden" name="appointmentId" value="${appointment.appointmentID}">
+
+                                                    <div class="payment-methods mb-4">
+                                                        <h4 class="section-title">
+                                                            <i class="bi bi-credit-card me-2"></i>
+                                                            Phương thức thanh toán
+                                                        </h4>
+                                                        <div class="methods-grid">
+                                                            <div class="payment-method disabled">
+                                                                <img src="${pageContext.request.contextPath}/resources/images/vnpay-logo.png" alt="VNPAY">
+                                                                <span>Thanh toán qua VNPAY</span>
+                                                                <small class="text-muted">(Đang bảo trì)</small>
+                                                            </div>
+                                                            <div class="payment-method" onclick="selectPaymentMethod('PAYOS', this)">
+                                                                <img src="${pageContext.request.contextPath}/resources/images/payos-logo.png" alt="PAYOS">
+                                                                <span>Thanh toán qua PAYOS</span>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-
-                                                <!-- Navigation Buttons -->
-                                                <div class="nav-buttons">
-                                                    <a href="${pageContext.request.contextPath}/appointments/info?slotId=${appointment.bookingSlot.slotID}"
-                                                        class="btn btn-secondary">
-                                                        <i class="bi bi-arrow-left me-2"></i>
-                                                        Quay lại
-                                                    </a>
-                                                    <form id="paymentForm"
-                                                        action="${pageContext.request.contextPath}/appointments/process-payment"
-                                                        method="POST" style="display: inline;">
-                                                        <input type="hidden" name="paymentMethod" id="paymentMethod">
-                                                        <input type="hidden" name="appointmentId"
-                                                            value="${appointment.appointmentID}">
-                                                        <button type="submit" class="btn btn-primary" disabled
-                                                            id="paymentButton">
-                                                            <i class="bi bi-lock me-2"></i>
-                                                            Thanh toán an toàn
+                                                    <div class="nav-buttons">
+                                                        <a href="${pageContext.request.contextPath}/appointments/info?slotId=${appointment.bookingSlot.slotID}"
+                                                           class="btn btn-secondary">
+                                                            <i class="bi bi-arrow-left me-2"></i>Quay lại
+                                                        </a>
+                                                        <button type="submit" class="btn btn-primary" id="paymentButton" disabled>
+                                                            <i class="bi bi-lock me-2"></i>Thanh toán an toàn
                                                         </button>
-                                                    </form>
-                                                </div>
+                                                    </div>
+                                                </form>
                                             </div>
                                         </div>
                                     </main>
@@ -174,14 +186,12 @@
                             <script
                                 src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
                             <script>
-                                function selectPaymentMethod(method) {
+                                function selectPaymentMethod(method, el) {
                                     // Remove selected class from all methods
-                                    document.querySelectorAll('.payment-method').forEach(el => {
-                                        el.classList.remove('selected');
-                                    });
+                                    document.querySelectorAll('.payment-method').forEach(e => e.classList.remove('selected'));
 
                                     // Add selected class to clicked method
-                                    event.currentTarget.classList.add('selected');
+                                    el.classList.add('selected');
 
                                     // Update hidden input and enable button
                                     document.getElementById('paymentMethod').value = method;
@@ -290,6 +300,7 @@
                                     }
                                 }
                             </style>
-                        </body>
 
-                        </html>
+</body>
+
+</html>

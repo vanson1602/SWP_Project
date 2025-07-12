@@ -91,4 +91,12 @@ public class Patient {
                 ", occupation=" + occupation + ", maritalStatus=" + maritalStatus +
                 ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
+
+    public long getPatientID() {
+        return patientID;
+    }
+    
+    public void setPatientID(long patientID) {
+        this.patientID = patientID;
+    }
 }

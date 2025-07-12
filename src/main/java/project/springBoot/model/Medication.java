@@ -80,5 +80,11 @@ public class Medication {
                 ", isControlled=" + isControlled + ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
 
-    
+    public long getMedicationID() {
+        return medicationID;
+    }
+
+    public String getMedicationName() {
+        return medicationName;
+    }
 }

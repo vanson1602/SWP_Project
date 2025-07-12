@@ -178,4 +178,12 @@ public class Appointment {
                 ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
 
+    public long getAppointmentID() {
+        return appointmentID;
+    }
+    
+    public void setAppointmentID(long appointmentID) {
+        this.appointmentID = appointmentID;
+    }
+
 }

@@ -98,4 +98,22 @@ public class DoctorBookingSlot {
     public boolean isAvailable() {
         return this.status != null && this.status.equals("Available");
     }
+
+public void setSlotID(long slotID) {
+    this.slotID = slotID;
+}
+
+public void setSchedule(DoctorSchedule schedule) {
+    this.schedule = schedule;
+}
+
+public void setStartTime(LocalDateTime startTime) {
+    this.startTime = startTime;
+}
+
+public void setEndTime(LocalDateTime endTime) {
+    this.endTime = endTime;
+}
+
+
 }

@@ -38,7 +38,6 @@
               <div class="d-flex justify-content-between">
                 <h3>Table User</h3>
                 <a href="/admin/create" class="btn btn-primary">Create User</a>
-                <a href="/admin/doctor/create" class="btn btn-primary">Create Doctor</a>
               </div>
               <hr />
               <table class="table table-hover">
@@ -57,9 +56,9 @@
                       <td>${user.email}</td>
                       <td>${user.firstName}</td>
                       <td>
-                        <a href="/api/admin/user/${user.userID}" class="btn btn-success">View</a>
-                        <a href="/api/admin/user/update/${user.userID}" class="btn btn-warning mx-2">Update</a>
-                        <a href="/api/admin/user/delete/${user.userID}" onclick="return confirm('Are you sure?')"
+                        <a href="/admin/user/${user.userID}" class="btn btn-success">View</a>
+                        <a href="/admin/user/update/${user.userID}" class="btn btn-warning mx-2">Update</a>
+                        <a href="/admin/user/delete/${user.userID}" onclick="return confirm('Are you sure?')"
                           class="btn btn-danger">Delete</a>
                       </td>
                     </tr>

@@ -91,4 +91,8 @@ public class DoctorSchedule {
                ", status=" + status + ", maxPatients=" + maxPatients + ", clinicRoom=" + clinicRoom + 
                ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
+
+    public Doctor getDoctor() {
+        return doctor;
+    }
 } 

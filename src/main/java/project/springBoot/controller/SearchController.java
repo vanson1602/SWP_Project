@@ -21,68 +21,74 @@ import project.springBoot.service.SpecializationService;
 @RequestMapping("/search")
 public class SearchController {
 
-        @Autowired
-        private DoctorService doctorService;
+    @Autowired
+    private DoctorService doctorService;
 
-        @Autowired
-        private SpecializationService specializationService;
+    @Autowired
+    private SpecializationService specializationService;
 
-        @GetMapping("/specialties")
-        public String searchDoctorsBySpec(
-                        @RequestParam(required = false) String keyword,
-                        @RequestParam(required = false) String[] specializationName,
-                        @RequestParam(required = false) Integer experienceYears,
-                        @RequestParam(required = false) BigDecimal consultationFee,
-                        Model model) {
+    @GetMapping("/specialties")
+    public String searchDoctorsBySpec(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String[] specializationName,
+            @RequestParam(required = false) Integer experienceYears,
+            @RequestParam(required = false) BigDecimal consultationFee,
+            Model model) {
 
-                List<Doctor> doctorsBySpecialty = doctorService.findDoctorBySpecility(keyword, specializationName,
-                                experienceYears, consultationFee);
+        List<Doctor> doctorsBySpecialty = doctorService.findDoctorBySpecility(
+                keyword, 
+                specializationName,
+                experienceYears, 
+                consultationFee
+        );
 
-                // Get all active specializations from database
-                List<Specialization> specializations = specializationService.getAllActiveSpecializations();
+        // Get all active specializations from database
+        List<Specialization> specializations = specializationService.getAllActiveSpecializations();
 
-                model.addAttribute("doctors", doctorsBySpecialty);
-                model.addAttribute("specializations", specializations);
-                model.addAttribute("searchKeyword", keyword);
-                model.addAttribute("currentPath", "/search/specialties");
-                model.addAttribute("searchType", "specialty");
-                model.addAttribute("selectedSpecializations",
-                                specializationName != null ? Arrays.asList(specializationName) : null);
+        model.addAttribute("doctors", doctorsBySpecialty);
+        model.addAttribute("specializations", specializations);
+        model.addAttribute("searchKeyword", keyword);
+        model.addAttribute("currentPath", "/search/specialties");
+        model.addAttribute("searchType", "specialty");
+        model.addAttribute("selectedSpecializations",
+                specializationName != null ? Arrays.asList(specializationName) : null);
 
-                return "doctor/searchDoctors";
-        }
+        return "doctor/searchDoctors";
+    }
 
-        @GetMapping("/doctors")
-        public String searchDoctorByName(
-                        @RequestParam(required = false) String keyword,
-                        @RequestParam(required = false) String[] specializationName,
-                        @RequestParam(required = false) Integer experienceYears,
-                        @RequestParam(required = false) BigDecimal consultationFee,
-                        Model model) {
+    @GetMapping("/doctors")
+    public String searchDoctorByName(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String[] specializationName,
+            @RequestParam(required = false) Integer experienceYears,
+            @RequestParam(required = false) BigDecimal consultationFee,
+            Model model) {
 
-                List<Doctor> doctorsByName = doctorService.findDoctorByName(keyword, specializationName,
-                                experienceYears,
-                                consultationFee);
+        List<Doctor> doctorsByName = doctorService.findDoctorByName(
+                keyword, 
+                specializationName,
+                experienceYears,
+                consultationFee
+        );
 
-                // Get all active specializations from database
-                List<Specialization> specializations = specializationService.getAllActiveSpecializations();
+        // Get all active specializations from database
+        List<Specialization> specializations = specializationService.getAllActiveSpecializations();
 
-                model.addAttribute("doctors", doctorsByName);
-                model.addAttribute("specializations", specializations);
-                model.addAttribute("searchKeyword", keyword);
-                model.addAttribute("currentPath", "/search/doctors");
-                model.addAttribute("searchType", "doctor");
-                model.addAttribute("selectedSpecializations",
-                                specializationName != null ? Arrays.asList(specializationName) : null);
+        model.addAttribute("doctors", doctorsByName);
+        model.addAttribute("specializations", specializations);
+        model.addAttribute("searchKeyword", keyword);
+        model.addAttribute("currentPath", "/search/doctors");
+        model.addAttribute("searchType", "doctor");
+        model.addAttribute("selectedSpecializations",
+                specializationName != null ? Arrays.asList(specializationName) : null);
 
-                return "doctor/searchDoctors";
-        }
+        return "doctor/searchDoctors";
+    }
 
-        @GetMapping("/doctors/details/{id}")
-        public String getDoctorDetails(@PathVariable Long id, Model model) {
-                Doctor doctor = doctorService.getDoctorById(id);
-                model.addAttribute("doctor", doctor);
-                return "doctor/detailsDoctors";
-        }
-
+    @GetMapping("/doctors/details/{id}")
+    public String getDoctorDetails(@PathVariable Long id, Model model) {
+        Doctor doctor = doctorService.getDoctorById(id);
+        model.addAttribute("doctor", doctor);
+        return "doctor/detailsDoctors";
+    }
 }

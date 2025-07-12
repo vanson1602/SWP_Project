@@ -236,6 +236,52 @@
                                 }
 
                                 .btn-payment {
+                                    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+                                    color: white;
+                                    border: none;
+                                }
+
+                                .btn-payment:hover {
+                                    color: white;
+                                    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+                                }
+
+                                .btn-cancel {
+                                    background-color: #dc3545;
+                                    color: white;
+                                    border: none;
+                                }
+
+                                .btn-cancel:hover {
+                                    color: white;
+                                    background-color: #c82333;
+                                    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+                                }
+
+                                .btn-payment {
+                                    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+                                    color: white;
+                                    border: none;
+                                }
+
+                                .btn-payment:hover {
+                                    color: white;
+                                    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+                                }
+
+                                .btn-cancel {
+                                    background-color: #dc3545;
+                                    color: white;
+                                    border: none;
+                                }
+
+                                .btn-cancel:hover {
+                                    color: white;
+                                    background-color: #c82333;
+                                    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+                                }
+
+                                .btn-payment {
                                     background: linear-gradient(135deg, #0061f2 0%, #00a7e1 100%);
                                     color: white;
                                     border: none;
@@ -464,116 +510,85 @@
                                             </div>
                                         </c:if>
 
-                                        <c:forEach items="${appointments}" var="appointment">
-                                            <div class="appointment-card">
-                                                <div class="appointment-header">
-                                                    <div class="appointment-number">
-                                                        <i class="bi bi-bookmark-check"></i>
-                                                        Mã lịch hẹn: #${appointment.appointmentNumber}
-                                                    </div>
-                                                    <span class="status-badge 
-                                                ${appointment.status == 'Pending' ? 'status-pending' : ''}
-                                                ${appointment.status == 'Confirmed' ? 'status-confirmed' : ''}
-                                                ${appointment.status == 'Cancelled' ? 'status-cancelled' : ''}">
-                                                        <i class="bi 
-                                                    ${appointment.status == 'Pending' ? 'bi-hourglass-split' : ''}
-                                                    ${appointment.status == 'Confirmed' ? 'bi-check-circle' : ''}
-                                                    ${appointment.status == 'Cancelled' ? 'bi-x-circle' : ''}">
-                                                        </i>
-                                                        ${appointment.status}
-                                                    </span>
+                                    <c:forEach items="${appointments}" var="appointment">
+                                        <div class="appointment-card">
+                                            <div class="appointment-header">
+                                                <div class="appointment-number">
+                                                    <i class="bi bi-bookmark-check"></i>
+                                                    Mã lịch hẹn: #${appointment.appointmentNumber}
                                                 </div>
-                                                <div class="appointment-content">
-                                                    <div class="doctor-info">
-                                                        <img src="${pageContext.request.contextPath}/resources/images/defaultImg.jpg"
-                                                            alt="Doctor Avatar" class="doctor-avatar">
-                                                        <div class="doctor-name">
-                                                            <c:choose>
-                                                                <c:when test="${appointment.doctor != null}">
-                                                                    BS. ${appointment.doctor.user.firstName}
-                                                                    ${appointment.doctor.user.lastName}
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    BS.
-                                                                    ${appointment.bookingSlot.schedule.doctor.user.firstName}
-                                                                    ${appointment.bookingSlot.schedule.doctor.user.lastName}
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                        </div>
-                                                        <div class="doctor-specialty">
-                                                            <c:choose>
-                                                                <c:when test="${appointment.doctor != null}">
-                                                                    <c:forEach
-                                                                        items="${appointment.doctor.specializations}"
-                                                                        var="spec" varStatus="loop">
-                                                                        <c:if test="${loop.first}">
-                                                                            ${spec.specializationName}</c:if>
-                                                                    </c:forEach>
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <c:forEach
-                                                                        items="${appointment.bookingSlot.schedule.doctor.specializations}"
-                                                                        var="spec" varStatus="loop">
-                                                                        <c:if test="${loop.first}">
-                                                                            ${spec.specializationName}</c:if>
-                                                                    </c:forEach>
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                        </div>
+                                                <span class="status-badge 
+                                            ${appointment.status == 'Pending' ? 'status-pending' : ''}
+                                            ${appointment.status == 'Confirmed' ? 'status-confirmed' : ''}
+                                            ${appointment.status == 'Cancelled' ? 'status-cancelled' : ''}">
+                                                    <i class="bi 
+                                                ${appointment.status == 'Pending' ? 'bi-hourglass-split' : ''}
+                                                ${appointment.status == 'Confirmed' ? 'bi-check-circle' : ''}
+                                                ${appointment.status == 'Cancelled' ? 'bi-x-circle' : ''}">
+                                                    </i>
+                                                    ${appointment.status}
+                                                </span>
+                                            </div>
+                                            <div class="appointment-content">
+                                                <div class="doctor-info">
+                                                    <img src="${pageContext.request.contextPath}/resources/images/defaultImg.jpg"
+                                                        alt="Doctor Avatar" class="doctor-avatar">
+                                                    <div class="doctor-name">
+                                                        BS. ${appointment.bookingSlot.schedule.doctor.user.firstName}
+                                                        ${appointment.bookingSlot.schedule.doctor.user.lastName}
                                                     </div>
-                                                    <div class="appointment-details">
-                                                        <div class="appointment-info">
-                                                            <i class="bi bi-calendar-date"></i>
-                                                            <span>Ngày khám:
-                                                                ${appointment.appointmentDate.format(dateFormatter)}</span>
-                                                        </div>
-                                                        <div class="appointment-info">
-                                                            <i class="bi bi-clock"></i>
-                                                            <span>Giờ khám:
-                                                                ${appointment.appointmentDate.format(timeFormatter)} →
-                                                                ${appointment.appointmentDate.plusHours(1).format(timeFormatter)}</span>
-                                                        </div>
-                                                        <div class="appointment-info">
-                                                            <i class="bi bi-cash"></i>
-                                                            <span>Phí khám:
-                                                                <c:choose>
-                                                                    <c:when test="${appointment.doctor != null}">
-                                                                        ${appointment.doctor.consultationFee}đ
-                                                                    </c:when>
-                                                                    <c:otherwise>
-                                                                        ${appointment.bookingSlot.schedule.doctor.consultationFee}đ
-                                                                    </c:otherwise>
-                                                                </c:choose>
-                                                            </span>
-                                                        </div>
-                                                        <div class="appointment-info">
-                                                            <i class="bi bi-card-text"></i>
-                                                            <span>Ghi chú: ${not empty appointment.patientNotes ?
-                                                                appointment.patientNotes : 'Không có'}</span>
-                                                        </div>
+                                                    <div class="doctor-specialty">
+                                                        ${appointment.bookingSlot.schedule.doctor.specializations.iterator().next().specializationName}
+                                                    </div>
+                                                </div>
+                                                <div class="appointment-details">
+                                                    <div class="appointment-info">
+                                                        <i class="bi bi-calendar2"></i>
+                                                        <strong>Ngày:</strong>
+                                                        ${appointment.appointmentDate.format(dateFormatter)}
+                                                    </div>
 
-                                                        <!-- Action Buttons -->
-                                                        <div class="action-buttons">
-                                                            <c:if test="${appointment.status == 'Pending'}">
-                                                                <a href="${pageContext.request.contextPath}/appointments/payment?appointmentId=${appointment.appointmentID}"
-                                                                    class="btn btn-payment">
-                                                                    <i class="bi bi-credit-card"></i>
-                                                                    Thanh toán ngay
-                                                                </a>
-                                                            </c:if>
-                                                            <c:if
-                                                                test="${appointment.status != 'Cancelled' && appointment.status != 'Completed'}">
-                                                                <button type="button" class="btn btn-cancel"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#cancelModal${appointment.appointmentID}">
-                                                                    <i class="bi bi-x-circle"></i>
-                                                                    Hủy lịch hẹn
-                                                                </button>
-                                                            </c:if>
-                                                        </div>
+                                                    <div class="appointment-info">
+                                                        <i class="bi bi-clock"></i>
+                                                        <strong>Giờ khám:</strong>
+                                                        ${appointment.appointmentDate.format(timeFormatter)} -
+                                                        ${appointment.appointmentDate.plusHours(1).format(timeFormatter)}
                                                     </div>
+
+                                                    <div class="appointment-info">
+                                                        <i class="bi bi-clipboard2-pulse"></i>
+                                                        <strong>Loại khám:</strong>
+                                                        ${appointment.appointmentType.typeName}
+                                                    </div>
+
+                                                    <div class="appointment-info">
+                                                        <i class="bi bi-hospital"></i>
+                                                        <strong>Phòng khám:</strong>
+                                                        ${appointment.bookingSlot.schedule.clinicRoom}
+                                                    </div>
+
+                                                    <c:if test="${not empty appointment.patientNotes}">
+                                                        <div class="appointment-info">
+                                                            <i class="bi bi-chat-left-text"></i>
+                                                            <strong>Ghi chú:</strong>
+                                                            ${appointment.patientNotes}
+                                                        </div>
+                                                    </c:if>
+
+                                                    <c:if
+                                                        test="${appointment.status != 'Cancelled' && appointment.status != 'Completed'}">
+                                                        <div class="mt-3">
+                                                            <button type="button" class="cancel-btn"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#cancelModal${appointment.appointmentID}">
+                                                                <i class="bi bi-x-circle me-2"></i>
+                                                                Hủy lịch hẹn
+                                                            </button>
+                                                        </div>
+                                                    </c:if>
                                                 </div>
                                             </div>
+                                        </div>
 
                                             <!-- Cancel Modal -->
                                             <div class="modal fade" id="cancelModal${appointment.appointmentID}"

@@ -17,7 +17,8 @@ function loadNotifications() {
   fetch("/notifications/list")
     .then((response) => response.json())
     .then((notifications) => {
-      const container = document.querySelector(".notification-list");
+      console.log("Raw notifications:", notifications); // Debug log
+      const container = document.querySelector(".notification-dropdown");
       if (container) {
         container.innerHTML = ""; // Xóa nội dung cũ
 
@@ -28,6 +29,8 @@ function loadNotifications() {
         }
 
         notifications.forEach((notification) => {
+          console.log("Processing notification:", notification); // Debug log for each notification
+          console.log("Timestamp:", notification.sentAt); // Debug specific timestamp
           const notificationElement = createNotificationElement(notification);
           container.appendChild(notificationElement);
         });
@@ -77,28 +80,59 @@ function createNotificationElement(notification) {
 
 // Hàm định dạng thời gian
 function formatTime(timestamp) {
-  if (!timestamp) return "Không xác định";
+  console.log("Formatting timestamp:", timestamp);
+
+  if (!timestamp) {
+    console.log("Timestamp is null or undefined");
+    return "Không xác định";
+  }
 
   try {
     let momentDate;
+
+    // Kiểm tra nếu timestamp là mảng
     if (Array.isArray(timestamp)) {
-      const [year, month, day, hour, minute, second] = timestamp;
-      momentDate = moment([year, month - 1, day, hour, minute, second]);
+      // Chuyển đổi mảng thành đối tượng Date
+      // Format: [year, month(1-12), day, hour, minute, second, nanoOfSecond]
+      const [year, month, day, hour, minute, second, nano] = timestamp;
+      // Lưu ý: moment month bắt đầu từ 0 nên phải trừ 1
+      momentDate = moment([
+        year,
+        month - 1,
+        day,
+        hour,
+        minute,
+        second,
+        Math.floor(nano / 1000000),
+      ]);
     } else {
       momentDate = moment(timestamp);
     }
 
-    if (!momentDate.isValid()) return "Không xác định";
+    if (!momentDate.isValid()) {
+      console.error("Invalid date:", timestamp);
+      return "Không xác định";
+    }
 
     const now = moment();
     const diff = now.diff(momentDate, "minutes");
 
-    if (diff < 1) return "Vừa xong";
-    if (diff < 60) return `${diff} phút trước`;
-    if (diff < 1440) return momentDate.format("HH:mm [hôm nay]");
-    if (diff < 2880) return momentDate.format("HH:mm [hôm qua]");
-    if (diff < 7200) return momentDate.format("HH:mm [• ] DD/MM");
-    return momentDate.format("HH:mm [•] DD/MM/YYYY");
+    console.log("Parsed date:", momentDate.format("YYYY-MM-DD HH:mm:ss"));
+    console.log("Time difference in minutes:", diff);
+
+    if (diff < 1) {
+      return "Vừa xong";
+    } else if (diff < 60) {
+      return momentDate.fromNow() + " • " + momentDate.format("HH:mm");
+    } else if (diff < 1440) {
+      // 24 giờ
+      return momentDate.fromNow() + " • " + momentDate.format("HH:mm");
+    } else if (diff < 10080) {
+      // 7 ngày
+      return momentDate.fromNow() + " • " + momentDate.format("HH:mm");
+    } else {
+      return momentDate.format("DD/MM/YYYY • HH:mm");
+    }
   } catch (error) {
     console.error("Error formatting date:", error);
     return "Không xác định";

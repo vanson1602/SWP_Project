@@ -7,9 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.apache.commons.lang3.StringUtils;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
@@ -63,6 +63,7 @@ public class UploadFileImpl implements UploadFileService {
         String fileName = getFileName(originalName)[0];
         return StringUtils.join(UUID.randomUUID().toString(), "_", fileName);
     }
+
     public void cleanDisk(File file) {
         log.info("File.toppath", file.toPath());
         try {

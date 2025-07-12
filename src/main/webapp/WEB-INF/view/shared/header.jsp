@@ -268,9 +268,29 @@
         </style>
 
         <!-- Header JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/vi.js"></script>
         <script>
             // Set moment.js locale to Vietnamese
             moment.locale('vi');
+        </script>
+
+        <script>
+            // Mobile menu toggle
+            document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.toggle('show');
+            });
+
+            // Profile dropdown toggle
+            document.getElementById('profileDropdownBtn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('profileDropdown').classList.toggle('show');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', () => {
+                document.getElementById('profileDropdown')?.classList.remove('show');
+            });
         </script>
 
         <script>

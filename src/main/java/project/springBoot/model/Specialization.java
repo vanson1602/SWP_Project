@@ -51,4 +51,8 @@ public class Specialization {
                 ", description=" + description + ", isActive=" + isActive +
                 ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
+
+    public long getSpecializationID() {
+        return specializationID;
+    }
 }

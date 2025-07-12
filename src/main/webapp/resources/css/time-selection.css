@@ -297,7 +297,8 @@
 
 .date-number {
     font-size: 1.1rem;
-    font-weight: 500;
+    font-weight: 600;
+    color: #333;
 }
 
 /* Time Slots */
@@ -309,7 +310,7 @@
 }
 
 .time-slot {
-    background: white;
+    padding: 1rem;
     border: 2px solid #e0e0e0;
     border-radius: 12px;
     padding: 1rem;
@@ -368,6 +369,38 @@
     right: 0.5rem;
     color: var(--danger-color);
     font-size: 1.1rem;
+}
+
+.booked-indicator {
+    font-size: 0.8rem;
+    color: #dc3545;
+    display: block;
+    margin-top: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .date-selector {
+        gap: 0.5rem;
+    }
+
+    .date-option {
+        min-width: 80px;
+        padding: 0.75rem;
+    }
+
+    .time-slots {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .time-slot {
+        padding: 0.75rem;
+    }
+
+    .time-range {
+        font-size: 0.9rem;
+    }
 }
 
 /* Navigation Buttons */

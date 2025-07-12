@@ -56,4 +56,8 @@ public class AppointmentType {
     public Long getAppointmentTypeID() {
          return appointmentTypeID;
     }
+
+    public String getTypeName() {
+        return typeName;
+    }
 } 

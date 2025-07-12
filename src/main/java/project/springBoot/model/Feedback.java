@@ -91,4 +91,12 @@ public class Feedback {
                 ", cleanlinessRating=" + cleanlinessRating + ", isAnonymous=" + isAnonymous +
                 ", isApproved=" + isApproved + ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
+
+    public Integer getRating() {
+        return rating;
+    }
+    
+    public Boolean getIsApproved() {
+        return isApproved;
+    }
 }
