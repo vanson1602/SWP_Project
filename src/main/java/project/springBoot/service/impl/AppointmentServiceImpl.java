@@ -288,4 +288,9 @@ public class AppointmentServiceImpl implements AppointmentService {
             notificationRepository.save(notification);
         }
     }
+
+    @Override
+    public List<Appointment> findAppointmentByPatientID(Long patientId) {
+        return appointmentRepository.findAppointmentByPatient_PatientID(patientId);
+    }
 }

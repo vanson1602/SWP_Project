@@ -36,4 +36,6 @@ public interface AppointmentService {
     Page<Appointment> getAppointmentsByPatientId(long patientId, int page, int size);
 
     Page<Appointment> getAppointmentsByPatientAndStatus(long patientId, String status, int page, int size);
+
+    List<Appointment> findAppointmentByPatientID(Long patientId);
 }
