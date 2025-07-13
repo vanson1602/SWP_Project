@@ -22,6 +22,7 @@ import project.springBoot.model.Examination;
 import project.springBoot.model.Patient;
 import project.springBoot.model.User;
 import project.springBoot.service.AppointmentService;
+import project.springBoot.service.ExaminationService;
 import project.springBoot.service.PatientService;
 import project.springBoot.service.UserService;
 
@@ -33,6 +34,8 @@ public class PatientHistoryController {
     private UserService userService;
     @Autowired
     private AppointmentService appointmentService;
+    @Autowired
+    private ExaminationService examinationService;
 
     @GetMapping("/medical-history")
     public String viewPatientHistory(HttpSession session, Model model) {
@@ -59,5 +62,20 @@ public class PatientHistoryController {
         model.addAttribute("formatter", formatter);
         model.addAttribute("appointment", appointments);
         return "patient/patient-history";
+    }
+
+    @GetMapping("/medical-history/medical-record/{appointmentID}")
+    public String viewPatientHistoryMedicalRecord(HttpSession session, Model model, @PathVariable Long appointmentID) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null || !"patient".equalsIgnoreCase(currentUser.getRole())) {
+            return "redirect:/login";
+        }
+        Examination examination = examinationService.getExaminationByAppointmentId(appointmentID);
+        DateTimeFormatter date = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter time = DateTimeFormatter.ofPattern("HH:mm");
+        model.addAttribute("examination", examination);
+        model.addAttribute("time", time);
+        model.addAttribute("date", date);
+        return "patient/patient-medicalRecord";
     }
 }
