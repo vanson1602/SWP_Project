@@ -15,6 +15,7 @@ import project.springBoot.service.EmailService;
 
 import jakarta.servlet.http.HttpSession;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -59,32 +60,46 @@ public class AdminScheduleController {
     }
 
     @PostMapping("/save")
-    public String saveSchedule(@ModelAttribute DoctorSchedule schedule, Model model) {
-        List<Doctor> doctors = doctorRepository.findAll();
-        model.addAttribute("doctors", doctors);
+    public String saveMultipleSchedules(
+            @ModelAttribute DoctorSchedule schedule,
+            @RequestParam("selectedDates") String selectedDatesString,
+            Model model) {
         try {
-            List<DoctorSchedule> existingSchedules = doctorScheduleService
-                    .getSchedulesByDoctorId(schedule.getDoctor().getDoctorID());
-            for (DoctorSchedule existing : existingSchedules) {
-                if (existing.getWorkDate().equals(schedule.getWorkDate())) {
-                    model.addAttribute("error",
-                            "Schedule creation failed: A schedule for this doctor on the selected date already exists. Please choose a different date.");
+            List<Doctor> doctors = doctorRepository.findAll();
+            model.addAttribute("doctors", doctors);
+
+            String[] selectedDates = selectedDatesString.split(",");
+            if (selectedDates.length == 0) {
+                model.addAttribute("error", "Please select at least one date.");
+                return "admin/schedules/add";
+            }
+
+            for (String dateStr : selectedDates) {
+                DoctorSchedule newSchedule = new DoctorSchedule();
+                newSchedule.setDoctor(schedule.getDoctor());
+                newSchedule.setStartTime(schedule.getStartTime());
+                newSchedule.setEndTime(schedule.getEndTime());
+                newSchedule.setClinicRoom(schedule.getClinicRoom());
+                newSchedule.setNotes(schedule.getNotes());
+                newSchedule.setStatus(schedule.getStatus());
+                newSchedule.setMaxPatients(schedule.getMaxPatients());
+                newSchedule.setWorkDate(LocalDate.parse(dateStr));
+
+                List<DoctorSchedule> existingSchedules = doctorScheduleService
+                        .getSchedulesByDoctorId(schedule.getDoctor().getDoctorID());
+                boolean isDuplicate = existingSchedules.stream()
+                        .anyMatch(existing -> existing.getWorkDate().equals(newSchedule.getWorkDate()));
+                if (isDuplicate) {
+                    model.addAttribute("error", "Schedule for date " + dateStr + " already exists.");
                     model.addAttribute("schedule", schedule);
                     return "admin/schedules/add";
                 }
+
+                doctorScheduleService.createSchedule(newSchedule);
             }
-            doctorScheduleService.createSchedule(schedule);
-        } catch (DataIntegrityViolationException e) {
-            model.addAttribute("error",
-                    "Schedule creation failed: A schedule for this doctor on the selected date already exists. Please choose a different date.");
-            model.addAttribute("schedule", schedule);
-            return "admin/schedules/add";
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("error", "Schedule creation failed: " + e.getMessage());
-            model.addAttribute("schedule", schedule);
-            return "admin/schedules/add";
+
         } catch (Exception e) {
-            model.addAttribute("error", "Schedule creation failed due to an unexpected error: " + e.getMessage());
+            model.addAttribute("error", "Schedule creation failed: " + e.getMessage());
             model.addAttribute("schedule", schedule);
             return "admin/schedules/add";
         }
