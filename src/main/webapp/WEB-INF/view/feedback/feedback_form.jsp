@@ -102,7 +102,8 @@
                         <!-- Đánh giá chung -->
                         <div class="rating-section">
                             <label class="form-label">Đánh giá chung</label>
-                            <form:input path="rating" type="hidden" id="ratingInput" />
+                            <form:input path="rating" type="number" id="ratingInput" cssClass="d-none"
+                                required="required" />
                             <div class="star-rating" data-target="ratingInput">
                                 <span class="star" data-value="1">★</span>
                                 <span class="star" data-value="2">★</span>
