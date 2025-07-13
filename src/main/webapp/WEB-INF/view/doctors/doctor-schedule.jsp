@@ -34,7 +34,6 @@
                 }
 
                 .btn-back {
-                    margin-top: 20px;
                     background-color: #6c757d;
                     border: none;
                 }
@@ -152,6 +151,7 @@
                 </div>
                 <div class="text-center">
                     <a href="/doctor/home" class="btn btn-back text-white">← Quay lại</a>
+                    <a href="/doctor/busy/schedule" class="btn btn-danger">Xin nghỉ trước</a>
                 </div>
             </div>
 

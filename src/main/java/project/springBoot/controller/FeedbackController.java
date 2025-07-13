@@ -44,7 +44,7 @@ public class FeedbackController {
 
     @PostMapping("/submit")
     public String submitFeedback(@ModelAttribute Feedback feedback, RedirectAttributes redirectAttributes) {
-        feedback.setApproved(false);
+        feedback.setIsApproved(false);
         feedback.setCreatedAt(LocalDateTime.now());
         feedback.setModifiedAt(LocalDateTime.now());
         feedbackService.saveFeedback(feedback);
@@ -75,7 +75,7 @@ public class FeedbackController {
         existing.setComment(feedback.getComment());
         existing.setAnonymous(feedback.isAnonymous());
         existing.setModifiedAt(LocalDateTime.now());
-        existing.setApproved(false);
+        existing.setIsApproved(false);
 
         feedbackService.saveFeedback(existing);
         redirectAttributes.addFlashAttribute("success", "Cập nhật Feedback thành công!");

@@ -55,7 +55,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         Feedback feedback = feedbackRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Feedback không tồn tại"));
 
-        feedback.setApproved(true);
+        feedback.setIsApproved(true);
         feedback.setModifiedAt(LocalDateTime.now());
 
         feedbackRepo.save(feedback);
