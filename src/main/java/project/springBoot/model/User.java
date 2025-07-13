@@ -1,10 +1,14 @@
 package project.springBoot.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter
@@ -31,6 +35,7 @@ public class User {
     private String lastName;
     @Column(nullable = false)
     private String role = "patient";
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dob;
     @Column(length = 10)
     private String gender;
@@ -44,7 +49,7 @@ public class User {
     private String verificationToken;
 
     @Column(name = "isVerified")
-    private boolean isVerified = false;
+    private Boolean isVerified = false;
 
     @Column(name = "reset_token", length = 256)
     private String resetToken;
@@ -123,5 +128,4 @@ public class User {
     public String getFullName() {
         return firstName + " " + lastName;
     }
-
 }

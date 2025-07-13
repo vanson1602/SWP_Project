@@ -104,8 +104,7 @@
                                         <form:select path="status" cssClass="form-select">
                                             <form:option value="Available">Available</form:option>
                                             <form:option value="Busy">Busy</form:option>
-                                            <form:option value="Off">Off</form:option>
-                                            <form:option value="Holiday">Holiday</form:option>
+                                            <form:option value="Processing">Processing</form:option>
                                         </form:select>
                                     </div>
 

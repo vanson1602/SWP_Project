@@ -20,9 +20,13 @@ public class Invoice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long invoiceID;
 
-    @ManyToOne
-    @JoinColumn(name = "examinationID", nullable = false)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "examinationID")
     private Examination examination;
+
+    @ManyToOne
+    @JoinColumn(name = "appointmentID", nullable = false)
+    private Appointment appointment;
 
     @ManyToOne
     @JoinColumn(name = "patientID", nullable = false)
@@ -33,9 +37,6 @@ public class Invoice {
 
     @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalAmount;
-
-    @Column(name = "discount_amount", precision = 10, scale = 2)
-    private BigDecimal discountAmount = BigDecimal.ZERO;
 
     @Column(name = "tax_amount", precision = 10, scale = 2)
     private BigDecimal taxAmount = BigDecimal.ZERO;
@@ -76,12 +77,19 @@ public class Invoice {
         if (paymentStatus != null && !paymentStatus.matches("Pending|Partial|Paid|Cancelled")) {
             throw new IllegalArgumentException("Invalid payment status: " + paymentStatus);
         }
+
+        // Calculate final amount based on total and tax only
+        if (totalAmount != null) {
+            BigDecimal taxValue = (taxAmount != null) ? taxAmount : BigDecimal.ZERO;
+            finalAmount = totalAmount.add(taxValue);
+        }
     }
 
     @Override
     public String toString() {
         return "Invoice [invoiceID=" + invoiceID +
                 ", examinationID=" + (examination != null ? examination.getExaminationID() : null) +
+                ", appointmentID=" + (appointment != null ? appointment.getAppointmentID() : null) +
                 ", patientID=" + (patient != null ? patient.getPatientID() : null) +
                 ", invoiceNumber=" + invoiceNumber + ", totalAmount=" + totalAmount +
                 ", finalAmount=" + finalAmount + ", paymentStatus=" + paymentStatus +

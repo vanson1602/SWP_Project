@@ -348,4 +348,184 @@ body {
         box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
     }
 
+
+
+
+
+
+
+
+
+
+        
+section.py-5 {
+    background-color: #6a0dad; 
+    padding: 40px 0;
+    color: #fff;
+}
+
+h2.text-white {
+    font-size: 2rem;
+}
+
+p.text-white {
+    font-size: 1.1rem;
+}
+
+
+.search-container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-container .form-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.search-container .form-control,
+.search-container .form-select {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    padding: 10px;
+}
+
+.search-container .btn-search {
+    background-color: #6c63ff; 
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    transition: background-color 0.3s;
+}
+
+.search-container .btn-search:hover {
+    background-color: #5a54d3;
+}
+
+.search-container .btn-search i {
+    margin-right: 5px;
+}
+
+
+.card {
+    border: none;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card .text-center {
+    padding: 15px;
+}
+
+.card img {
+    border: 2px solid #dee2e6;
+    margin-bottom: 10px;
+}
+
+.card h5 {
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.card .text-muted {
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+
+.card .specialization-icon::before {
+    content: "\f4f8"; 
+    font-family: "bootstrap-icons";
+    margin-right: 5px;
+    color: #007bff;
+}
+
+.card .experience-icon::before {
+    content: "\f4e3"; 
+    font-family: "bootstrap-icons";
+    margin-right: 5px;
+    color: #28a745;
+}
+
+.card .fee-icon::before {
+    content: "\f0d6"; 
+    font-family: "bootstrap-icons";
+    margin-right: 5px;
+    color: #dc3545;
+}
+
+
+.btn-outline-primary {
+    border-radius: 20px;
+    padding: 5px 15px;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.btn-outline-primary:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+
+p.text-muted {
+    display: flex;
+    align-items: center;
+}
+
+
+.card {
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.card .card-title i {
+    vertical-align: middle;
+}
+
+.card .card-text, .card ul {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #555;
+}
+
+.list-group-item {
+    background-color: transparent;
+    border: none;
+    padding: 5px 0;
+}
+
+.card[style*="transition: transform"] {
+    transition: transform 0.3s;
+}
+
+.card[style*="transition: transform"]:hover {
+    transform: scale(1.05);
+}
+
+
+@media (max-width: 768px) {
+    .card h3 {
+        font-size: 1.1rem;
+    }
+    .card .card-text, .card ul {
+        font-size: 0.9rem;
+    }
+}
+
+
+
 }

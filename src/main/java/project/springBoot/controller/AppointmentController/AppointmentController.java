@@ -1,22 +1,46 @@
 package project.springBoot.controller.AppointmentController;
 
-import lombok.RequiredArgsConstructor;
+import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
-import project.springBoot.model.*;
+import lombok.RequiredArgsConstructor;
+import project.springBoot.model.Appointment;
+import project.springBoot.model.AppointmentType;
+import project.springBoot.model.Doctor;
+import project.springBoot.model.DoctorBookingSlot;
+import project.springBoot.model.Patient;
+import project.springBoot.model.Specialization;
+import project.springBoot.model.User;
 import project.springBoot.service.AppointmentService;
 import project.springBoot.service.DoctorService;
+import project.springBoot.service.EmailService;
+import project.springBoot.service.InvoiceService;
+import project.springBoot.service.PatientService;
 import project.springBoot.service.SpecializationService;
-import project.springBoot.service.impl.AppointmentServiceImpl;
+import vn.payos.PayOS;
+import vn.payos.type.CheckoutResponseData;
+import vn.payos.type.ItemData;
+import vn.payos.type.PaymentData;
+import org.springframework.data.domain.Page;
 
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -26,10 +50,25 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
     private final DoctorService doctorService;
     private final SpecializationService specializationService;
+    private final PayOS payOS;
+    private final EmailService emailService;
+    private final PatientService patientService;
+    private final InvoiceService invoiceService;
 
     @GetMapping("")
-    public String showAppointmentForm(Model model, Principal principal) {
-        // Hiển thị trang chính đặt lịch
+    public String showAppointmentForm(Model model, Principal principal, HttpSession session) {
+        User user = (User) session.getAttribute("currentUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        Patient patient = patientService.getPatientByUsername(user.getUsername());
+        if (patient == null) {
+            return "redirect:/login";
+        }
+
+        session.setAttribute("currentUser", user);
+        session.setAttribute("currentPatient", patient);
         return "appointment/appointment-page";
     }
 
@@ -93,6 +132,7 @@ public class AppointmentController {
             HttpSession session,
             Model model) {
         DoctorBookingSlot slot = doctorService.getSlotById(slotId);
+        System.out.println("Slot: " + slot);
         User user = (User) session.getAttribute("currentUser");
         Patient patient = doctorService.getPatientByUsername(user.getUsername());
         Specialization specialization = (Specialization) session.getAttribute("selectedSpecialization");
@@ -113,12 +153,16 @@ public class AppointmentController {
             @RequestParam Long appointmentTypeId,
             HttpSession session,
             Model model) {
+
         try {
             User user = (User) session.getAttribute("currentUser");
             Patient patient = doctorService.getPatientByUsername(user.getUsername());
             Specialization specialization = (Specialization) session.getAttribute("selectedSpecialization");
-
+            System.out.println("Specialization: " + specialization);
+            System.out.println("User: " + user);
+            System.out.println("Patient: " + patient);
             DoctorBookingSlot slot = doctorService.getSlotById(slotId);
+
             System.out.println("Slot:" + slot);
             System.out.println("Slot id:" + slotId);
             System.out.println("Specialization ID: " + specialization.getSpecializationID());
@@ -136,7 +180,7 @@ public class AppointmentController {
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             System.out.println("Error: " + e.getMessage());
-            return "appointment/error";
+            return "redirect:/appointments/info?error=" + e.getMessage();
         }
     }
 
@@ -155,7 +199,6 @@ public class AppointmentController {
                     return "redirect:/appointments/my-appointments?error=This appointment cannot be paid";
                 }
 
-                // Kiểm tra xem người dùng hiện tại có phải là chủ của appointment không
                 User currentUser = (User) session.getAttribute("currentUser");
                 if (currentUser.getUserID() != appointment.getPatient().getUser().getUserID()) {
                     return "redirect:/appointments/my-appointments?error=Unauthorized access";
@@ -166,7 +209,6 @@ public class AppointmentController {
                 return "redirect:/appointments/my-appointments?error=" + e.getMessage();
             }
         } else {
-            // Nếu không có appointmentId, lấy từ session như cũ
             appointment = (Appointment) session.getAttribute("pendingAppointment");
             if (appointment == null) {
                 return "redirect:/appointments/booking";
@@ -189,7 +231,6 @@ public class AppointmentController {
             HttpSession session,
             Model model) {
         try {
-            // Kiểm tra xem appointment có tồn tại và thuộc về người dùng hiện tại không
             Appointment appointment = appointmentService.getAppointmentById(appointmentId);
             if (appointment == null) {
                 throw new RuntimeException("Appointment not found");
@@ -204,35 +245,24 @@ public class AppointmentController {
                 throw new RuntimeException("This appointment cannot be paid");
             }
 
-            boolean paymentSuccess = false;
-            String paymentNote = "";
+            String currentTimeString = String.valueOf(new Date().getTime());
+            long orderCode = Long.parseLong(currentTimeString.substring(currentTimeString.length() - 6));
+            ItemData item = ItemData.builder()
+                    .name("Thanh Toán Lịch Hẹn")
+                    .price(appointment.getBookingSlot().getSchedule().getDoctor().getConsultationFee().intValue())
+                    .quantity(1)
+                    .build();
+            PaymentData paymentData = PaymentData.builder()
+                    .orderCode(orderCode)
+                    .amount(appointment.getBookingSlot().getSchedule().getDoctor().getConsultationFee().intValue())
+                    .description("thanh toan lich hen")
+                    .returnUrl("http://localhost:8080/appointments/payment-success")
+                    .cancelUrl("http://localhost:8080/appointments/payment-cancel")
+                    .item(item).build();
 
-            switch (paymentMethod) {
-                case "momo":
-                    paymentSuccess = true;
-                    paymentNote = "Thanh toán qua MoMo thành công";
-                    break;
-                case "vnpay":
-                    paymentSuccess = true;
-                    paymentNote = "Thanh toán qua VNPay thành công";
-                    break;
-                case "banking":
-                    paymentSuccess = true;
-                    paymentNote = "Thanh toán qua Banking thành công";
-                    break;
-                default:
-                    throw new RuntimeException("Invalid payment method");
-            }
-
-            if (paymentSuccess) {
-                // Cập nhật trạng thái appointment thành CONFIRMED sau khi thanh toán thành công
-                appointmentService.updateAppointmentStatus(appointmentId, "Confirmed", paymentNote);
-                session.removeAttribute("pendingAppointment");
-                return "redirect:/appointments/payment-success";
-            } else {
-                model.addAttribute("error", "Payment failed. Please try again.");
-                return "appointment/payment";
-            }
+            CheckoutResponseData checkoutResponseData = payOS.createPaymentLink(paymentData);
+            String paymentLink = checkoutResponseData.getCheckoutUrl();
+            return "redirect:" + paymentLink;
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("appointment", appointmentService.getAppointmentByIdWithDetails(appointmentId));
@@ -241,16 +271,75 @@ public class AppointmentController {
     }
 
     @GetMapping("/payment-success")
-    public String showPaymentSuccess() {
-        return "appointment/payment-success";
+    public String showPaymentSuccess(HttpSession session) {
+        try {
+            Appointment appointment = (Appointment) session.getAttribute("pendingAppointment");
+            if (appointment != null) {
+                appointmentService.updatePaymentStatus(appointment.getAppointmentID(), "Confirmed");
+                appointment = appointmentService.getAppointmentByIdWithDetails(appointment.getAppointmentID());
+
+                // Create invoice for the appointment
+                invoiceService.createAppointmentInvoice(appointment, "PayOS");
+
+                // Send confirmation emails
+                emailService.sendAppointmentConfirmationEmail(
+                        appointment.getPatient().getUser().getEmail(),
+                        appointment);
+                emailService.sendDoctorAppointmentNotificationEmail(
+                        appointment.getBookingSlot().getSchedule().getDoctor().getUser().getEmail(),
+                        appointment);
+                session.removeAttribute("pendingAppointment");
+            }
+            return "appointment/payment-success";
+        } catch (Exception e) {
+            return "redirect:/appointments/my-appointments?error=" + e.getMessage();
+        }
+    }
+
+    @GetMapping("/payment-cancel")
+    public String showPaymentCancel(HttpSession session, Model model) {
+        try {
+            Appointment appointment = (Appointment) session.getAttribute("pendingAppointment");
+            if (appointment != null) {
+                appointment = appointmentService.getAppointmentByIdWithDetails(appointment.getAppointmentID());
+                model.addAttribute("appointment", appointment);
+            }
+            return "appointment/payment-cancel";
+        } catch (Exception e) {
+            return "redirect:/appointments/my-appointments?error=" + e.getMessage();
+        }
     }
 
     @GetMapping("/my-appointments")
-    public String showMyAppointments(HttpSession session, Model model) {
+    public String viewMyAppointments(Model model, HttpSession session,
+            @RequestParam(defaultValue = "all") String status,
+            @RequestParam(defaultValue = "0") int page) {
         User user = (User) session.getAttribute("currentUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
         Patient patient = doctorService.getPatientByUsername(user.getUsername());
-        List<Appointment> appointments = appointmentService.getPatientAppointments(patient.getPatientID());
-        model.addAttribute("appointments", appointments);
+        if (patient == null) {
+            return "redirect:/login";
+        }
+
+        final int PAGE_SIZE = 5;
+        Page<Appointment> appointmentPage;
+
+        if ("all".equals(status)) {
+            appointmentPage = appointmentService.getAppointmentsByPatientId(patient.getPatientID(), page, PAGE_SIZE);
+        } else {
+            appointmentPage = appointmentService.getAppointmentsByPatientAndStatus(patient.getPatientID(), status, page,
+                    PAGE_SIZE);
+        }
+
+        model.addAttribute("appointments", appointmentPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", appointmentPage.getTotalPages());
+        model.addAttribute("totalItems", appointmentPage.getTotalElements());
+        model.addAttribute("currentStatus", status);
+
         return "appointment/my-appointments";
     }
 

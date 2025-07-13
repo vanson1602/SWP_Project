@@ -37,7 +37,7 @@ public class RegistrationController {
         try {
             User existingUser = userRepository.findByEmail(user.getEmail());
             if (existingUser != null) {
-                if (existingUser.isVerified()) {
+                if (existingUser.getIsVerified()) {
                     redirectAttributes.addFlashAttribute("error", "Email đã được đăng ký và xác thực!");
                     return "redirect:/register";
                 } else {

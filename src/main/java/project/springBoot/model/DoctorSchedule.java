@@ -42,7 +42,7 @@ public class DoctorSchedule {
     private String status = "Available";
 
     @Column(name = "max_patients")
-    private Integer maxPatients = 20;
+    private Integer maxPatients;
 
     @Column(name = "clinic_room", length = 50)
     private String clinicRoom;
@@ -62,7 +62,7 @@ public class DoctorSchedule {
     @PrePersist
     @PreUpdate
     private void validateEnumLikeFields() {
-        if (status != null && !status.matches("Available|Busy|Off|Holiday")) {
+        if (status != null && !status.matches("Available|Busy|Processing|Done")) {
             throw new IllegalArgumentException("Invalid status: " + status);
         }
     }
@@ -75,4 +75,5 @@ public class DoctorSchedule {
                 ", status=" + status + ", maxPatients=" + maxPatients + ", clinicRoom=" + clinicRoom +
                 ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
+
 }

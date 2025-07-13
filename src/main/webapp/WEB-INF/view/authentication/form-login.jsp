@@ -56,8 +56,8 @@
                   <label class="form-label">Email hoặc tên đăng nhập</label>
                   <div class="input-with-icon">
                     <i class="bi bi-person"></i>
-                    <input type="text" name="emailorusername" class="form-input"
-                      placeholder="Nhập email hoặc tên đăng nhập" required value="${emailorusername}">
+                    <input type="text" name="emailOrUsername" class="form-input"
+                      placeholder="Nhập email hoặc tên đăng nhập" required value="${emailOrUsername}">
                   </div>
                 </div>
                 <div class="form-group">

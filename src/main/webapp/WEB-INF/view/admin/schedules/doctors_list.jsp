@@ -127,7 +127,7 @@
                         </table>
                     </div>
                 </div>
-                <div class="d-flex justify-content-center mt-4">
+                <div class="d-flex justify-content-center mt-4" style="margin-bottom: 2%;">
                     <a href="/admin" class="btn btn-back">← Back to Dashboard</a>
                 </div>
             </div>

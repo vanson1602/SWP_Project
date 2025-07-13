@@ -110,7 +110,7 @@
                                             <form:select path="status" cssClass="form-select">
                                                 <form:option value="" label="-- Select Status --" />
                                                 <form:option value="Available">Available</form:option>
-                                                <form:option value="Busy">not Available</form:option>
+                                                <form:option value="Busy">Busy</form:option>
                                             </form:select>
                                         </div>
                                         <div class="mb-3">

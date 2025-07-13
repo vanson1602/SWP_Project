@@ -1,17 +1,33 @@
 package project.springBoot.service.impl;
 
 import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.springBoot.model.*;
-import project.springBoot.repository.*;
+
+import lombok.RequiredArgsConstructor;
+import project.springBoot.model.Appointment;
+import project.springBoot.model.AppointmentType;
+import project.springBoot.model.Doctor;
+import project.springBoot.model.DoctorBookingSlot;
+import project.springBoot.model.Notification;
+import project.springBoot.model.Patient;
+import project.springBoot.repository.AppointmentRepository;
+import project.springBoot.repository.AppointmentTypeRepository;
+import project.springBoot.repository.DoctorBookingSlotRepository;
+import project.springBoot.repository.NotificationRepository;
+import project.springBoot.repository.PatientRepository;
 import project.springBoot.service.AppointmentService;
 import project.springBoot.service.EmailService;
 import project.springBoot.utils.AppointmentUtils;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Service
 @Transactional
@@ -64,6 +80,20 @@ public class AppointmentServiceImpl implements AppointmentService {
         doctorNotification.setNotificationType("NewAppointment");
         doctorNotification.setRead(false);
         notificationRepository.save(doctorNotification);
+
+        try {
+            String patientEmail = patient.getUser().getEmail();
+            emailService.sendAppointmentBookingConfirmationEmail(patientEmail, appointment);
+        } catch (Exception e) {
+            System.err.println("Failed to send booking confirmation email: " + e.getMessage());
+        }
+
+        try {
+            String doctorEmail = slot.getSchedule().getDoctor().getUser().getEmail();
+            emailService.sendDoctorAppointmentNotificationEmail(doctorEmail, appointment);
+        } catch (Exception e) {
+            System.err.println("Failed to send doctor notification email: " + e.getMessage());
+        }
 
         return appointment;
     }
@@ -209,6 +239,23 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointmentRepository.save(appointment);
     }
 
+    @Override
+    public List<Appointment> findByPatientAndStatus(Long patientId, String status) {
+        return appointmentRepository.findByPatientAndStatus(patientId, status);
+    }
+
+    @Override
+    public Page<Appointment> getAppointmentsByPatientId(long patientId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").descending());
+        return appointmentRepository.findByPatientId(patientId, pageable);
+    }
+
+    @Override
+    public Page<Appointment> getAppointmentsByPatientAndStatus(long patientId, String status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").descending());
+        return appointmentRepository.findByPatientAndStatus(patientId, status, pageable);
+    }
+
     private void createStatusNotification(Appointment appointment, String status) {
         String title = "";
         String message = "";
@@ -236,5 +283,36 @@ public class AppointmentServiceImpl implements AppointmentService {
         notification.setMessage(message);
         notification.setNotificationType("General");
         notificationRepository.save(notification);
+    }
+
+    @Scheduled(fixedRate = 300000)
+    public void cancelUnpaidAppointments() {
+        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(3);
+        List<Appointment> unpaidAppointments = appointmentRepository.findUnpaidAppointments(cutoffTime);
+
+        for (Appointment appointment : unpaidAppointments) {
+            appointment.setStatus("Cancelled");
+            appointment.setModifiedAt(LocalDateTime.now());
+            appointmentRepository.save(appointment);
+
+            Notification notification = new Notification();
+            notification.setUser(appointment.getPatient().getUser());
+            notification.setAppointment(appointment);
+            notification.setTitle("Lịch Hẹn Bị Hủy");
+            notification.setMessage("Lịch hẹn của bạn đã bị hủy do chưa thanh toán sau 12 giờ.");
+            notification.setNotificationType("Rejection");
+            notification.setPriority("High");
+            notificationRepository.save(notification);
+        }
+    }
+
+    public List<Appointment> getAppointmentsByDoctorAndDateRange(Long doctorId, LocalDateTime startDate,
+            LocalDateTime endDate) {
+        return appointmentRepository.findByDoctorAndDateRangeAndNotCompleted(doctorId, startDate, endDate);
+    }
+
+    @Override
+    public Appointment findByIdAppointment(Long appointmentId) {
+        return appointmentRepository.findById(appointmentId).orElse(null);
     }
 }
