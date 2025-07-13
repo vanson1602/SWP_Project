@@ -35,7 +35,7 @@ public class VerificationController {
             }
 
             user.setVerificationToken(null);
-            user.setVerified(true);
+            user.setIsVerified(true);
             userRepository.save(user);
 
             redirectAttributes.addFlashAttribute("message", "Xác thực email thành công! Vui lòng đăng nhập.");

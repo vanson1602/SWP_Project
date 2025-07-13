@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,12 +34,51 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
         @Query("SELECT DISTINCT a FROM Appointment a " +
                         "LEFT JOIN FETCH a.patient p " +
                         "LEFT JOIN FETCH p.user pu " +
-                        "LEFT JOIN FETCH a.bookingSlots bs " +
+                        "LEFT JOIN FETCH a.bookingSlot bs " +
                         "LEFT JOIN FETCH bs.schedule s " +
                         "LEFT JOIN FETCH a.doctor d " +
                         "LEFT JOIN FETCH d.user du " +
                         "LEFT JOIN FETCH d.specializations " +
                         "WHERE a.appointmentID = :id")
         Optional<Appointment> findByIdWithDetails(@Param("id") Long id);
-        List<Appointment> findByDoctorDoctorID(long doctorId);
+
+        @Query("SELECT a FROM Appointment a " +
+                        "LEFT JOIN FETCH a.patient p " +
+                        "LEFT JOIN FETCH p.user pu " +
+                        "LEFT JOIN FETCH a.bookingSlot bs " +
+                        "LEFT JOIN FETCH bs.schedule s " +
+                        "LEFT JOIN FETCH s.doctor d " +
+                        "LEFT JOIN FETCH d.user du " +
+                        "LEFT JOIN FETCH d.specializations " +
+                        "WHERE p.patientID = :patientId " +
+                        "AND a.status = :status " +
+                        "ORDER BY a.appointmentDate DESC")
+        List<Appointment> findByPatientAndStatus(@Param("patientId") Long patientId, @Param("status") String status);
+
+        @Query("SELECT DISTINCT a FROM Appointment a LEFT JOIN FETCH a.doctor LEFT JOIN FETCH a.bookingSlot bs LEFT JOIN FETCH bs.schedule s LEFT JOIN FETCH s.doctor d WHERE a.patient.patientID = :patientId")
+        Page<Appointment> findByPatientId(@Param("patientId") Long patientId, Pageable pageable);
+
+        @Query("SELECT DISTINCT a FROM Appointment a LEFT JOIN FETCH a.doctor LEFT JOIN FETCH a.bookingSlot bs LEFT JOIN FETCH bs.schedule s LEFT JOIN FETCH s.doctor d WHERE a.patient.patientID = :patientId AND a.status = :status")
+        Page<Appointment> findByPatientAndStatus(@Param("patientId") Long patientId, @Param("status") String status,
+                        Pageable pageable);
+
+        @Query("SELECT a FROM Appointment a WHERE a.status = 'Pending' AND a.createdAt <= :cutoffTime")
+        List<Appointment> findUnpaidAppointments(@Param("cutoffTime") LocalDateTime cutoffTime);
+
+        @Query("SELECT DISTINCT a FROM Appointment a " +
+                        "LEFT JOIN FETCH a.patient p " +
+                        "LEFT JOIN FETCH p.user pu " +
+                        "LEFT JOIN FETCH a.bookingSlot bs " +
+                        "LEFT JOIN FETCH bs.schedule s " +
+                        "LEFT JOIN FETCH a.doctor d " +
+                        "LEFT JOIN FETCH d.user du " +
+                        "LEFT JOIN FETCH a.appointmentType at " +
+                        "WHERE a.doctor.doctorID = :doctorId " +
+                        "AND a.appointmentDate BETWEEN :startDate AND :endDate " +
+                        "AND a.status NOT IN ('Completed', 'Cancelled', 'NoShow') " +
+                        "ORDER BY a.appointmentDate")
+        List<Appointment> findByDoctorAndDateRangeAndNotCompleted(
+                        @Param("doctorId") Long doctorId,
+                        @Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate);
 }

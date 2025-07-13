@@ -3,24 +3,12 @@ package project.springBoot.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter
@@ -47,6 +35,7 @@ public class User {
     private String lastName;
     @Column(nullable = false)
     private String role = "patient";
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dob;
     @Column(length = 10)
     private String gender;
@@ -60,7 +49,7 @@ public class User {
     private String verificationToken;
 
     @Column(name = "isVerified")
-    private boolean isVerified = false;
+    private Boolean isVerified = false;
 
     @Column(name = "reset_token", length = 256)
     private String resetToken;

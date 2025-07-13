@@ -13,6 +13,8 @@ import java.util.Optional;
 
 @Repository
 public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, Long> {
+        List<DoctorSchedule> findByDoctorDoctorID(Long doctorID);
+
         List<DoctorSchedule> findByDoctorAndWorkDateBetweenOrderByWorkDateAsc(
                         Doctor doctor,
                         LocalDate startDate,

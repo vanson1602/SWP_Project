@@ -17,7 +17,7 @@ function loadNotifications() {
     fetch('/notifications/list')
         .then(response => response.json())
         .then(notifications => {
-            const container = document.querySelector('.notification-dropdown');
+            const container = document.querySelector('.notification-list');
             if (container) {
                 container.innerHTML = ''; // Xóa nội dung cũ
 
@@ -76,20 +76,31 @@ function createNotificationElement(notification) {
 
 // Hàm định dạng thời gian
 function formatTime(timestamp) {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now - date;
+    if (!timestamp) return 'Không xác định';
 
-    if (diff < 60000) { // Dưới 1 phút
-        return 'Vừa xong';
-    } else if (diff < 3600000) { // Dưới 1 giờ
-        const minutes = Math.floor(diff / 60000);
-        return `${minutes} phút trước`;
-    } else if (diff < 86400000) { // Dưới 1 ngày
-        const hours = Math.floor(diff / 3600000);
-        return `${hours} giờ trước`;
-    } else {
-        return date.toLocaleDateString('vi-VN');
+    try {
+        let momentDate;
+        if (Array.isArray(timestamp)) {
+            const [year, month, day, hour, minute, second] = timestamp;
+            momentDate = moment([year, month - 1, day, hour, minute, second]);
+        } else {
+            momentDate = moment(timestamp);
+        }
+
+        if (!momentDate.isValid()) return 'Không xác định';
+
+        const now = moment();
+        const diff = now.diff(momentDate, 'minutes');
+
+        if (diff < 1) return 'Vừa xong';
+        if (diff < 60) return `${diff} phút trước`;
+        if (diff < 1440) return momentDate.format('HH:mm [hôm nay]');
+        if (diff < 2880) return momentDate.format('HH:mm [hôm qua]');
+        if (diff < 7200) return momentDate.format('HH:mm [• ] DD/MM');
+        return momentDate.format('HH:mm [•] DD/MM/YYYY');
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        return 'Không xác định';
     }
 }
 
@@ -98,7 +109,8 @@ function markAsRead(notificationId) {
     fetch(`/notifications/${notificationId}/mark-read`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
         }
     })
         .then(() => {
@@ -113,7 +125,8 @@ function markAllAsRead() {
     fetch('/notifications/mark-all-read', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
         }
     })
         .then(() => {
@@ -125,8 +138,8 @@ function markAllAsRead() {
 
 // Khởi tạo khi trang được load
 document.addEventListener('DOMContentLoaded', () => {
-    const notificationBtn = document.querySelector('.notification-btn');
-    const notificationDropdown = document.querySelector('.notification-dropdown');
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationDropdown = document.getElementById('notificationDropdown');
 
     if (notificationBtn && notificationDropdown) {
         // Cập nhật số lượng thông báo chưa đọc mỗi 30 giây

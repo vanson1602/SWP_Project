@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{layout/master-layout :: layout(~{::title}, ~{::main}, ~{::script})}">
+
+<head>
+    <title>Tìm kiếm bác sĩ</title>
+</head>
+
+<body>
+    <main>
+        <div class="container mt-5">
+            <h2 class="mb-4">Tìm kiếm bác sĩ</h2>
+
+            <!-- Search Form -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <form th:action="@{/search/specialties}" method="GET" class="search-form" id="specialtyForm">
+                        <div class="row g-3">
+                            <div class="col-md-9">
+                                <label class="form-label">Chuyên khoa</label>
+                                <input type="text" name="keyword" class="form-control" th:value="${searchKeyword}"
+                                    required>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="search-button w-100">
+                                    <i class="bi bi-search me-2"></i>Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <form th:action="@{/search/dates}" method="GET" class="search-form mt-3">
+                        <div class="row g-3">
+                            <div class="col-md-9">
+                                <label class="form-label">Ngày khám</label>
+                                <input type="date" class="form-control" name="date" th:value="${searchDate}" required>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="search-button w-100">
+                                    <i class="bi bi-search me-2"></i>Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div th:if="${message}" class="alert" th:classappend="${doctors.empty ? 'alert-warning' : 'alert-success'}"
+                role="alert">
+                <span th:text="${message}"></span>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger" role="alert">
+                <span th:text="${error}"></span>
+            </div>
+
+            <!-- Results -->
+            <div th:if="${!doctors.empty}" class="row">
+                <div class="col">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Mã bác sĩ</th>
+                                    <th>Họ và tên</th>
+                                    <th>Chuyên khoa</th>
+                                    <th>Kinh nghiệm</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="doctor : ${doctors}">
+                                    <td th:text="${doctor.doctorCode}"></td>
+                                    <td th:text="${doctor.user.firstName + ' ' + doctor.user.lastName}"></td>
+                                    <td>
+                                        <span th:each="spec, iterStat : ${doctor.specializations}">
+                                            <span th:text="${spec.specializationName}"></span>
+                                            <span th:if="${!iterStat.last}">, </span>
+                                        </span>
+                                    </td>
+                                    <td th:text="${doctor.experienceYears + ' năm'}"></td>
+                                    <td>
+                                        <a th:href="@{/doctors/{id}(id=${doctor.doctorID})}"
+                                            class="btn btn-sm btn-primary">Xem chi tiết</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script th:inline="javascript">
+        // Any additional JavaScript if needed
+    </script>
+</body>
+
+</html>

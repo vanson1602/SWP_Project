@@ -73,11 +73,11 @@ public class UserService {
         System.out.println("Found user: " + user);
 
         if (user != null) {
-            System.out.println("User verified status: " + user.isVerified());
+            System.out.println("User verified status: " + user.getIsVerified());
             System.out.println("Stored password hash: " + user.getPassword());
             System.out.println("Input password: " + password);
 
-            if (!user.isVerified()) {
+            if (!user.getIsVerified()) {
                 System.out.println("User is not verified");
                 return null;
             }
@@ -117,7 +117,7 @@ public class UserService {
     }
 
     public Long getDoctorIdByUserId(long userId) {
-        return doctorRepository.findByUserUserID(userId)
+        return doctorRepository.findByUserId(userId)
                 .map(Doctor::getDoctorID)
                 .orElse(null);
     }

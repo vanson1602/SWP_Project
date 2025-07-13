@@ -1,20 +1,24 @@
 package project.springBoot.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import project.springBoot.model.Notification;
+import project.springBoot.model.NotificationDTO;
 import project.springBoot.model.User;
 import project.springBoot.service.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
-@RequiredArgsConstructor
 @RequestMapping("/notifications")
+@RequiredArgsConstructor
 public class NotificationController {
     private final NotificationService notificationService;
 
@@ -32,14 +36,18 @@ public class NotificationController {
 
     @GetMapping("/list")
     @ResponseBody
-    public ResponseEntity<List<Notification>> getNotifications(HttpSession session) {
+    public ResponseEntity<List<NotificationDTO>> getNotifications(HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) {
             return ResponseEntity.badRequest().build();
         }
 
         List<Notification> notifications = notificationService.getRecentNotifications(currentUser.getUserID());
-        return ResponseEntity.ok(notifications);
+        List<NotificationDTO> notificationDTOs = notifications.stream()
+                .map(NotificationDTO::fromEntity)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(notificationDTOs);
     }
 
     @PostMapping("/{id}/mark-read")

@@ -1,13 +1,23 @@
 package project.springBoot.service.impl;
 
+import lombok.RequiredArgsConstructor;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import project.springBoot.model.Appointment;
+import project.springBoot.model.AppointmentType;
+import project.springBoot.model.Doctor;
+import project.springBoot.model.DoctorBookingSlot;
 import project.springBoot.model.Notification;
 import project.springBoot.model.Patient;
 import project.springBoot.repository.AppointmentRepository;
@@ -17,6 +27,7 @@ import project.springBoot.repository.NotificationRepository;
 import project.springBoot.repository.PatientRepository;
 import project.springBoot.service.AppointmentService;
 import project.springBoot.service.EmailService;
+import project.springBoot.utils.AppointmentUtils;
 
 @Service
 @Transactional
@@ -29,115 +40,145 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final NotificationRepository notificationRepository;
     private final EmailService emailService;
 
-    // @Override
-    // @Transactional
-    // public Appointment createAppointment(Long patientId, Long slotId, Long specializationId,
-    //         Long appointmentTypeId, String notes) {
-    //     Patient patient = patientRepository.findById(patientId)
-    //             .orElseThrow(() -> new RuntimeException("Patient not found"));
+    @Override
+    @Transactional
+    public Appointment createAppointment(Long patientId, Long slotId, Long specializationId,
+            Long appointmentTypeId, String notes) {
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
 
-    //     DoctorBookingSlot slot = bookingSlotRepository.findById(slotId)
-    //             .orElseThrow(() -> new RuntimeException("Booking slot not found"));
+        DoctorBookingSlot slot = bookingSlotRepository.findById(slotId)
+                .orElseThrow(() -> new RuntimeException("Booking slot not found"));
 
-    //     AppointmentType appointmentType = appointmentTypeRepository.findById(appointmentTypeId)
-    //             .orElseThrow(() -> new RuntimeException("Appointment type not found"));
+        AppointmentType appointmentType = appointmentTypeRepository.findById(appointmentTypeId)
+                .orElseThrow(() -> new RuntimeException("Appointment type not found"));
 
-    //     if (!slot.getStatus().equalsIgnoreCase("Available")) {
-    //         throw new RuntimeException("This slot is no longer available. Current status: " + slot.getStatus());
-    //     }
+        if (!slot.getStatus().equalsIgnoreCase("Available")) {
+            throw new RuntimeException("This slot is no longer available. Current status: " + slot.getStatus());
+        }
 
-    //     Appointment appointment = new Appointment();
-    //     appointment.setPatient(patient);
-    //     appointment.setAppointmentDate(slot.getStartTime());
-    //     appointment.setAppointmentNumber(AppointmentUtils.generateAppointmentNumber());
-    //     appointment.setStatus("Pending");
-    //     appointment.setPatientNotes(notes);
-    //     appointment.setAppointmentType(appointmentType);
-    //     appointment = appointmentRepository.save(appointment);
+        Appointment appointment = new Appointment();
+        appointment.setPatient(patient);
+        appointment.setDoctor(slot.getSchedule().getDoctor());
+        appointment.setAppointmentDate(slot.getStartTime());
+        appointment.setAppointmentNumber(AppointmentUtils.generateAppointmentNumber());
+        appointment.setStatus("Pending");
+        appointment.setPatientNotes(notes);
+        appointment.setAppointmentType(appointmentType);
+        appointment = appointmentRepository.save(appointment);
 
-    //     slot.setStatus("Booked");
-    //     slot.setAppointment(appointment);
-    //     slot.setModifiedAt(LocalDateTime.now());
-    //     bookingSlotRepository.save(slot);
+        slot.setStatus("Booked");
+        slot.setAppointment(appointment);
+        slot.setModifiedAt(LocalDateTime.now());
+        bookingSlotRepository.save(slot);
 
-    //     Notification doctorNotification = new Notification();
-    //     doctorNotification.setUser(slot.getSchedule().getDoctor().getUser());
-    //     doctorNotification.setTitle("Lịch hẹn mới");
-    //     doctorNotification.setMessage("Bạn có lịch hẹn mới với bệnh nhân " + patient.getUser().getFullName() +
-    //             " vào lúc " + appointment.getAppointmentDate());
-    //     doctorNotification.setNotificationType("NewAppointment");
-    //     doctorNotification.setRead(false);
-    //     notificationRepository.save(doctorNotification);
+        Notification doctorNotification = new Notification();
+        doctorNotification.setUser(slot.getSchedule().getDoctor().getUser());
+        doctorNotification.setTitle("Lịch hẹn mới");
+        doctorNotification.setMessage("Bạn có lịch hẹn mới với bệnh nhân " + patient.getUser().getFullName() +
+                " vào lúc " + appointment.getAppointmentDate());
+        doctorNotification.setNotificationType("NewAppointment");
+        doctorNotification.setRead(false);
+        notificationRepository.save(doctorNotification);
 
-    //     return appointment;
-    // }
+        try {
+            String patientEmail = patient.getUser().getEmail();
+            emailService.sendAppointmentBookingConfirmationEmail(patientEmail, appointment);
+        } catch (Exception e) {
+            System.err.println("Failed to send booking confirmation email: " + e.getMessage());
+        }
 
-    // @Override
-    // public Appointment updateAppointmentStatus(Long appointmentId, String status, String notes) {
-    //     Appointment appointment = appointmentRepository.findById(appointmentId)
-    //             .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        try {
+            String doctorEmail = slot.getSchedule().getDoctor().getUser().getEmail();
+            emailService.sendDoctorAppointmentNotificationEmail(doctorEmail, appointment);
+        } catch (Exception e) {
+            System.err.println("Failed to send doctor notification email: " + e.getMessage());
+        }
 
-    //     appointment.setStatus(status);
-    //     if (notes != null) {
-    //         appointment.setAdminNotes(notes);
-    //     }
-    //     appointment.setModifiedAt(LocalDateTime.now());
+        return appointment;
+    }
 
-    //     if ("Cancelled".equals(status) || "Rejected".equals(status)) {
-    //         DoctorBookingSlot slot = appointment.getBookingSlot();
-    //         slot.setStatus("Available");
-    //         slot.setAppointment(null);
-    //         bookingSlotRepository.save(slot);
-    //     } else if ("Confirmed".equals(status)) {
-    //         Notification patientNotification = new Notification();
-    //         patientNotification.setUser(appointment.getPatient().getUser());
-    //         patientNotification.setTitle("Xác nhận lịch hẹn");
-    //         patientNotification.setMessage("Lịch hẹn của bạn đã được xác nhận thành công.");
-    //         patientNotification.setNotificationType("Confirmation");
-    //         patientNotification.setRead(false);
-    //         notificationRepository.save(patientNotification);
+    @Override
+    public Appointment updateAppointmentStatus(Long appointmentId, String status, String notes) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
-    //         String patientEmail = appointment.getPatient().getUser().getEmail();
-    //         emailService.sendAppointmentConfirmationEmail(patientEmail, appointment);
+        appointment.setStatus(status);
+        if (notes != null) {
+            appointment.setAdminNotes(notes);
+        }
+        appointment.setModifiedAt(LocalDateTime.now());
 
-    //         String doctorEmail = appointment.getBookingSlot().getSchedule().getDoctor().getUser().getEmail();
-    //         emailService.sendDoctorAppointmentNotificationEmail(doctorEmail, appointment);
-    //     }
+        if ("Cancelled".equals(status) || "Rejected".equals(status)) {
+            DoctorBookingSlot slot = appointment.getBookingSlot();
+            slot.setStatus("Available");
+            slot.setAppointment(null);
+            bookingSlotRepository.save(slot);
+        } else if ("Confirmed".equals(status)) {
+            Notification patientNotification = new Notification();
+            patientNotification.setUser(appointment.getPatient().getUser());
+            patientNotification.setTitle("Xác nhận lịch hẹn");
+            patientNotification.setMessage("Lịch hẹn của bạn đã được xác nhận thành công.");
+            patientNotification.setNotificationType("Confirmation");
+            patientNotification.setRead(false);
+            notificationRepository.save(patientNotification);
 
-    //     return appointmentRepository.save(appointment);
-    // }
+            String patientEmail = appointment.getPatient().getUser().getEmail();
+            emailService.sendAppointmentConfirmationEmail(patientEmail, appointment);
 
-    // @Override
-    // public void cancelAppointment(Long appointmentId, String reason) {
-    //     Appointment appointment = appointmentRepository.findById(appointmentId)
-    //             .orElseThrow(() -> new RuntimeException("Appointment not found"));
+            String doctorEmail = appointment.getBookingSlot().getSchedule().getDoctor().getUser().getEmail();
+            emailService.sendDoctorAppointmentNotificationEmail(doctorEmail, appointment);
+        }
 
-    //     if ("Cancelled".equals(appointment.getStatus())) {
-    //         throw new RuntimeException("Appointment is already cancelled");
-    //     }
+        return appointmentRepository.save(appointment);
+    }
 
-    //     appointment.setStatus("Cancelled");
-    //     appointment.setAdminNotes(reason);
-    //     appointment.setModifiedAt(LocalDateTime.now());
+    @Override
+    public void cancelAppointment(Long appointmentId, String reason) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
-    //     DoctorBookingSlot slot = appointment.getBookingSlots();//getBookingSlot();
-    //     if (slot != null) {
-    //         slot.setStatus("Available");
-    //         slot.setAppointment(null);
-    //         bookingSlotRepository.save(slot);
-    //     }
+        if ("Cancelled".equals(appointment.getStatus())) {
+            throw new RuntimeException("Appointment is already cancelled");
+        }
 
-    //     Notification doctorNotification = new Notification();
-    //     doctorNotification.setUser(slot.getSchedule().getDoctor().getUser());
-    //     doctorNotification.setTitle("Lịch hẹn bị hủy");
-    //     doctorNotification.setMessage("Lịch hẹn với bệnh nhân " + appointment.getPatient().getUser().getFullName() +
-    //             " vào lúc " + appointment.getAppointmentDate() + " đã bị hủy. Lý do: " + reason);
-    //     doctorNotification.setNotificationType("Appointment");
-    //     doctorNotification.setRead(false);
-    //     notificationRepository.save(doctorNotification);
+        Doctor doctor = appointment.getBookingSlot().getSchedule().getDoctor();
+        if (appointment.getDoctor() == null) {
+            appointment.setDoctor(doctor);
+        }
 
-    //     appointmentRepository.save(appointment);
-    // }
+        appointment.setStatus("Cancelled");
+        appointment.setAdminNotes(reason);
+        appointment.setModifiedAt(LocalDateTime.now());
+
+        DoctorBookingSlot slot = appointment.getBookingSlot();
+        if (slot != null) {
+            slot.setStatus("Available");
+            slot.setAppointment(null);
+            bookingSlotRepository.save(slot);
+        }
+
+        Notification doctorNotification = new Notification();
+        doctorNotification.setUser(doctor.getUser());
+        doctorNotification.setTitle("Lịch hẹn bị hủy");
+        doctorNotification.setMessage("Lịch hẹn với bệnh nhân " + appointment.getPatient().getUser().getFullName() +
+                " vào lúc " + appointment.getAppointmentDate() + " đã bị hủy. Lý do: " + reason);
+        doctorNotification.setNotificationType("General");
+        doctorNotification.setRead(false);
+        notificationRepository.save(doctorNotification);
+
+        Notification patientNotification = new Notification();
+        patientNotification.setUser(appointment.getPatient().getUser());
+        patientNotification.setTitle("Lịch hẹn đã bị hủy");
+        patientNotification.setMessage("Lịch hẹn của bạn với bác sĩ " + doctor.getUser().getFullName() +
+                " vào lúc " + appointment.getAppointmentDate() +
+                " đã bị hủy. Lý do: " + reason);
+        patientNotification.setNotificationType("General");
+        patientNotification.setRead(false);
+        notificationRepository.save(patientNotification);
+
+        appointmentRepository.save(appointment);
+    }
 
     @Override
     public Appointment getAppointmentById(Long appointmentId) {
@@ -178,16 +219,16 @@ public class AppointmentServiceImpl implements AppointmentService {
         return pendingCount < 2;
     }
 
-    // @Override
-    // public AppointmentType getAppointmentTypeById(Long appointmentTypeId) {
-    //     return appointmentTypeRepository.findById(appointmentTypeId)
-    //             .orElseThrow(() -> new RuntimeException("Appointment type not found"));
-    // }
+    @Override
+    public AppointmentType getAppointmentTypeById(Long appointmentTypeId) {
+        return appointmentTypeRepository.findById(appointmentTypeId)
+                .orElseThrow(() -> new RuntimeException("Appointment type not found"));
+    }
 
-    // @Override
-    // public List<AppointmentType> getAllAppointmentTypes() {
-    //     return appointmentTypeRepository.findAll();
-    // }
+    @Override
+    public List<AppointmentType> getAllAppointmentTypes() {
+        return appointmentTypeRepository.findAll();
+    }
 
     @Override
     public void updatePaymentStatus(Long appointmentId, String status) {
@@ -196,6 +237,23 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setStatus(status);
         appointment.setModifiedAt(LocalDateTime.now());
         appointmentRepository.save(appointment);
+    }
+
+    @Override
+    public List<Appointment> findByPatientAndStatus(Long patientId, String status) {
+        return appointmentRepository.findByPatientAndStatus(patientId, status);
+    }
+
+    @Override
+    public Page<Appointment> getAppointmentsByPatientId(long patientId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").descending());
+        return appointmentRepository.findByPatientId(patientId, pageable);
+    }
+
+    @Override
+    public Page<Appointment> getAppointmentsByPatientAndStatus(long patientId, String status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").descending());
+        return appointmentRepository.findByPatientAndStatus(patientId, status, pageable);
     }
 
     private void createStatusNotification(Appointment appointment, String status) {
@@ -227,26 +285,34 @@ public class AppointmentServiceImpl implements AppointmentService {
         notificationRepository.save(notification);
     }
 
-    @Override
-    public List<Appointment> getAppointmentsByDoctorAndDateRange(Long doctorId, LocalDateTime startDate, LocalDateTime endDate) {
-        // Logic to filter appointments by doctor and date range (custom query needed)
-        return appointmentRepository.findAll(); // Placeholder
+    @Scheduled(fixedRate = 300000)
+    public void cancelUnpaidAppointments() {
+        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(3);
+        List<Appointment> unpaidAppointments = appointmentRepository.findUnpaidAppointments(cutoffTime);
+
+        for (Appointment appointment : unpaidAppointments) {
+            appointment.setStatus("Cancelled");
+            appointment.setModifiedAt(LocalDateTime.now());
+            appointmentRepository.save(appointment);
+
+            Notification notification = new Notification();
+            notification.setUser(appointment.getPatient().getUser());
+            notification.setAppointment(appointment);
+            notification.setTitle("Lịch Hẹn Bị Hủy");
+            notification.setMessage("Lịch hẹn của bạn đã bị hủy do chưa thanh toán sau 12 giờ.");
+            notification.setNotificationType("Rejection");
+            notification.setPriority("High");
+            notificationRepository.save(notification);
+        }
+    }
+
+    public List<Appointment> getAppointmentsByDoctorAndDateRange(Long doctorId, LocalDateTime startDate,
+            LocalDateTime endDate) {
+        return appointmentRepository.findByDoctorAndDateRangeAndNotCompleted(doctorId, startDate, endDate);
     }
 
     @Override
-    public Appointment findById(Long id) {
-        return appointmentRepository.findById(id).orElse(null);
-    }
-
-    @Override
-    public Appointment saveAppointment(Appointment appointment) {
-        return appointmentRepository.save(appointment);
-    }
-
-    
-
-    @Override
-    public List<Appointment> findByDoctorId(long doctorId) {
-        return appointmentRepository.findByDoctorDoctorID(doctorId);
+    public Appointment findByIdAppointment(Long appointmentId) {
+        return appointmentRepository.findById(appointmentId).orElse(null);
     }
 }

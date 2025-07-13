@@ -46,7 +46,7 @@ public class Feedback {
     private boolean isAnonymous = false;
 
     @Column(name = "is_approved")
-    private boolean isApproved = true;
+    private Boolean isApproved = true;
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

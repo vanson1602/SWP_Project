@@ -131,7 +131,7 @@
           </div>
           <ul class="sidebar-menu">
             <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
-            <li><a href="/api/admin/user"><i class="fas fa-users"></i> Users</a></li>
+            <li><a href="/admin/user"><i class="fas fa-users"></i> Users</a></li>
             <li><a href="/admin/schedules/processing"><i class="fas fa-calendar-check"></i> Phê duyệt lịch bận</a></li>
 
             <li><a href="/admin/schedules/doctors"><i class="fas fa-user-md"></i> Lịch Bác Sĩ</a></li>
