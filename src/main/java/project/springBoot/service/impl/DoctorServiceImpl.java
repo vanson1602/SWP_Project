@@ -16,6 +16,7 @@ import java.util.*;
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -123,6 +124,19 @@ public class DoctorServiceImpl implements DoctorService {
         Set<String> specializations = parseSpecializations(specializationNames);
         List<Doctor> doctors = doctorRepository.findDoctorsAdvanced(keyword, specializations, experienceYears,
                 consultationFee);
+
+        // Filter doctors who have all the requested specializations
+        if (specializations != null && !specializations.isEmpty()) {
+            doctors = doctors.stream()
+                    .filter(doctor -> {
+                        Set<String> doctorSpecializations = doctor.getSpecializations().stream()
+                                .map(spec -> spec.getSpecializationName())
+                                .collect(Collectors.toSet());
+                        return doctorSpecializations.containsAll(specializations);
+                    })
+                    .collect(Collectors.toList());
+        }
+
         logger.info("Found {} doctors", doctors.size());
         return doctors;
     }
@@ -139,6 +153,19 @@ public class DoctorServiceImpl implements DoctorService {
         Set<String> specializations = parseSpecializations(specializationNames);
         List<Doctor> doctors = doctorRepository.findDoctorsAdvanced(keyword, specializations, experienceYears,
                 consultationFee);
+
+        // Filter doctors who have all the requested specializations
+        if (specializations != null && !specializations.isEmpty()) {
+            doctors = doctors.stream()
+                    .filter(doctor -> {
+                        Set<String> doctorSpecializations = doctor.getSpecializations().stream()
+                                .map(spec -> spec.getSpecializationName())
+                                .collect(Collectors.toSet());
+                        return doctorSpecializations.containsAll(specializations);
+                    })
+                    .collect(Collectors.toList());
+        }
+
         logger.info("Found {} doctors", doctors.size());
         return doctors;
     }

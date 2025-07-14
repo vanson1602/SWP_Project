@@ -422,38 +422,39 @@
     <section class="py-4">
       <div class="container">
         <h2 class="fw-bold text-center mb-4">Đội ngũ bác sĩ</h2>
-        <div class="row g-3">
+        <div class="row g-4">
           <c:forEach items="${doctors}" var="doctor">
-            <div class="col-lg-4 col-md-6">
-              <a href="/search/doctors/details/${doctor.doctorID}" class="card h-100">
-                <div class="doctor-image-wrapper">
-                  <c:choose>
-                    <c:when test="${not empty doctor.user.avatarUrl}">
-                      <img src="${doctor.user.avatarUrl}" class="card-img-top"
-                        alt="BS. ${doctor.user.firstName} ${doctor.user.lastName}">
-                    </c:when>
-                    <c:otherwise>
-                      <img src="/resources/images/defaultImg.jpg" class="card-img-top" alt="Default doctor photo">
-                    </c:otherwise>
-                  </c:choose>
+            <div class="col-lg-6">
+              <div class="doctor-card">
+                <div class="doctor-card-content">
+                  <div class="doctor-avatar">
+                    <img
+                      src="${not empty doctor.user.avatarUrl ? doctor.user.avatarUrl : '/resources/images/defaultImg.jpg'}"
+                      alt="BS. ${doctor.user.firstName} ${doctor.user.lastName}">
+                  </div>
+                  <div class="doctor-info">
+                    <h3 class="doctor-name">BS. ${doctor.user.firstName} ${doctor.user.lastName}</h3>
+                    <div class="specialties">
+                      <i class="bi bi-briefcase-fill"></i>
+                      <c:forEach items="${doctor.specializations}" var="spec" varStatus="loop">
+                        ${spec.specializationName}${!loop.last ? ', ' : ''}
+                      </c:forEach>
+                    </div>
+                    <div class="experience">
+                      <i class="bi bi-clock-history"></i>
+                      <span>Kinh nghiệm: ${doctor.experienceYears} năm</span>
+                    </div>
+                    <div class="fee">
+                      <i class="bi bi-cash"></i>
+                      <span>Phí khám: ${doctor.consultationFee} VNĐ</span>
+                    </div>
+                    <a href="/search/doctors/details/${doctor.doctorID}" class="view-profile">
+                      <i class="bi bi-info-circle"></i>
+                      Xem chi tiết
+                    </a>
+                  </div>
                 </div>
-                <div class="card-body">
-                  <h5 class="card-title mb-2">BS. ${doctor.user.firstName} ${doctor.user.lastName}</h5>
-                  <div class="specialty-text mb-3">
-                    <c:forEach items="${doctor.specializations}" var="spec" varStatus="status">
-                      ${spec.specializationName}${!status.last ? ', ' : ''}
-                    </c:forEach>
-                  </div>
-                  <div class="info-group mb-2">
-                    <i class="bi bi-briefcase-fill"></i>
-                    <p class="info-text">${doctor.experienceYears} năm kinh nghiệm</p>
-                  </div>
-                  <div class="info-group">
-                    <i class="bi bi-cash"></i>
-                    <p class="info-text">Phí tư vấn: ${doctor.consultationFee} VNĐ</p>
-                  </div>
-                </div>
-              </a>
+              </div>
             </div>
           </c:forEach>
         </div>
