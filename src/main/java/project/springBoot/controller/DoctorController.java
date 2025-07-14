@@ -574,4 +574,25 @@ public class DoctorController {
             return "doctor/create-doctor";
         }
     }
+
+    @GetMapping("/admin/dashboard/daily-data")
+    @ResponseBody
+    public Map<String, Object> getDailyData() {
+        // Return daily statistics
+        return new HashMap<>();
+    }
+
+    @GetMapping("/admin/dashboard/weekly-data")
+    @ResponseBody
+    public Map<String, Object> getWeeklyData() {
+        // Return weekly statistics
+        return new HashMap<>();
+    }
+
+    @GetMapping("/admin/dashboard/monthly-data")
+    @ResponseBody
+    public Map<String, Object> getMonthlyData() {
+        // Return monthly statistics
+        return new HashMap<>();
+    }
 }

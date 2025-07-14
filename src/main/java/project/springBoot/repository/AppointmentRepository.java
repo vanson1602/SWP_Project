@@ -119,16 +119,16 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     @Query("SELECT NEW map(" +
            "d.doctorID as doctorId, " +
-           "d.user.firstName as firstName, " +
-           "d.user.lastName as lastName, " +
+           "d as doctor, " +
            "d.consultationFee as fee, " +
            "COUNT(a) as totalExaminations, " +
            "d.consultationFee * COUNT(a) as totalRevenue) " +
            "FROM Appointment a " +
            "JOIN a.doctor d " +
+           "JOIN FETCH d.user u " +
            "WHERE a.status = 'Completed' " +
            "AND a.appointmentDate BETWEEN :startDate AND :endDate " +
-           "GROUP BY d.doctorID, d.user.firstName, d.user.lastName, d.consultationFee " +
+           "GROUP BY d.doctorID, d, d.consultationFee " +
            "ORDER BY totalRevenue DESC")
     List<Map<String, Object>> getRevenueByDoctor(@Param("startDate") LocalDateTime startDate, 
                                                 @Param("endDate") LocalDateTime endDate);
@@ -178,6 +178,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
            "COUNT(a) as count) " +
            "FROM Appointment a " +
            "WHERE a.appointmentDate BETWEEN :startDate AND :endDate " +
+           "AND a.status IN ('Pending', 'Confirmed', 'Completed', 'Cancelled', 'Rejected') " +
            "GROUP BY a.status")
     List<Map<String, Object>> getAppointmentStatusDistributionBetween(@Param("startDate") LocalDateTime startDate, 
                                                                      @Param("endDate") LocalDateTime endDate);
