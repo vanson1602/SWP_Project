@@ -15,7 +15,7 @@ import project.springBoot.model.Prescription;
 import project.springBoot.service.PrescriptionService;
 
 @Controller
-@RequestMapping("/api/prescriptions")
+@RequestMapping("/prescriptions")
 public class PrescriptionController {
     
     @Autowired

@@ -59,7 +59,7 @@ public class DashboardController {
         }
     }
 
-    @GetMapping("/api/dashboard/daily-stats")
+    @GetMapping("/dashboard/daily-stats")
     @ResponseBody
     public ResponseEntity<?> getDailyStats(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
@@ -73,7 +73,7 @@ public class DashboardController {
         }
     }
 
-    @GetMapping("/api/dashboard/monthly-stats")
+    @GetMapping("/dashboard/monthly-stats")
     @ResponseBody
     public ResponseEntity<?> getMonthlyStats(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
@@ -87,7 +87,7 @@ public class DashboardController {
         }
     }
 
-    @GetMapping("/api/dashboard/overview")
+    @GetMapping("/dashboard/overview")
     @ResponseBody
     public ResponseEntity<?> getDashboardOverview(
             @RequestParam(defaultValue = "day") String filter,

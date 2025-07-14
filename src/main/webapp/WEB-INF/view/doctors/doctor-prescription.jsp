@@ -815,7 +815,7 @@
             // Function to load all medications with improved error handling
             async function loadAllMedications() {
                 try {
-                    const response = await fetch('/api/medications');
+                    const response = await fetch('/medications');
                     const data = await handleResponse(response, 'Không thể tải danh sách thuốc');
                     allMedications = data;
                     

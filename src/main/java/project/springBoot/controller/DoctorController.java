@@ -87,7 +87,6 @@ public class DoctorController {
 
         Long doctorId = (Long) session.getAttribute("doctorId");
         if (doctorId == null) {
-            // Try to get doctorId from user if it's missing in session
             doctorId = userService.getDoctorIdByUserId(currentUser.getUserID());
             if (doctorId != null) {
                 session.setAttribute("doctorId", doctorId);
@@ -134,7 +133,6 @@ public class DoctorController {
         }
         Appointment appointment = appointmentService.findByIdAppointment(appointmentId);
         if (appointment != null) {
-            // Get the latest examination for this appointment
             Examination latestExamination = null;
             if (!appointment.getExaminations().isEmpty()) {
                 latestExamination = appointment.getExaminations().stream()
@@ -142,7 +140,6 @@ public class DoctorController {
                         .orElse(null);
             }
 
-            // Format the follow-up date if exists
             String followUpDateStr = "";
             if (latestExamination != null && latestExamination.getFollowUpDate() != null) {
                 followUpDateStr = latestExamination.getFollowUpDate()
@@ -187,12 +184,10 @@ public class DoctorController {
             }
             examination.setDoctor(appointment.getDoctor());
 
-            // Only set examination date if this is a new examination (create mode)
             if (examination.getExaminationID() == 0) {
                 examination.setExaminationDate(LocalDateTime.now());
                 examination.setCreatedAt(LocalDateTime.now());
             } else {
-                // This is an update - preserve existing prescriptions to avoid deletion
                 Examination existingExamination = examinationService.getExaminationById(examination.getExaminationID());
                 if (existingExamination != null && existingExamination.getPrescriptions() != null) {
                     examination.setPrescriptions(existingExamination.getPrescriptions());
@@ -201,8 +196,6 @@ public class DoctorController {
             }
 
             examinationService.saveExamination(examination);
-
-            // Update appointment status to "Completed" after creating/updating examination
             if (examination.getExaminationID() == 0 || !appointment.getStatus().equals("Completed")) {
                 appointmentService.updateAppointmentStatus(appointment.getAppointmentID(), "Completed",
                         "Khám bệnh hoàn tất vào " + LocalDateTime.now()
@@ -228,7 +221,6 @@ public class DoctorController {
             return "redirect:/doctor/appointments";
         }
 
-        // Get the latest examination for this appointment
         Examination examination = null;
         if (!appointment.getExaminations().isEmpty()) {
             examination = appointment.getExaminations().stream()
@@ -237,7 +229,6 @@ public class DoctorController {
         }
 
         if (examination == null) {
-            // If no examination exists, redirect to create
             return "redirect:/doctor/appointments/" + appointmentId + "/examination/create";
         }
 

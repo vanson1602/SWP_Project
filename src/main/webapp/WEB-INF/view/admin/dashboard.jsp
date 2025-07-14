@@ -591,9 +591,9 @@
                     break;
             }
 
-            $.ajax({
-                url: '/admin/api/dashboard/overview',
-                method: 'GET',
+                            $.ajax({
+                    url: '/admin/dashboard/overview',
+                    method: 'GET',
                 data: {
                     filter: filter,
                     startDate: startDate.toISOString(),
@@ -620,7 +620,7 @@
 
                     let dailyStats = [];
                     $.ajax({
-                        url: '/admin/api/dashboard/' + (filter === 'month' ? 'monthly-stats' : 'daily-stats'),
+                        url: '/admin/dashboard/' + (filter === 'month' ? 'monthly-stats' : 'daily-stats'),
                             method: 'GET',
                         data: { 
                             startDate: chartStart.toISOString(), 

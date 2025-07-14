@@ -41,7 +41,6 @@ public class AdminController {
 
             log.info("Processing dashboard request with filter: {}", filter);
 
-            // Determine time range based on filter
             switch (filter.toLowerCase()) {
                 case "week":
                     startDate = now.with(DayOfWeek.MONDAY).toLocalDate().atStartOfDay();
@@ -67,16 +66,13 @@ public class AdminController {
             long totalPatients = appointmentService.getDistinctPatientsCompletedBetween(startDate, endDate);
             double totalRevenue = appointmentService.getRevenueBetween(startDate, endDate);
             
-            // Lấy và sắp xếp lại dữ liệu trạng thái theo thứ tự mong muốn
             Map<String, Long> rawStatusDistribution = appointmentService.getAppointmentStatusDistributionBetween(startDate, endDate);
             Map<String, Long> orderedStatusDistribution = new LinkedHashMap<>();
             String[] statusOrder = {"PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "REJECTED"};
             
-            // Log raw data
             log.info("Raw status distribution: {}", rawStatusDistribution);
             
             for (String status : statusOrder) {
-                // Tìm kiếm cả lowercase và uppercase
                 Long count = rawStatusDistribution.get(status);
                 if (count == null) {
                     count = rawStatusDistribution.get(status.toLowerCase());
@@ -90,7 +86,6 @@ public class AdminController {
                 }
             }
             
-            // Log processed data
             log.info("Ordered status distribution: {}", orderedStatusDistribution);
             
             List<Map<String, Object>> doctorRevenue = appointmentService.getDoctorRevenueReport(startDate, endDate);

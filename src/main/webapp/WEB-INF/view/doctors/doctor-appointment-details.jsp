@@ -1743,7 +1743,7 @@
                                             const controller = new AbortController();
                                             const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
-                                            const response = await fetch('/api/medications', {
+                                            const response = await fetch('/medications', {
                                                 signal: controller.signal
                                             });
                                             clearTimeout(timeoutId);

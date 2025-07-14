@@ -38,7 +38,6 @@ public class MedicalResultsController {
 
     @GetMapping("/appointments/medical-result")
     public String showMedicalResults(Model model, HttpSession session) {
-        // Get the logged-in user from session
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) {
             logger.warn("User not authenticated");
@@ -47,7 +46,6 @@ public class MedicalResultsController {
         
         logger.debug("Looking up patient ID for user: {}", currentUser.getUsername());
         
-        // Get patient ID
         Patient patient = patientRepository.findByUser(currentUser);
         if (patient == null) {
             logger.error("Could not find patient record for user: {}", currentUser.getUsername());
@@ -57,15 +55,11 @@ public class MedicalResultsController {
         
         Long patientId = patient.getPatientID();
         logger.debug("Found patient ID: {}", patientId);
-
-        // Check if patient has any appointments
         if (appointmentService.findByPatientPatientIDOrderByAppointmentDateDesc(patientId).isEmpty()) {
             logger.warn("No appointments found for patient ID: {}", patientId);
             model.addAttribute("message", "Bạn chưa có lịch hẹn khám bệnh nào.");
             return "error";
         }
-
-        // Fetch the latest examination for the patient
         Examination examination = examinationService.getLatestExaminationByPatientId(patientId);
         if (examination != null) {
             logger.debug("Found examination ID: {} for patient ID: {}", examination.getExaminationID(), patientId);
