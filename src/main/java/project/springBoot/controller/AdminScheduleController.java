@@ -162,6 +162,23 @@ public class AdminScheduleController {
         return "admin/schedules/doctor_schedules";
     }
 
+    @GetMapping("/doctor/{doctorId}/schedules")
+    @ResponseBody
+    public List<Map<String, Object>> getDoctorSchedulesJson(@PathVariable long doctorId) {
+        List<DoctorSchedule> schedules = doctorScheduleService.getSchedulesByDoctorId(doctorId);
+        return schedules.stream()
+                .map(schedule -> {
+                    Map<String, Object> scheduleMap = new HashMap<>();
+                    scheduleMap.put("scheduleID", schedule.getScheduleID());
+                    scheduleMap.put("workDate", schedule.getWorkDate().toString());
+                    scheduleMap.put("startTime", schedule.getStartTime().toString());
+                    scheduleMap.put("endTime", schedule.getEndTime().toString());
+                    scheduleMap.put("status", schedule.getStatus());
+                    return scheduleMap;
+                })
+                .toList();
+    }
+
     @GetMapping("/processing")
     public String viewPendingSchedules(Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
