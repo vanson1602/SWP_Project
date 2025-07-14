@@ -29,6 +29,11 @@ public class AuthInterceptor implements HandlerInterceptor {
             return false;
         }
 
+        // Chat URLs are allowed for all authenticated users
+        if (requestURI.startsWith("/chat")) {
+            return true;
+        }
+
         // Kiểm tra quyền truy cập
         if (requestURI.startsWith("/admin") && !"admin".equalsIgnoreCase(user.getRole())) {
             response.sendRedirect("/access-denied");

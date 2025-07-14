@@ -39,7 +39,7 @@ public class UserService {
     }
 
     public User handleUpdateUser(User user) {
-        User existingUser = userRepository.findById(user.getUserID());
+        User existingUser = userRepository.findByUserID(user.getUserID());
         if (existingUser != null) {
             // Only hash the password if it's different from the existing one
             if (!user.getPassword().equals(existingUser.getPassword()) && !isPasswordEncoded(user.getPassword())) {

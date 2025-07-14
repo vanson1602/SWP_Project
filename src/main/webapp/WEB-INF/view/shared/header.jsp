@@ -62,6 +62,11 @@
                                     </div>
                                 </div>
 
+                                <!-- Chat Button -->
+                                <a href="/chat" class="chat-btn" title="Tin nhắn">
+                                    <i class="bi bi-chat-dots"></i>
+                                </a>
+
                                 <!-- User Dropdown -->
                                 <div class="dropdown">
                                     <button class="profile-btn" id="profileDropdownBtn">
@@ -196,6 +201,29 @@
                 transition: color 0.3s ease;
             }
 
+            /* Chat Button Styles */
+            .chat-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: none;
+                border: none;
+                color: #333;
+                font-size: 1.2rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                padding: 0;
+            }
+
+            .chat-btn:hover {
+                color: #007bff;
+                background-color: rgba(0, 123, 255, 0.1);
+            }
+
             .dropdown {
                 position: relative;
             }
@@ -267,9 +295,9 @@
             }
         </style>
 
-        <!-- Header JavaScript -->
+     
         <script>
-            // Set moment.js locale to Vietnamese
+          
             moment.locale('vi');
         </script>
 

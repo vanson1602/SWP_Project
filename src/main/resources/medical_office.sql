@@ -356,6 +356,32 @@ CREATE TABLE tblFeedback (
   FOREIGN KEY (examinationID) REFERENCES tblExaminations(examinationID)
 );
 
+-- CONVERSATIONS TABLE
+CREATE TABLE tblConversations (
+  id INT IDENTITY(1,1) PRIMARY KEY,
+  sender_id INT NOT NULL,
+  receiver_id INT NOT NULL,
+  created_at DATETIME DEFAULT GETDATE(),
+  modified_at DATETIME DEFAULT GETDATE(),
+  FOREIGN KEY (sender_id) REFERENCES tblUsers(userID),
+  FOREIGN KEY (receiver_id) REFERENCES tblUsers(userID)
+);
+
+-- MESSAGES TABLE
+CREATE TABLE tblMessages (
+  id INT IDENTITY(1,1) PRIMARY KEY,
+  conversation_id INT NOT NULL,
+  sender_id INT NOT NULL,
+  receiver_id INT NOT NULL,
+  content NVARCHAR(MAX) NOT NULL,
+  is_read BIT DEFAULT 0,
+  created_at DATETIME DEFAULT GETDATE(),
+  modified_at DATETIME DEFAULT GETDATE(),
+  FOREIGN KEY (conversation_id) REFERENCES tblConversations(id),
+  FOREIGN KEY (sender_id) REFERENCES tblUsers(userID),
+  FOREIGN KEY (receiver_id) REFERENCES tblUsers(userID)
+);
+
 -- =============================================
 -- INDEXES FOR PERFORMANCE
 -- =============================================
@@ -393,6 +419,12 @@ CREATE INDEX IX_Notifications_Sent ON tblNotifications(sent_at);
 -- Invoices indexes
 CREATE INDEX IX_Invoices_Date_Status ON tblInvoices(invoice_date, payment_status);
 CREATE INDEX IX_Invoices_Patient ON tblInvoices(patientID);
+
+-- Indexes for conversations and messages
+CREATE INDEX IX_Conversations_Users ON tblConversations(sender_id, receiver_id);
+CREATE INDEX IX_Messages_Conversation ON tblMessages(conversation_id);
+CREATE INDEX IX_Messages_Users ON tblMessages(sender_id, receiver_id);
+CREATE INDEX IX_Messages_Read ON tblMessages(is_read);
 
 -- USER AVATARS TABLE
 CREATE TABLE tbl_user_avatars (

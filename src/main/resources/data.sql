@@ -141,3 +141,8 @@ INSERT INTO tbl_invoice_details (invoiceid, item_type, item_id, description, qua
 VALUES 
 ((SELECT invoiceid FROM tbl_invoices WHERE invoice_number = 'INV001'),
 'Service', 1, 'Khám tổng quát', 1, 500000.00, 500000.00, NOW(), NOW());
+
+-- Add receptionist user
+INSERT INTO tbl_users (username, password, first_name, last_name, role, dob, gender, address, phone, email, is_verified, state, created_at, modified_at)
+VALUES 
+('receptionist1', '$2a$10$HwtpZcsQpcFSxu6fDMZAO.QVb0kiR5gBk8I9.1yVg1Y.2ElaPJCF6', 'Receptionist', 'Staff', 'receptionist', '1990-01-01', 'Female', 'Ho Chi Minh', '0123456789', 'receptionist@healthcare.com', 1, 1, NOW(), NOW());
