@@ -121,4 +121,9 @@ public class UserService {
                 .map(Doctor::getDoctorID)
                 .orElse(null);
     }
+
+    public List<User> findUserByRole(String role) {
+        return userRepository.findByRole(role);
+    }
+
 }
