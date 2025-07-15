@@ -9,6 +9,7 @@ import project.springBoot.repository.PatientRepository;
 import project.springBoot.repository.UserRepository;
 import project.springBoot.service.PatientService;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -46,5 +47,10 @@ public class PatientServiceImpl implements PatientService {
 
         return patientRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Patient not found with email: " + email));
+    }
+
+    @Override
+    public List<Patient> getAllPatient() {
+        return patientRepository.findAll();
     }
 }

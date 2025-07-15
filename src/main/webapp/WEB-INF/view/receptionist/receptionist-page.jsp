@@ -12,5 +12,6 @@ prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
   </head>
   <body>
     <a href="/booking-receptionist/step-1">booking here</a>
+    <a href="/booking-repceptionist/patientInfor">view patient</a>
   </body>
 </html>

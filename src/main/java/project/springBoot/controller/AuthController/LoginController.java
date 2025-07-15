@@ -52,7 +52,6 @@ public class LoginController {
             HttpSession session,
             Model model) {
         System.out.println("Login controller received request for: " + emailOrUsername);
-
         try {
             // Kiểm tra user có tồn tại không
             User user = userService.getUserByEmailOrUsername(emailOrUsername, emailOrUsername);
@@ -61,7 +60,6 @@ public class LoginController {
                 model.addAttribute("emailorusername", emailOrUsername);
                 return "authentication/form-login";
             }
-
             // Kiểm tra đã xác thực email chưa
             if (!user.getIsVerified()) {
                 model.addAttribute("error", "Tài khoản chưa được xác thực! Vui lòng kiểm tra email để xác thực.");

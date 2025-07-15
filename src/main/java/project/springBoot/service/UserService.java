@@ -94,4 +94,8 @@ public class UserService {
     public User save(User user) {
         return userRepository.save(user);
     }
+
+    public List<User> findUserByRole(String role) {
+        return userRepository.findByRole(role);
+    }
 }
