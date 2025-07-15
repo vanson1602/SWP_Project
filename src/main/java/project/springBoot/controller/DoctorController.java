@@ -514,12 +514,36 @@ public class DoctorController {
         return "doctors/doctor-medical-record-details";
     }
 
+    @GetMapping("/admin/dashboard/daily-data")
+    @ResponseBody
+    public Map<String, Object> getDailyData() {
+        // Return daily statistics
+        return new HashMap<>();
+    }
+
+    @GetMapping("/admin/dashboard/weekly-data")
+    @ResponseBody
+    public Map<String, Object> getWeeklyData() {
+        // Return weekly statistics
+        return new HashMap<>();
+    }
+
+    @GetMapping("/admin/dashboard/monthly-data")
+    @ResponseBody
+    public Map<String, Object> getMonthlyData() {
+        // Return monthly statistics
+        return new HashMap<>();
+    }
+
     @RequestMapping("/admin/doctor/create")
     public String getCreateDoctorPage(Model model) {
         Doctor newDoctor = new Doctor();
         newDoctor.setUser(new User()); // Initialize the User object
         model.addAttribute("newDoctor", newDoctor);
-        model.addAttribute("specializations", specializationService.getAllActiveSpecializations());
+        List<Specialization> spec = specializationService.getAllActiveSpecializations();
+        log.info("Số lượng chuyên khoa được lấy: {}", spec.size());
+        log.info("Chi tiết chuyên khoa: {}", spec);
+        model.addAttribute("specializations", spec);
         return "doctor/create-doctor";
     }
 
@@ -557,27 +581,6 @@ public class DoctorController {
             model.addAttribute("error", "Failed to create doctor: " + e.getMessage());
             return "doctor/create-doctor";
         }
-    }
-
-    @GetMapping("/admin/dashboard/daily-data")
-    @ResponseBody
-    public Map<String, Object> getDailyData() {
-        // Return daily statistics
-        return new HashMap<>();
-    }
-
-    @GetMapping("/admin/dashboard/weekly-data")
-    @ResponseBody
-    public Map<String, Object> getWeeklyData() {
-        // Return weekly statistics
-        return new HashMap<>();
-    }
-
-    @GetMapping("/admin/dashboard/monthly-data")
-    @ResponseBody
-    public Map<String, Object> getMonthlyData() {
-        // Return monthly statistics
-        return new HashMap<>();
     }
 
 }

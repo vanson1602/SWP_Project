@@ -59,7 +59,6 @@ public interface AppointmentService {
     List<Map<String, Object>> getMonthlyAppointmentReport(LocalDateTime startDate, LocalDateTime endDate);
     Map<String, Object> getDashboardStatistics();
 
-    // Dashboard filter methods
     long getDistinctAppointmentsCompletedBetween(LocalDateTime start, LocalDateTime end);
     long getDistinctPatientsCompletedBetween(LocalDateTime start, LocalDateTime end);
     double getRevenueBetween(LocalDateTime start, LocalDateTime end);

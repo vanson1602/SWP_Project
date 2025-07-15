@@ -188,4 +188,21 @@ public class DoctorServiceImpl implements DoctorService {
         logger.info("Found {} doctors", doctors.size());
         return doctors;
     }
+
+    @Override
+    public Optional<Doctor> findByUserId(long userId) {
+        return doctorRepository.findByUserId(userId);
+    }
+
+    @Override
+    public Doctor getDoctorByUserId(long userId) {
+        return doctorRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+    }
+
+    @Override
+    public Doctor findById(Long id) {
+        return doctorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+    }
 }

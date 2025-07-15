@@ -7,12 +7,6 @@
         <link rel="stylesheet" href="/resources/css/notifications.css">
         <script src="/resources/js/notifications.js"></script>
 
-        <!-- Required scripts for notifications -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/vi.js"></script>
-        <link rel="stylesheet" href="/resources/css/notifications.css">
-        <script src="/resources/js/notifications.js"></script>
-
         <!-- Header -->
         <header class="header">
             <div class="container">
@@ -56,50 +50,53 @@
                                 <!-- Notification Dropdown -->
                                 <div class="notification-wrapper">
                                     <button type="button" class="notification-btn" id="notificationBtn">
-                                    <button type="button" class="notification-btn" id="notificationBtn">
-                                        <i class="bi bi-bell"></i>
-                                        <span class="notification-badge">0</span>
-                                    </button>
-                                    <div class="notification-dropdown" id="notificationDropdown">
-                                        <div class="notification-header">
-                                            <h3>Thông báo</h3>
+                                        <button type="button" class="notification-btn" id="notificationBtn">
+                                            <i class="bi bi-bell"></i>
+                                            <span class="notification-badge">0</span>
+                                        </button>
+                                        <div class="notification-dropdown" id="notificationDropdown">
+                                            <div class="notification-header">
+                                                <h3>Thông báo</h3>
+                                            </div>
+                                            <div class="notification-list">
+                                                <!-- Notifications will be loaded here -->
+                                            </div>
+                                            <div class="notification-dropdown" id="notificationDropdown">
+                                                <div class="notification-header">
+                                                    <h3>Thông báo</h3>
+                                                </div>
+                                                <div class="notification-list">
+                                                    <!-- Notifications will be loaded here -->
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="notification-list">
-                                            <!-- Notifications will be loaded here -->
-                                        </div>
-                                    <div class="notification-dropdown" id="notificationDropdown">
-                                        <div class="notification-header">
-                                            <h3>Thông báo</h3>
-                                        </div>
-                                        <div class="notification-list">
-                                            <!-- Notifications will be loaded here -->
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <!-- Chat Button -->
-                                <a href="/chat" class="chat-btn" title="Tin nhắn">
-                                    <i class="bi bi-chat-dots"></i>
-                                </a>
+                                        <!-- Chat Button -->
+                                        <a href="/chat" class="chat-btn" title="Tin nhắn">
+                                            <i class="bi bi-chat-dots"></i>
+                                        </a>
 
-                                <!-- User Dropdown -->
-                                <div class="dropdown">
-                                    <button class="profile-btn" id="profileDropdownBtn">
-                                        <i class="bi bi-person-circle"></i>
-                                        ${sessionScope.currentUser.firstName} ${sessionScope.currentUser.lastName}
-                                    </button>
-                                    <ul class="dropdown-menu" id="profileDropdown">
-                                        <li><a class="dropdown-item" href="/profile"><i class="bi bi-person"></i> Trang
-                                                cá nhân</a></li>
-                                        <li><a class="dropdown-item" href="/settings"><i class="bi bi-gear"></i> Cài
-                                                đặt</a></li>
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                        <li><a class="dropdown-item" href="/logout"><i
-                                                    class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
-                                    </ul>
-                                </div>
+                                        <!-- User Dropdown -->
+                                        <div class="dropdown">
+                                            <button class="profile-btn" id="profileDropdownBtn">
+                                                <i class="bi bi-person-circle"></i>
+                                                ${sessionScope.currentUser.firstName}
+                                                ${sessionScope.currentUser.lastName}
+                                            </button>
+                                            <ul class="dropdown-menu" id="profileDropdown">
+                                                <li><a class="dropdown-item" href="/profile"><i
+                                                            class="bi bi-person"></i> Trang
+                                                        cá nhân</a></li>
+                                                <li><a class="dropdown-item" href="/settings"><i class="bi bi-gear"></i>
+                                                        Cài
+                                                        đặt</a></li>
+                                                <li>
+                                                    <hr class="dropdown-divider">
+                                                </li>
+                                                <li><a class="dropdown-item" href="/logout"><i
+                                                            class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+                                            </ul>
+                                        </div>
                             </c:when>
                             <c:otherwise>
                                 <a href="/login" class="profile-btn">
@@ -327,49 +324,11 @@
             }
         </style>
 
-     
+
         <script>
             // Set moment.js locale to Vietnamese
             moment.locale('vi');
-        </script>
 
-        <script>
-            // Mobile menu toggle
-            document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
-                document.getElementById('navLinks').classList.toggle('show');
-            });
-
-            // Profile dropdown toggle
-            document.getElementById('profileDropdownBtn')?.addEventListener('click', (e) => {
-                e.stopPropagation();
-                document.getElementById('profileDropdown').classList.toggle('show');
-            });
-          
-            moment.locale('vi');
-        </script>
-
-        <script>
-            // Mobile menu toggle
-            document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
-                document.getElementById('navLinks').classList.toggle('show');
-            });
-
-            // Profile dropdown toggle
-            document.getElementById('profileDropdownBtn')?.addEventListener('click', (e) => {
-                e.stopPropagation();
-                document.getElementById('profileDropdown').classList.toggle('show');
-            });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', () => {
-                document.getElementById('profileDropdown')?.classList.remove('show');
-            // Close dropdown when clicking outside
-            document.addEventListener('click', () => {
-                document.getElementById('profileDropdown')?.classList.remove('show');
-            });
-        </script>
-
-        <script>
             // Mobile menu toggle
             document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
                 document.getElementById('navLinks').classList.toggle('show');
@@ -385,4 +344,5 @@
             document.addEventListener('click', () => {
                 document.getElementById('profileDropdown')?.classList.remove('show');
             });
+        </script>
         </script>

@@ -67,7 +67,6 @@ public class LoginController {
                 return "authentication/form-login";
             }
 
-            // Kiểm tra đã xác thực email chưa
             if (!user.getIsVerified()) {
                 model.addAttribute("error", "Tài khoản chưa được xác thực! Vui lòng kiểm tra email để xác thực.");
                 model.addAttribute("emailorusername", emailOrUsername);
@@ -175,7 +174,7 @@ public class LoginController {
                         return "redirect:/admin";
                     } else if ("receptionist".equalsIgnoreCase(role)) {
                         return "redirect:/receptionist";
-                    } else if ("patient".equalsIgnoreCase(role) || "doctor".equalsIgnoreCase(role)) {
+                    } else if ("patient".equalsIgnoreCase(role)) {
                         return "redirect:/";
                     } else if ("doctor".equalsIgnoreCase(role)) {
                         return "redirect:/doctor/home";

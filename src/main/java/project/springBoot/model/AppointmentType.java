@@ -1,5 +1,6 @@
 package project.springBoot.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,9 @@ public class AppointmentType {
     @Column(name = "is_active")
     private boolean isActive = true;
 
+    @Column(name = "fee", nullable = false, precision = 10, scale = 2)
+    private BigDecimal fee = BigDecimal.ZERO;
+
     @OneToMany(mappedBy = "appointmentType", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Appointment> appointments = new ArrayList<>();
 
@@ -48,16 +52,16 @@ public class AppointmentType {
 
     @Override
     public String toString() {
-        return "AppointmentType [appointmentTypeID=" + appointmentTypeID + ", typeName=" + typeName + 
-               ", description=" + description + ", isActive=" + isActive + 
-               ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
+        return "AppointmentType [appointmentTypeID=" + appointmentTypeID + ", typeName=" + typeName +
+                ", description=" + description + ", isActive=" + isActive +
+                ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
 
     public Long getAppointmentTypeID() {
-         return appointmentTypeID;
+        return appointmentTypeID;
     }
 
     public String getTypeName() {
         return typeName;
     }
-} 
+}
