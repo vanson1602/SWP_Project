@@ -10,53 +10,82 @@ prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Thông tin bệnh nhân</title>
     <style>
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f7fa;
+        padding: 20px;
       }
 
-      th,
-      td {
-        border: 1px solid #ccc;
-        padding: 8px;
-        text-align: left;
+      h2 {
+        text-align: center;
+        color: #333;
       }
 
-      th {
-        background-color: #f2f2f2;
+      .card-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+      }
+
+      .card {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        text-align: center;
+        transition: transform 0.3s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+      }
+
+      .card img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-bottom: 15px;
+      }
+
+      .card h3 {
+        margin: 10px 0 5px;
+        font-size: 18px;
+        color: #2c3e50;
+      }
+
+      .card p {
+        margin: 5px 0;
+        font-size: 14px;
+        color: #555;
       }
 
       .back-button {
-        margin-top: 20px;
         display: inline-block;
+        margin-top: 30px;
+        text-decoration: none;
+        color: #3498db;
+        font-weight: bold;
       }
     </style>
   </head>
   <body>
     <h2>Danh sách bệnh nhân</h2>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Họ tên</th>
-          <th>Email</th>
-          <th>Số điện thoại</th>
-          <th>Địa chỉ</th>
-        </tr>
-      </thead>
-      <tbody>
-        <c:forEach var="patient" items="${listPatient}">
-          <tr>
-            <td>${patient.fullName}</td>
-            <td>${patient.email}</td>
-            <td>${patient.phone}</td>
-            <td>${patient.address}</td>
-          </tr>
-        </c:forEach>
-      </tbody>
-    </table>
+    <div class="card-container">
+      <c:forEach var="patient" items="${listPatient}">
+        <div class="card">
+          <h3>${patient.fullName}</h3>
+          <p><strong>Email:</strong> ${patient.email}</p>
+          <p><strong>Điện thoại:</strong> ${patient.phone}</p>
+          <p><strong>Địa chỉ:</strong> ${patient.address}</p>
+        </div>
+      </c:forEach>
+    </div>
 
-    <a href="javascript:history.back()" class="back-button">← Quay lại</a>
+    <div style="text-align: center">
+      <a href="javascript:history.back()" class="back-button">← Quay lại</a>
+    </div>
   </body>
 </html>

@@ -20,7 +20,7 @@ public class ReceptionistController {
     private final PatientService patientService;
     private final UserService userService;
 
-    @GetMapping("/booking-repceptionist/patientInfor")
+    @GetMapping("/booking-receptionist/patientInfor")
     public String viewPatientInfor(Model model) {
         List<User> listPatient = userService.findUserByRole("patient");
         model.addAttribute("listPatient", listPatient);

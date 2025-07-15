@@ -8,10 +8,42 @@ prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Receptionist Portal</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 40px;
+        background-color: #f5f5f5;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 30px;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 12px 24px;
+        margin-right: 15px;
+        background-color: #3498db;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+      }
+
+      .btn:hover {
+        background-color: #2980b9;
+      }
+    </style>
   </head>
   <body>
-    <a href="/booking-receptionist/step-1">booking here</a>
-    <a href="/booking-repceptionist/patientInfor">view patient</a>
+    <h1>Receptionist Portal</h1>
+
+    <a href="/booking-receptionist/step-1" class="btn">➕ Booking Here</a>
+    <a href="/booking-receptionist/patientInfor" class="btn"
+      >👥 View Patients</a
+    >
   </body>
 </html>
