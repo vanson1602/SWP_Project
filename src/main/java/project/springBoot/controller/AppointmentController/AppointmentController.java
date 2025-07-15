@@ -1,13 +1,31 @@
 package project.springBoot.controller.AppointmentController;
 
-import lombok.RequiredArgsConstructor;
+import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
-import project.springBoot.model.*;
+import lombok.RequiredArgsConstructor;
+import project.springBoot.model.Appointment;
+import project.springBoot.model.AppointmentType;
+import project.springBoot.model.Doctor;
+import project.springBoot.model.DoctorBookingSlot;
+import project.springBoot.model.Patient;
+import project.springBoot.model.Specialization;
+import project.springBoot.model.User;
 import project.springBoot.service.AppointmentService;
 import project.springBoot.service.DoctorService;
 import project.springBoot.service.EmailService;
@@ -17,14 +35,6 @@ import vn.payos.PayOS;
 import vn.payos.type.CheckoutResponseData;
 import vn.payos.type.ItemData;
 import vn.payos.type.PaymentData;
-import org.springframework.data.domain.Page;
-
-import java.security.Principal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -114,6 +124,7 @@ public class AppointmentController {
             HttpSession session,
             Model model) {
         DoctorBookingSlot slot = doctorService.getSlotById(slotId);
+        System.out.println("Slot: " + slot);
         System.out.println("Slot: " + slot);
         User user = (User) session.getAttribute("currentUser");
         Patient patient = doctorService.getPatientByUsername(user.getUsername());

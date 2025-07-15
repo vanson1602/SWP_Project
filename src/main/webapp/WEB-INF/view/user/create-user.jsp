@@ -27,21 +27,25 @@
                     <label class="form-label">Username</label>
                     <div class="input-group">
                       <span class="input-group-text"><i class="bi bi-person"></i></span>
-                      <form:input path="username" class="form-control" placeholder="Enter username" />
+                      <form:input path="username" class="form-control" placeholder="Enter username" required="true" />
+                      <form:errors path="username" cssClass="text-danger" />
                     </div>
                   </div>
                   <div class="mb-3">
                     <label class="form-label">Email</label>
                     <div class="input-group">
                       <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                      <form:input path="email" class="form-control" placeholder="Enter email" />
+                      <form:input path="email" class="form-control" placeholder="Enter email" required="true" />
+                      <form:errors path="email" cssClass="text-danger" />
                     </div>
                   </div>
                   <div class="mb-3">
                     <label class="form-label">Password</label>
                     <div class="input-group">
                       <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                      <form:password path="password" class="form-control" placeholder="Enter password" />
+                      <form:password path="password" class="form-control" placeholder="Enter password"
+                        required="true" />
+                      <form:errors path="password" cssClass="text-danger" />
                     </div>
                   </div>
                   <div class="row">
@@ -83,7 +87,8 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label">Role</label>
-                    <form:select path="role" class="form-select">
+                    <form:select path="role" class="form-select" required="true">
+                      <form:errors path="role" cssClass="text-danger" />
                       <form:option value="" label="-- Select role --" />
                       <form:option value="admin" label="Admin" />
                       <form:option value="patient" label="Patient" />

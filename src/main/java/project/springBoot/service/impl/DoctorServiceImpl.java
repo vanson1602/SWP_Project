@@ -1,12 +1,28 @@
 package project.springBoot.service.impl;
 
-import lombok.RequiredArgsConstructor;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.hibernate.Hibernate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 import project.springBoot.model.Doctor;
 import project.springBoot.model.DoctorBookingSlot;
 import project.springBoot.model.Patient;
-import project.springBoot.repository.*;
+import project.springBoot.repository.DoctorBookingSlotRepository;
+import project.springBoot.repository.DoctorRepository;
+import project.springBoot.repository.PatientRepository;
+import project.springBoot.repository.UserRepository;
 import project.springBoot.service.DoctorService;
 
 import java.math.BigDecimal;
@@ -27,6 +43,7 @@ public class DoctorServiceImpl implements DoctorService {
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
     private static final Logger logger = LoggerFactory.getLogger(DoctorServiceImpl.class);
+ 
 
     @Override
     public List<Doctor> getDoctorsBySpecialization(Long specializationId) {
@@ -51,6 +68,8 @@ public class DoctorServiceImpl implements DoctorService {
             slot.setModifiedAt(LocalDateTime.now());
             bookingSlotRepository.save(slot);
         }
+
+      
 
         // Only return slots that are in the future
         return bookingSlotRepository.findAvailableSlotsByDoctorAndTimeRange(doctorId,

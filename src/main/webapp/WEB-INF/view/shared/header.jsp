@@ -7,6 +7,12 @@
         <link rel="stylesheet" href="/resources/css/notifications.css">
         <script src="/resources/js/notifications.js"></script>
 
+        <!-- Required scripts for notifications -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/vi.js"></script>
+        <link rel="stylesheet" href="/resources/css/notifications.css">
+        <script src="/resources/js/notifications.js"></script>
+
         <!-- Header -->
         <header class="header">
             <div class="container">
@@ -47,11 +53,20 @@
                         <c:choose>
                             <c:when test="${not empty sessionScope.currentUser}">
                                 <!-- Notification Dropdown -->
+                                <!-- Notification Dropdown -->
                                 <div class="notification-wrapper">
+                                    <button type="button" class="notification-btn" id="notificationBtn">
                                     <button type="button" class="notification-btn" id="notificationBtn">
                                         <i class="bi bi-bell"></i>
                                         <span class="notification-badge">0</span>
                                     </button>
+                                    <div class="notification-dropdown" id="notificationDropdown">
+                                        <div class="notification-header">
+                                            <h3>Thông báo</h3>
+                                        </div>
+                                        <div class="notification-list">
+                                            <!-- Notifications will be loaded here -->
+                                        </div>
                                     <div class="notification-dropdown" id="notificationDropdown">
                                         <div class="notification-header">
                                             <h3>Thông báo</h3>
@@ -127,6 +142,11 @@
 
             .logo:hover {
                 color: #007bff;
+                transition: color 0.3s;
+            }
+
+            .logo:hover {
+                color: #007bff;
             }
 
             .logo-icon {
@@ -188,6 +208,8 @@
                 cursor: pointer;
                 padding: 0.5rem 1rem;
                 border-radius: 0.5rem;
+                transition: all 0.3s ease;
+                text-decoration: none;
                 transition: all 0.3s ease;
                 text-decoration: none;
             }
@@ -253,6 +275,7 @@
                 color: #333;
                 text-decoration: none;
                 transition: all 0.3s ease;
+                transition: all 0.3s ease;
             }
 
             .dropdown-item:hover {
@@ -262,9 +285,17 @@
 
             .dropdown-item i {
                 font-size: 1.1rem;
+                color: #007bff;
+            }
+
+            .dropdown-item i {
+                font-size: 1.1rem;
             }
 
             .dropdown-divider {
+                height: 1px;
+                background-color: #e9ecef;
+                border: none;
                 height: 1px;
                 background-color: #e9ecef;
                 border: none;
@@ -284,6 +315,7 @@
                     right: 0;
                     background-color: #fff;
                     padding: 1rem;
+                    padding: 1rem;
                     flex-direction: column;
                     gap: 1rem;
                     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -297,8 +329,44 @@
 
      
         <script>
+            // Set moment.js locale to Vietnamese
+            moment.locale('vi');
+        </script>
+
+        <script>
+            // Mobile menu toggle
+            document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.toggle('show');
+            });
+
+            // Profile dropdown toggle
+            document.getElementById('profileDropdownBtn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('profileDropdown').classList.toggle('show');
+            });
           
             moment.locale('vi');
+        </script>
+
+        <script>
+            // Mobile menu toggle
+            document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.toggle('show');
+            });
+
+            // Profile dropdown toggle
+            document.getElementById('profileDropdownBtn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('profileDropdown').classList.toggle('show');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', () => {
+                document.getElementById('profileDropdown')?.classList.remove('show');
+            // Close dropdown when clicking outside
+            document.addEventListener('click', () => {
+                document.getElementById('profileDropdown')?.classList.remove('show');
+            });
         </script>
 
         <script>

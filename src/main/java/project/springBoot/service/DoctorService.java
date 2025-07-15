@@ -3,11 +3,15 @@ package project.springBoot.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
 
 import project.springBoot.model.Doctor;
 import project.springBoot.model.DoctorBookingSlot;
 import project.springBoot.model.Patient;
 
+@Service
 public interface DoctorService {
         List<Doctor> getDoctorsBySpecialization(Long specializationId);
 
@@ -19,6 +23,10 @@ public interface DoctorService {
 
         Doctor getDoctorById(Long doctorId);
 
+        Optional<Doctor> findByUserId(long userId);
+
+        Doctor getDoctorByUserId(long userId);
+
         Doctor save(Doctor doctor);
 
         List<Doctor> findDoctorByName(String keyword, String[] specializationNames, Integer experienceYears,
@@ -26,4 +34,7 @@ public interface DoctorService {
 
         List<Doctor> findDoctorBySpecility(String keyword, String[] specializationNames, Integer experienceYears,
                         BigDecimal consultationFee);
+
+        Doctor findById(Long id);
+
 }

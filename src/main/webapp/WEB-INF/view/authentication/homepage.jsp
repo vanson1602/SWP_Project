@@ -3,6 +3,8 @@
 
     <!DOCTYPE html>
     <html lang="vi">
+    <!DOCTYPE html>
+    <html lang="vi">
 
     <head>
       <meta charset="UTF-8">
@@ -318,6 +320,20 @@
 
     <jsp:include page="../shared/header.jsp" />
 
+    <jsp:include page="../shared/header.jsp" />
+
+
+    <!-- Dịch vụ nổi bật -->
+    <section class="py-4">
+      <div class="container">
+        <h2 class="fw-bold mb-4 text-center">Dịch vụ nổi bật</h2>
+        <div class="row g-3">
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 p-3">
+              <div
+                class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center mx-auto mb-2"
+                style="width: 50px; height: 50px;">
+                <i class="bi bi-calendar-check fs-5"></i>
 
     <!-- Dịch vụ nổi bật -->
     <section class="py-4">
@@ -334,6 +350,9 @@
               <h5 class="fw-semibold mb-2 text-center">Đặt lịch khám</h5>
               <p class="text-muted small mb-0 text-center">Đặt lịch hẹn với bác sĩ chuyên khoa phù hợp</p>
             </div>
+              <h5 class="fw-semibold mb-2 text-center">Đặt lịch khám</h5>
+              <p class="text-muted small mb-0 text-center">Đặt lịch hẹn với bác sĩ chuyên khoa phù hợp</p>
+            </div>
           </div>
 
           <div class="col-md-3 col-sm-6">
@@ -347,7 +366,29 @@
               <p class="text-muted small mb-0 text-center">Tìm kiếm bác sĩ theo chuyên khoa và địa điểm</p>
             </div>
           </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 p-3">
+              <div
+                class="bg-danger text-white rounded-circle d-flex justify-content-center align-items-center mx-auto mb-2"
+                style="width: 50px; height: 50px;">
+                <i class="bi bi-person-badge fs-5"></i>
+              </div>
+              <h5 class="fw-semibold mb-2 text-center">Tìm bác sĩ</h5>
+              <p class="text-muted small mb-0 text-center">Tìm kiếm bác sĩ theo chuyên khoa và địa điểm</p>
+            </div>
+          </div>
 
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 p-3">
+              <div
+                class="bg-info text-white rounded-circle d-flex justify-content-center align-items-center mx-auto mb-2"
+                style="width: 50px; height: 50px;">
+                <i class="bi bi-chat-dots fs-5"></i>
+              </div>
+              <h5 class="fw-semibold mb-2 text-center">Tư vấn online</h5>
+              <p class="text-muted small mb-0 text-center">Tư vấn sức khỏe trực tuyến 24/7</p>
+            </div>
+          </div>
           <div class="col-md-3 col-sm-6">
             <div class="card h-100 shadow-sm border-0 p-3">
               <div
@@ -454,8 +495,31 @@
                     </a>
                   </div>
                 </div>
-              </div>
+              </a>
             </div>
+          </c:forEach>
+        </div>
+
+        <!-- Pagination -->
+        <c:if test="${totalPages > 1}">
+          <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+              <li class="page-item ${currentPage == 0 ? 'disabled' : ''}">
+                <a class="page-link" href="/?page=${currentPage - 1}">Trước</a>
+              </li>
+              <c:forEach begin="0" end="${totalPages - 1}" var="i">
+                <li class="page-item ${currentPage == i ? 'active' : ''}">
+                  <a class="page-link" href="/?page=${i}">${i + 1}</a>
+                </li>
+              </c:forEach>
+              <li class="page-item ${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                <a class="page-link" href="/?page=${currentPage + 1}">Sau</a>
+              </li>
+            </ul>
+          </nav>
+        </c:if>
+      </div>
+    </section>
           </c:forEach>
         </div>
 
@@ -512,5 +576,38 @@
       });
     </script>
     </body>
+    <!-- Include Footer -->
+    <jsp:include page="../shared/footer.jsp" />
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const searchTabs = document.querySelectorAll('.search-tab');
+        const searchForms = {
+          specialty: document.getElementById('specialtyForm'),
+          doctor: document.getElementById('doctorForm')
+        };
+
+        searchTabs.forEach(tab => {
+          tab.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Remove active class from all tabs
+            searchTabs.forEach(t => t.classList.remove('active'));
+            // Add active class to clicked tab
+            tab.classList.add('active');
+
+            // Hide all forms
+            Object.values(searchForms).forEach(form => {
+              form.classList.add('d-none');
+            });
+            // Show selected form
+            const formId = tab.dataset.tab;
+            searchForms[formId].classList.remove('d-none');
+          });
+        });
+      });
+    </script>
+    </body>
+
+    </html>
     </html>

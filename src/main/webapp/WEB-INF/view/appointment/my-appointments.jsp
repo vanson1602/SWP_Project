@@ -236,6 +236,52 @@
                                 }
 
                                 .btn-payment {
+                                    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+                                    color: white;
+                                    border: none;
+                                }
+
+                                .btn-payment:hover {
+                                    color: white;
+                                    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+                                }
+
+                                .btn-cancel {
+                                    background-color: #dc3545;
+                                    color: white;
+                                    border: none;
+                                }
+
+                                .btn-cancel:hover {
+                                    color: white;
+                                    background-color: #c82333;
+                                    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+                                }
+
+                                .btn-payment {
+                                    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+                                    color: white;
+                                    border: none;
+                                }
+
+                                .btn-payment:hover {
+                                    color: white;
+                                    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+                                }
+
+                                .btn-cancel {
+                                    background-color: #dc3545;
+                                    color: white;
+                                    border: none;
+                                }
+
+                                .btn-cancel:hover {
+                                    color: white;
+                                    background-color: #c82333;
+                                    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+                                }
+
+                                .btn-payment {
                                     background: linear-gradient(135deg, #0061f2 0%, #00a7e1 100%);
                                     color: white;
                                     border: none;

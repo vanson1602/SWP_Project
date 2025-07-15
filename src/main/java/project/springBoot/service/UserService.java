@@ -7,13 +7,18 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import project.springBoot.model.Doctor;
 import project.springBoot.model.User;
+import project.springBoot.repository.DoctorRepository;
 import project.springBoot.repository.UserRepository;
 
 @Service
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private DoctorRepository doctorRepository;
 
     public User handleSaveUser(User user) {
         if (user.getUserID() == 0) {
@@ -39,12 +44,19 @@ public class UserService {
     }
 
     public User handleUpdateUser(User user) {
-        User existingUser = userRepository.findByUserID(user.getUserID());
-        if (existingUser != null) {
-            // Only hash the password if it's different from the existing one
-            if (!user.getPassword().equals(existingUser.getPassword()) && !isPasswordEncoded(user.getPassword())) {
-                String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-                user.setPassword(hashed);
+        Optional<User> existingUserOpt = userRepository.findById(user.getUserID());
+        if (existingUserOpt.isPresent()) {
+            User existingUser = existingUserOpt.get();
+            // Nếu password không được gửi lên từ form (null hoặc rỗng) thì giữ nguyên
+            if (user.getPassword() == null || user.getPassword().isEmpty()) {
+                user.setPassword(existingUser.getPassword());
+            } else {
+                // Nếu người dùng có thay đổi password (không trùng hoặc chưa mã hoá), thì mã hoá lại
+                if (!isPasswordEncoded(user.getPassword()) ||
+                        !BCrypt.checkpw(user.getPassword(), existingUser.getPassword())) {
+                    String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+                    user.setPassword(hashed);
+                }
             }
         }
         return this.userRepository.save(user);
@@ -73,6 +85,14 @@ public class UserService {
             System.out.println("Password match: " + passwordMatch);
 
             if (passwordMatch) {
+                // If this is a doctor, ensure they have a doctor record
+                if ("doctor".equalsIgnoreCase(user.getRole())) {
+                    Long doctorId = getDoctorIdByUserId(user.getUserID());
+                    if (doctorId == null) {
+                        System.out.println("Doctor record not found for user: " + user.getUserID());
+                        return null;
+                    }
+                }
                 return user;
             }
         }
@@ -93,5 +113,11 @@ public class UserService {
 
     public User save(User user) {
         return userRepository.save(user);
+    }
+
+    public Long getDoctorIdByUserId(long userId) {
+        return doctorRepository.findByUserId(userId)
+                .map(Doctor::getDoctorID)
+                .orElse(null);
     }
 }
