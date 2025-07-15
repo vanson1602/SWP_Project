@@ -146,6 +146,18 @@
                             Lịch hẹn của tôi
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/appointments/medical-result">
+                            <i class="bi bi-calendar-plus"></i>
+                            Kết quả khám bệnh
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/medical-history">
+                            <i class="bi bi-calendar-week"></i>
+                            Lịch sử khám
+                        </a>
+                    </li>
                 </ul>
 
                 <!-- Content Section -->

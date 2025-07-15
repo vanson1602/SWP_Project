@@ -44,6 +44,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Transactional
     public Appointment createAppointment(Long patientId, Long slotId, Long specializationId,
             Long appointmentTypeId, String notes) {
+
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
 
@@ -65,13 +66,20 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setStatus("Pending");
         appointment.setPatientNotes(notes);
         appointment.setAppointmentType(appointmentType);
+
+        // Save appointment before linking slot
         appointment = appointmentRepository.save(appointment);
 
+        // Link appointment <-> slot
         slot.setStatus("Booked");
         slot.setAppointment(appointment);
         slot.setModifiedAt(LocalDateTime.now());
         bookingSlotRepository.save(slot);
 
+        // 👇 Gán lại slot cho appointment để tránh null khi gọi getBookingSlot()
+        appointment.setBookingSlot(slot);
+
+        // Tạo thông báo cho bác sĩ
         Notification doctorNotification = new Notification();
         doctorNotification.setUser(slot.getSchedule().getDoctor().getUser());
         doctorNotification.setTitle("Lịch hẹn mới");
