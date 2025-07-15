@@ -1,18 +1,20 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
         <!DOCTYPE html>
-        <html>
+        <html lang="vi">
 
         <head>
             <meta charset="UTF-8">
             <title>Chat</title>
+            <!-- External libraries -->
             <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/vi.js"></script>
-            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-            <link href="/resources/css/chat-dashboard.css" rel="stylesheet">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
+            <!-- Chat User Data (hidden) -->
             <div id="chatData" hidden data-user-id="${currentUser.userID}" data-username="${currentUser.username}"
                 data-fullname="${currentUser.fullName}" data-role="${currentUser.role}"
                 data-conversation-id="${conversation.id}" data-sender-id="${conversation.sender.userID}"
@@ -25,7 +27,7 @@
 
             <style>
                 body {
-                    font-family: Arial, sans-serif;
+                    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
                     margin: 0;
                     padding: 20px;
                     background-color: #f0f2f5;
@@ -34,39 +36,43 @@
                 .chat-container {
                     max-width: 900px;
                     margin: 0 auto;
-                    background: white;
-                    border-radius: 10px;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    background-color: white;
+                    border-radius: 12px;
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+                    display: flex;
+                    flex-direction: column;
+                    height: 90vh;
                 }
 
                 .chat-header {
                     padding: 20px;
                     border-bottom: 1px solid #e0e0e0;
-                    background: #ffffff;
-                    border-radius: 10px 10px 0 0;
+                    background: #007bff;
+                    border-radius: 12px 12px 0 0;
+                    color: white;
                 }
 
                 .chat-header h1 {
                     margin: 0;
-                    font-size: 1.5em;
-                    color: #1a1a1a;
+                    font-size: 20px;
                 }
 
                 .message-area {
-                    height: 500px;
+                    flex: 1;
                     padding: 20px;
                     overflow-y: auto;
-                    background: #fff;
+                    background: #f9fafb;
                 }
 
                 .message {
                     margin-bottom: 15px;
-                    max-width: 80%;
+                    max-width: 75%;
                     clear: both;
+                    display: inline-block;
                 }
 
                 .message-header {
-                    font-size: 0.9em;
+                    font-size: 0.85em;
                     margin-bottom: 5px;
                     color: #666;
                 }
@@ -75,74 +81,100 @@
                     padding: 10px 15px;
                     border-radius: 15px;
                     font-size: 0.95em;
-                    line-height: 1.4;
+                    line-height: 1.5;
+                    word-wrap: break-word;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
                 }
 
                 .sent {
                     float: right;
+                    text-align: right;
                 }
 
                 .sent .message-content {
-                    background: #0084ff;
+                    background-color: #007bff;
                     color: white;
                 }
 
                 .received {
                     float: left;
+                    text-align: left;
                 }
 
                 .received .message-content {
-                    background: #e9ecef;
-                    color: black;
+                    background-color: #e9ecef;
+                    color: #333;
                 }
 
                 .message-input-container {
-                    padding: 20px;
-                    background: #fff;
+                    padding: 15px 20px;
+                    background: #ffffff;
                     border-top: 1px solid #e0e0e0;
-                    border-radius: 0 0 10px 10px;
+                    border-radius: 0 0 12px 12px;
                     display: flex;
                     align-items: center;
+                    gap: 12px;
                 }
 
                 #messageInput {
                     flex: 1;
-                    padding: 12px;
-                    border: 1px solid #e0e0e0;
-                    border-radius: 20px;
-                    margin-right: 10px;
+                    padding: 12px 16px;
+                    border: 1px solid #d0d0d0;
+                    border-radius: 25px;
                     font-size: 0.95em;
+                    transition: border-color 0.3s ease;
                 }
 
                 #messageInput:focus {
                     outline: none;
-                    border-color: #0084ff;
+                    border-color: #007bff;
+                    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
                 }
 
                 .send-button {
-                    background: #0084ff;
+                    background: #007bff;
                     color: white;
                     border: none;
                     padding: 12px 20px;
-                    border-radius: 20px;
+                    border-radius: 25px;
                     cursor: pointer;
                     font-size: 0.95em;
                     display: flex;
                     align-items: center;
+                    transition: background 0.3s ease;
                 }
 
                 .send-button:hover {
-                    background: #0073e6;
+                    background: #0056b3;
                 }
 
                 .send-button i {
-                    margin-left: 5px;
+                    margin-left: 8px;
                 }
 
                 .time {
-                    font-size: 0.8em;
-                    color: #999;
-                    margin-left: 10px;
+                    font-size: 0.75em;
+                    color: #aaa;
+                    margin-left: 8px;
+                }
+
+                @media (max-width: 600px) {
+                    .chat-container {
+                        height: 100vh;
+                        border-radius: 0;
+                    }
+
+                    .chat-header h1 {
+                        font-size: 18px;
+                    }
+
+                    .send-button {
+                        padding: 10px 16px;
+                    }
+
+                    .message-content {
+                        font-size: 0.9em;
+                    }
                 }
             </style>
         </head>
@@ -150,8 +182,11 @@
         <body>
             <div class="chat-container">
                 <div class="chat-header">
-                    <h1>Chat with ${conversation.sender.userID == currentUser.userID ? conversation.receiver.fullName :
-                        conversation.sender.fullName}</h1>
+                    <h1>
+                        Chat với
+                        ${conversation.sender.userID == currentUser.userID ? conversation.receiver.fullName :
+                        conversation.sender.fullName}
+                    </h1>
                 </div>
 
                 <div class="message-area" id="messageArea">
@@ -167,13 +202,14 @@
                 </div>
 
                 <div class="message-input-container">
-                    <input type="text" id="messageInput" placeholder="Type your message...">
+                    <input type="text" id="messageInput" placeholder="Nhập tin nhắn...">
                     <button class="send-button" onclick="sendMessage()">
-                        Send <i class="fas fa-paper-plane"></i>
+                        Gửi <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
             </div>
 
+            <!-- JavaScript xử lý gửi tin nhắn -->
             <script src="/resources/js/chat.js"></script>
         </body>
 

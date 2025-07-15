@@ -16,7 +16,69 @@
 
         <body>
             <!-- Header -->
-            <jsp:include page="../shared/header-doctor.jsp" />
+            <header class="header">
+                <div class="container">
+                    <nav class="nav">
+                        <!-- Logo -->
+                        <a href="<c:url value='/doctor/home' />" class="logo">
+                            <div class="logo-icon">⚕️</div>
+                            HealthCare+
+                        </a>
+
+                        <!-- Mobile Menu Button -->
+                        <button class="mobile-menu-btn" id="mobileMenuBtn">
+                            <i class="bi bi-list"></i>
+                        </button>
+
+                        <!-- Navigation Links -->
+                        <ul class="nav-links" id="navLinks">
+                            <li><a href="<c:url value='/doctor/home' />"><i class="bi bi-house-door"></i> Trang chủ</a>
+                            </li>
+                            <li><a href="/doctor/busy/schedule"><i class="bi bi-person-badge"></i> Gửi lịch
+                                    bận</a></li>
+                            <li><a href="/doctor/schedules"><i class="bi bi-clipboard2-pulse"></i> Xem lịch làm việc</a>
+                            </li>
+                            <li><a href="<c:url value='/doctor/appointments' />" class="active"><i
+                                        class="bi bi-calendar-check"></i> Lịch hẹn</a></li>
+                        </ul>
+
+                        <!-- User Menu -->
+                        <div class="user-menu">
+                            <c:choose>
+                                <c:when test="${not empty currentUser}">
+                                    <button class="notification-btn">
+                                        <i class="bi bi-bell"></i>
+                                        <span class="notification-badge">2</span>
+                                    </button>
+                                    <div class="dropdown">
+                                        <button class="profile-btn" id="profileDropdownBtn">
+                                            <i class="bi bi-person-circle"></i>
+                                            ${currentUser.firstName} ${currentUser.lastName}
+                                        </button>
+                                        <ul class="dropdown-menu" id="profileDropdown">
+                                            <li><a class="dropdown-item" href="/doctor/profile"><i
+                                                        class="bi bi-person"></i> Trang cá nhân</a></li>
+                                            <li><a class="dropdown-item" href="/doctor/settings"><i
+                                                        class="bi bi-gear"></i> Cài đặt</a></li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li><a class="dropdown-item" href="/doctor/logout"><i
+                                                        class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+                                        </ul>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <a href="<c:url value='/doctor' />" class="profile-btn">
+                                        <i class="bi bi-box-arrow-in-right"></i>
+                                        Đăng nhập
+                                    </a>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                    </nav>
+                </div>
+            </header>
 
             <!-- Appointment Section -->
             <section class="appointments-section">
@@ -95,14 +157,8 @@
                                             </div>
                                             <div class="d-flex align-items-center gap-3">
                                                 <span
-                                                    class="status-badge ${appointment.status == 'Pending' ? 'status-pending' : appointment.status == 'Confirmed' ? 'status-confirmed' : appointment.status == 'Completed' ? 'status-completed' : 'status-cancelled'}">
-                                                    <c:choose>
-                                                        <c:when test="${appointment.status eq 'Pending'}">Chờ khám</c:when>
-                                                        <c:when test="${appointment.status eq 'Confirmed'}">Đã xác nhận</c:when>
-                                                        <c:when test="${appointment.status eq 'Completed'}">Đã khám</c:when>
-                                                        <c:when test="${appointment.status eq 'Cancelled'}">Đã hủy</c:when>
-                                                        <c:otherwise>${appointment.status}</c:otherwise>
-                                                    </c:choose>
+                                                    class="status-badge ${appointment.status == 'Pending' ? 'status-pending' : 'status-confirmed'}">
+                                                    ${appointment.status}
                                                 </span>
                                                 <a href="<c:url value='/doctor/appointments/${appointment.appointmentID}' />"
                                                     class="action-button view-btn">

@@ -599,6 +599,44 @@
                                                         </div>
 
                                                         <!-- Action Buttons -->
+                                                        <c:if test="${appointment.status == 'Completed'}">
+                                                            <c:forEach items="${appointment.examinations}" var="exam">
+                                                                <c:choose>
+                                                                    <c:when test="${empty exam.feedbacks}">
+                                                                        <a href="${pageContext.request.contextPath}/feedback/new?examinationId=${exam.examinationID}"
+                                                                            class="btn btn-primary mt-2">
+                                                                            <i class="bi bi-star"></i> Gửi Feedback
+                                                                        </a>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <a href="${pageContext.request.contextPath}/feedback/edit?feedbackId=${exam.feedbacks[0].feedbackID}"
+                                                                            class="btn btn-warning mt-2">
+                                                                            <i class="bi bi-pencil"></i> Chỉnh sửa
+                                                                            Feedback
+                                                                        </a>
+                                                                        <form method="post"
+                                                                            action="${pageContext.request.contextPath}/feedback/delete"
+                                                                            style="display:inline-block"
+                                                                            onsubmit="return confirm('Bạn có chắc chắn muốn xóa Feedback này?');">
+                                                                            <input type="hidden" name="feedbackId"
+                                                                                value="${exam.feedbacks[0].feedbackID}" />
+                                                                            <button type="submit"
+                                                                                class="btn btn-danger mt-2">
+                                                                                <i class="bi bi-trash"></i> Xóa Feedback
+                                                                            </button>
+                                                                        </form>
+                                                                        <c:if
+                                                                            test="${not empty exam.feedbacks[0].response}">
+                                                                            <div class="alert alert-info mt-2">
+                                                                                <strong>Phản hồi từ bác sĩ / quản
+                                                                                    trị:</strong><br />
+                                                                                ${exam.feedbacks[0].response}
+                                                                            </div>
+                                                                        </c:if>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </c:forEach>
+                                                        </c:if>
                                                         <div class="action-buttons">
                                                             <c:if test="${appointment.status == 'Pending'}">
                                                                 <a href="${pageContext.request.contextPath}/appointments/payment?appointmentId=${appointment.appointmentID}"

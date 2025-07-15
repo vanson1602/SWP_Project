@@ -37,7 +37,7 @@
             <div class="col-12 mx-auto">
               <div class="d-flex justify-content-between">
                 <h3>Table User</h3>
-                <a href="/admin/createUser" class="btn btn-primary">Create User</a>
+                <a href="/admin/create" class="btn btn-primary">Create User</a>
                 <a href="/admin/doctor/create" class="btn btn-primary">Create Doctor</a>
               </div>
               <hr />

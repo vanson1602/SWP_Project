@@ -1,28 +1,25 @@
 package project.springBoot.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import jakarta.servlet.http.HttpSession;
 import project.springBoot.model.Doctor;
 import project.springBoot.model.DoctorSchedule;
 import project.springBoot.model.User;
 import project.springBoot.repository.DoctorRepository;
 import project.springBoot.service.DoctorScheduleService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import project.springBoot.service.EmailService;
+
+import jakarta.servlet.http.HttpSession;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/admin/schedules")
@@ -63,32 +60,46 @@ public class AdminScheduleController {
     }
 
     @PostMapping("/save")
-    public String saveSchedule(@ModelAttribute DoctorSchedule schedule, Model model) {
-        List<Doctor> doctors = doctorRepository.findAll();
-        model.addAttribute("doctors", doctors);
+    public String saveMultipleSchedules(
+            @ModelAttribute DoctorSchedule schedule,
+            @RequestParam("selectedDates") String selectedDatesString,
+            Model model) {
         try {
-            List<DoctorSchedule> existingSchedules = doctorScheduleService
-                    .getSchedulesByDoctorId(schedule.getDoctor().getDoctorID());
-            for (DoctorSchedule existing : existingSchedules) {
-                if (existing.getWorkDate().equals(schedule.getWorkDate())) {
-                    model.addAttribute("error",
-                            "Schedule creation failed: A schedule for this doctor on the selected date already exists. Please choose a different date.");
+            List<Doctor> doctors = doctorRepository.findAll();
+            model.addAttribute("doctors", doctors);
+
+            String[] selectedDates = selectedDatesString.split(",");
+            if (selectedDates.length == 0) {
+                model.addAttribute("error", "Please select at least one date.");
+                return "admin/schedules/add";
+            }
+
+            for (String dateStr : selectedDates) {
+                DoctorSchedule newSchedule = new DoctorSchedule();
+                newSchedule.setDoctor(schedule.getDoctor());
+                newSchedule.setStartTime(schedule.getStartTime());
+                newSchedule.setEndTime(schedule.getEndTime());
+                newSchedule.setClinicRoom(schedule.getClinicRoom());
+                newSchedule.setNotes(schedule.getNotes());
+                newSchedule.setStatus(schedule.getStatus());
+                newSchedule.setMaxPatients(schedule.getMaxPatients());
+                newSchedule.setWorkDate(LocalDate.parse(dateStr));
+
+                List<DoctorSchedule> existingSchedules = doctorScheduleService
+                        .getSchedulesByDoctorId(schedule.getDoctor().getDoctorID());
+                boolean isDuplicate = existingSchedules.stream()
+                        .anyMatch(existing -> existing.getWorkDate().equals(newSchedule.getWorkDate()));
+                if (isDuplicate) {
+                    model.addAttribute("error", "Schedule for date " + dateStr + " already exists.");
                     model.addAttribute("schedule", schedule);
                     return "admin/schedules/add";
                 }
+
+                doctorScheduleService.createSchedule(newSchedule);
             }
-            doctorScheduleService.createSchedule(schedule);
-        } catch (DataIntegrityViolationException e) {
-            model.addAttribute("error",
-                    "Schedule creation failed: A schedule for this doctor on the selected date already exists. Please choose a different date.");
-            model.addAttribute("schedule", schedule);
-            return "admin/schedules/add";
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("error", "Schedule creation failed: " + e.getMessage());
-            model.addAttribute("schedule", schedule);
-            return "admin/schedules/add";
+
         } catch (Exception e) {
-            model.addAttribute("error", "Schedule creation failed due to an unexpected error: " + e.getMessage());
+            model.addAttribute("error", "Schedule creation failed: " + e.getMessage());
             model.addAttribute("schedule", schedule);
             return "admin/schedules/add";
         }
@@ -149,6 +160,23 @@ public class AdminScheduleController {
         model.addAttribute("schedules", schedules);
         model.addAttribute("doctor", doctor);
         return "admin/schedules/doctor_schedules";
+    }
+
+    @GetMapping("/doctor/{doctorId}/schedules")
+    @ResponseBody
+    public List<Map<String, Object>> getDoctorSchedulesJson(@PathVariable long doctorId) {
+        List<DoctorSchedule> schedules = doctorScheduleService.getSchedulesByDoctorId(doctorId);
+        return schedules.stream()
+                .map(schedule -> {
+                    Map<String, Object> scheduleMap = new HashMap<>();
+                    scheduleMap.put("scheduleID", schedule.getScheduleID());
+                    scheduleMap.put("workDate", schedule.getWorkDate().toString());
+                    scheduleMap.put("startTime", schedule.getStartTime().toString());
+                    scheduleMap.put("endTime", schedule.getEndTime().toString());
+                    scheduleMap.put("status", schedule.getStatus());
+                    return scheduleMap;
+                })
+                .toList();
     }
 
     @GetMapping("/processing")

@@ -16,6 +16,7 @@
             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/base.css">
             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/homepage.css">
             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/doctor-selection.css">
+
         </head>
 
         <body>

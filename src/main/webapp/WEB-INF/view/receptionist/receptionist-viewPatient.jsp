@@ -1,91 +1,111 @@
-<%@page contentType="text/html" pageEncoding="UTF-8" %> <%@ taglib prefix="c"
-uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib
-uri="http://www.springframework.org/tags/form" prefix="form" %> <%@ taglib
-prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@page contentType="text/html" pageEncoding="UTF-8" %>
+  <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+    <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+      <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Thông tin bệnh nhân</title>
-    <style>
-      body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f5f7fa;
-        padding: 20px;
-      }
+        <!DOCTYPE html>
+        <html lang="vi">
 
-      h2 {
-        text-align: center;
-        color: #333;
-      }
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <title>Danh sách bệnh nhân</title>
+          <style>
+            body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              background-color: #f5f7fa;
+              margin: 0;
+              padding: 20px;
+            }
 
-      .card-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 20px;
-        margin-top: 30px;
-      }
+            h2 {
+              text-align: center;
+              color: #2c3e50;
+              margin-bottom: 30px;
+            }
 
-      .card {
-        background-color: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        text-align: center;
-        transition: transform 0.3s ease;
-      }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              background-color: #fff;
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            }
 
-      .card:hover {
-        transform: translateY(-5px);
-      }
+            th,
+            td {
+              padding: 16px 20px;
+              text-align: left;
+              border-bottom: 1px solid #e0e0e0;
+            }
 
-      .card img {
-        width: 100px;
-        height: 100px;
-        object-fit: cover;
-        border-radius: 50%;
-        margin-bottom: 15px;
-      }
+            th {
+              background-color: #007bff;
+              color: white;
+              font-weight: 600;
+            }
 
-      .card h3 {
-        margin: 10px 0 5px;
-        font-size: 18px;
-        color: #2c3e50;
-      }
+            tr:hover {
+              background-color: #f1f9ff;
+            }
 
-      .card p {
-        margin: 5px 0;
-        font-size: 14px;
-        color: #555;
-      }
+            td {
+              color: #333;
+            }
 
-      .back-button {
-        display: inline-block;
-        margin-top: 30px;
-        text-decoration: none;
-        color: #3498db;
-        font-weight: bold;
-      }
-    </style>
-  </head>
-  <body>
-    <h2>Danh sách bệnh nhân</h2>
+            .back-button {
+              display: inline-block;
+              margin-top: 30px;
+              padding: 10px 20px;
+              background-color: #007bff;
+              color: white;
+              text-decoration: none;
+              border-radius: 6px;
+              transition: background-color 0.3s ease;
+            }
 
-    <div class="card-container">
-      <c:forEach var="patient" items="${listPatient}">
-        <div class="card">
-          <h3>${patient.fullName}</h3>
-          <p><strong>Email:</strong> ${patient.email}</p>
-          <p><strong>Điện thoại:</strong> ${patient.phone}</p>
-          <p><strong>Địa chỉ:</strong> ${patient.address}</p>
-        </div>
-      </c:forEach>
-    </div>
+            .back-button:hover {
+              background-color: #0056b3;
+            }
 
-    <div style="text-align: center">
-      <a href="javascript:history.back()" class="back-button">← Quay lại</a>
-    </div>
-  </body>
-</html>
+            .table-container {
+              max-width: 1000px;
+              margin: 0 auto;
+              overflow-x: auto;
+            }
+          </style>
+        </head>
+
+        <body>
+          <h2>Danh sách bệnh nhân</h2>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Họ và tên</th>
+                  <th>Email</th>
+                  <th>Điện thoại</th>
+                  <th>Địa chỉ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <c:forEach var="patient" items="${listPatient}">
+                  <tr>
+                    <td>${patient.fullName}</td>
+                    <td>${patient.email}</td>
+                    <td>${patient.phone}</td>
+                    <td>${patient.address}</td>
+                  </tr>
+                </c:forEach>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="text-align: center">
+            <a href="javascript:history.back()" class="back-button">← Quay lại</a>
+          </div>
+        </body>
+
+        </html>

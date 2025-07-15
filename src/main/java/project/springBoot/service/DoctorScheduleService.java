@@ -25,7 +25,6 @@ public class DoctorScheduleService {
         schedule.setCreatedAt(LocalDateTime.now());
         schedule.setModifiedAt(LocalDateTime.now());
         DoctorSchedule savedSchedule = doctorScheduleRepository.save(schedule);
-        generateAndSaveSlots(savedSchedule);
         if ("Available".equals(schedule.getStatus())) {
             generateAndSaveSlots(savedSchedule);
         }

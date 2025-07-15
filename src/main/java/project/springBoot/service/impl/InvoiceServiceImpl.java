@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
+import project.springBoot.model.Appointment;
 import project.springBoot.model.Invoice;
 import project.springBoot.repository.InvoiceRepository;
 import project.springBoot.service.InvoiceService;
@@ -88,4 +89,17 @@ public class InvoiceServiceImpl implements InvoiceService {
             return null;
         }
     }
+
+    @Override
+    public Invoice createAppointmentInvoice(Appointment appointment, String paymentMethod) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'createAppointmentInvoice'");
+    }
+
+    @Override
+    public Invoice getInvoiceByAppointment(Long appointmentId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getInvoiceByAppointment'");
+    }
+    
 } 

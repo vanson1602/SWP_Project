@@ -38,8 +38,9 @@
               <div class="card" style="width: 60%">
                 <div class="card-header">User information</div>
                 <div class="card-body">
-                  <form:form modelAttribute="user" method="post" action="/admin/update">
+                  <form:form modelAttribute="user" method="post" action="/api/admin/update">
                     <form:hidden path="userID" />
+                    <form:hidden path="username" />
 
 =======
 >>>>>>> diemvi

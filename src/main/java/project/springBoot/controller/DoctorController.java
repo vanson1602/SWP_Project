@@ -40,6 +40,7 @@ import project.springBoot.model.User;
 import project.springBoot.service.AppointmentService;
 import project.springBoot.service.DoctorBookingSlotService;
 import project.springBoot.service.DoctorScheduleService;
+import project.springBoot.service.DoctorScheduleService;
 import project.springBoot.service.DoctorService;
 import project.springBoot.service.ExaminationService;
 import project.springBoot.service.ICDCodeService;
@@ -49,6 +50,8 @@ import project.springBoot.service.PrescriptionService;
 import project.springBoot.service.SpecializationService;
 import project.springBoot.service.UploadFileService;
 import project.springBoot.service.UserService;
+import project.springBoot.model.DoctorSchedule;
+import project.springBoot.service.DoctorScheduleService;
 
 @Slf4j
 @Controller
@@ -86,6 +89,7 @@ public class DoctorController {
             return "redirect:/login";
         }
 
+
         Long doctorId = (Long) session.getAttribute("doctorId");
         if (doctorId == null) {
             doctorId = userService.getDoctorIdByUserId(currentUser.getUserID());
@@ -96,6 +100,7 @@ public class DoctorController {
                 return "redirect:/access-denied";
             }
         }
+
 
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("doctorId", doctorId);
@@ -298,6 +303,7 @@ public class DoctorController {
             System.out.println("Received request data: " + requestData);
 
             Appointment appointment = appointmentService.findByIdAppointment(appointmentId);
+
             if (appointment == null) {
                 throw new IllegalArgumentException("Không tìm thấy lịch khám");
             }
@@ -314,10 +320,12 @@ public class DoctorController {
             // Create new prescription
             Prescription prescription = new Prescription();
 
+
             // Set basic fields
             if (requestData.get("prescription_id") != null) {
                 prescription.setPrescriptionID(Long.parseLong(requestData.get("prescription_id").toString()));
             }
+
 
             // Get medication
             Long medicationId = Long.parseLong(requestData.get("medication_id").toString());
@@ -326,12 +334,14 @@ public class DoctorController {
                 throw new IllegalArgumentException("Không tìm thấy thuốc");
             }
 
+
             // Set quantity and validate stock
             int quantity = Integer.parseInt(requestData.get("quantity").toString());
             if (quantity > medication.getStockQuantity()) {
                 throw new IllegalArgumentException("Số lượng yêu cầu vượt quá số lượng tồn kho");
             }
             prescription.setQuantity(quantity);
+
 
             // Update medication stock
             medication.setStockQuantity(medication.getStockQuantity() - quantity);
@@ -341,6 +351,7 @@ public class DoctorController {
             prescription.setMedication(medication);
             prescription.setExamination(examination);
 
+
             // Set doctor directly from prescribed_by
             Long doctorId = Long.parseLong(requestData.get("prescribed_by").toString());
             Doctor doctor = doctorService.findById(doctorId);
@@ -349,14 +360,20 @@ public class DoctorController {
             }
             prescription.setPrescribedBy(doctor);
 
+
             prescription.setDosage(requestData.get("dosage").toString());
             prescription.setFrequency(requestData.get("frequency").toString());
             prescription
                     .setDuration(requestData.get("duration") != null ? requestData.get("duration").toString() : null);
             prescription.setInstructions(
                     requestData.get("instructions") != null ? requestData.get("instructions").toString() : null);
+            prescription
+                    .setDuration(requestData.get("duration") != null ? requestData.get("duration").toString() : null);
+            prescription.setInstructions(
+                    requestData.get("instructions") != null ? requestData.get("instructions").toString() : null);
             prescription.setIsRefillable(Boolean.parseBoolean(requestData.get("is_refillable").toString()));
             prescription.setStatus("PENDING");
+
 
             if (prescription.getPrescriptionID() == null) {
                 prescription.setCreatedAt(LocalDateTime.now());
@@ -394,6 +411,7 @@ public class DoctorController {
 
             // Update status of prescriptions
             prescriptionService.completePrescriptions(prescriptionIds);
+
 
             response.put("success", true);
             response.put("message", "Đơn thuốc đã được hoàn thành");

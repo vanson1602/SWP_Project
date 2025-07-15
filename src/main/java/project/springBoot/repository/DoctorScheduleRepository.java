@@ -12,8 +12,14 @@ import org.springframework.stereotype.Repository;
 import project.springBoot.model.Doctor;
 import project.springBoot.model.DoctorSchedule;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, Long> {
+        List<DoctorSchedule> findByDoctorDoctorID(Long doctorID);
+
         List<DoctorSchedule> findByDoctorAndWorkDateBetweenOrderByWorkDateAsc(
                         Doctor doctor,
                         LocalDate startDate,
@@ -34,4 +40,5 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
 
         @Query("SELECT ds FROM DoctorSchedule ds LEFT JOIN FETCH ds.bookingSlots WHERE ds.scheduleID = :scheduleId")
         Optional<DoctorSchedule> findByIdWithSlots(@Param("scheduleId") Long scheduleId);
+
 }

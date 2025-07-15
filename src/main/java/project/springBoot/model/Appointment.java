@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -181,7 +182,7 @@ public class Appointment {
     public long getAppointmentID() {
         return appointmentID;
     }
-    
+
     public void setAppointmentID(long appointmentID) {
         this.appointmentID = appointmentID;
     }

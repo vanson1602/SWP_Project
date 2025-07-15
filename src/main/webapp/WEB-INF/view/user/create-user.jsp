@@ -101,12 +101,12 @@
                     <input type="file" name="image" class="form-control" accept="image/*" />
                   </div>
 
-                  <div class="d-flex justify-content-end gap-2 mt-3">
-                    <button type="submit" class="btn btn-primary px-4">
-                      <i class="bi bi-check-circle me-2"></i>Submit
-                    </button>
-                  </div>
-                </form:form>
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                      <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-check-circle me-2"></i>Submit
+                      </button>
+                    </div>
+                  </form:form>
               </div>
             </div>
           </div>

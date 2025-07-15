@@ -1,5 +1,8 @@
 package project.springBoot.model;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -29,7 +32,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "tblDoctorSchedules", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"doctorID", "work_date"})
+        @UniqueConstraint(columnNames = { "doctorID", "work_date" })
 })
 @NoArgsConstructor
 @AllArgsConstructor
@@ -58,7 +61,7 @@ public class DoctorSchedule {
     private String status = "Available";
 
     @Column(name = "max_patients")
-    private Integer maxPatients = 20;
+    private Integer maxPatients;
 
     @Column(name = "clinic_room", length = 50)
     private String clinicRoom;
@@ -78,21 +81,22 @@ public class DoctorSchedule {
     @PrePersist
     @PreUpdate
     private void validateEnumLikeFields() {
-        if (status != null && !status.matches("Available|Busy|Off|Holiday")) {
+        if (status != null && !status.matches("Available|Busy|Processing|Done")) {
             throw new IllegalArgumentException("Invalid status: " + status);
         }
     }
 
     @Override
     public String toString() {
-        return "DoctorSchedule [scheduleID=" + scheduleID + 
-               ", doctorID=" + (doctor != null ? doctor.getDoctorID() : null) + 
-               ", workDate=" + workDate + ", startTime=" + startTime + ", endTime=" + endTime + 
-               ", status=" + status + ", maxPatients=" + maxPatients + ", clinicRoom=" + clinicRoom + 
-               ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
+        return "DoctorSchedule [scheduleID=" + scheduleID +
+                ", doctorID=" + (doctor != null ? doctor.getDoctorID() : null) +
+                ", workDate=" + workDate + ", startTime=" + startTime + ", endTime=" + endTime +
+                ", status=" + status + ", maxPatients=" + maxPatients + ", clinicRoom=" + clinicRoom +
+                ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
 
     public Doctor getDoctor() {
         return doctor;
     }
-} 
+
+}

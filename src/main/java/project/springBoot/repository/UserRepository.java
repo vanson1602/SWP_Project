@@ -41,4 +41,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findFirstByRole(String role);
 
     User findByRoleAndUsername(String role, String username);
+    
 }
