@@ -42,6 +42,8 @@ public interface AppointmentService {
 
         Page<Appointment> getAppointmentsByPatientAndStatus(long patientId, String status, int page, int size);
 
+
+
         List<Appointment> getAppointmentsByDoctorAndDateRange(Long doctorId, LocalDateTime startDate,
                         LocalDateTime endDate);
 

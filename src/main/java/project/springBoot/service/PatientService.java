@@ -1,6 +1,8 @@
 package project.springBoot.service;
 
 import project.springBoot.model.Patient;
+
+import java.util.List;
 import java.util.Optional;
 
 public interface PatientService {
@@ -11,4 +13,8 @@ public interface PatientService {
     Patient save(Patient patient);
 
     void delete(Long id);
+
+    Patient getPatientByEmail(String email);
+
+    List<Patient> getAllPatient();
 }
