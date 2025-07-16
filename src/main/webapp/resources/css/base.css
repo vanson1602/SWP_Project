@@ -1,0 +1,589 @@
+/* Base Styles */
+:root {
+    --primary-color: #6610f2;
+    --secondary-color: #667eea;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --gray-color: #6c757d;
+}
+
+/* Layout */
+.main-content {
+    padding: 2rem 0;
+    background-color: var(--light-color);
+    min-height: calc(100vh - 60px);
+}
+
+.content-container {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Typography */
+.page-title {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.page-title h1 {
+    color: var(--dark-color);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.page-title p {
+    color: var(--gray-color);
+    font-size: 1.1rem;
+}
+
+/* Navigation */
+.navbar-brand:hover {
+    color: var(--primary-color) !important;
+}
+
+.navbar-brand:hover img {
+    filter: brightness(0) saturate(100%) invert(21%) sepia(88%) saturate(3810%) hue-rotate(255deg) brightness(97%) contrast(105%);
+}
+
+.nav-link.dropdown-toggle:hover {
+    color: var(--primary-color) !important;
+}
+
+.dropdown-toggle::after {
+    transition: all 0.3s ease;
+}
+
+.nav-link.dropdown-toggle:hover::after {
+    border-top-color: var(--primary-color);
+}
+
+/* Logo */
+.logo {
+    transition: color 0.3s ease;
+}
+
+.logo:hover {
+    color: var(--primary-color) !important;
+}
+
+.logo:hover .logo-icon {
+    filter: opacity(0.8);
+    color: var(--primary-color) !important;
+}
+
+/* Buttons */
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:disabled {
+    background-color: #a5b4f3;
+    border-color: #a5b4f3;
+    cursor: not-allowed;
+}
+
+/* Progress Steps */
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto 3rem;
+}
+
+.progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e0e0e0;
+    z-index: 1;
+}
+
+.step {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    min-width: 100px;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem;
+    font-weight: bold;
+    color: var(--gray-color);
+}
+
+.step.active .step-number {
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: white;
+}
+
+.step.completed .step-number {
+    background: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+}
+
+.step span {
+    font-size: 0.9rem;
+    color: var(--gray-color);
+}
+
+.step.active span {
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+
+.step.completed span {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+/* Navigation Buttons */
+.nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.nav-buttons .btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+}
+
+/* Utilities */
+.shadow-sm {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+.shadow-md {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .progress-steps {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .progress-steps::before {
+        display: none;
+    }
+    
+    .step {
+        flex: 0 0 calc(33.333% - 1rem);
+    }
+    
+    .nav-buttons {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .nav-buttons .btn {
+        width: 100%;
+    }
+    
+    .content-container {
+        padding: 1rem;
+    }
+}
+
+/* Header styles */
+.navbar {
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.navbar-brand:hover {
+    color: #7749F8;
+}
+
+.nav-link {
+    color: #333;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #7749F8;
+}
+
+.nav-link.active {
+    color: #7749F8;
+    font-weight: 600;
+}
+
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.dropdown-item {
+    padding: 0.7rem 1.2rem;
+    color: #333;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background: rgba(119, 73, 248, 0.1);
+    color: #7749F8;
+}
+
+.dropdown-item.active {
+    background: #7749F8;
+    color: white;
+}
+
+.navbar-toggler {
+    border: none;
+    padding: 0;
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+}
+
+/* Breadcrumb styles */
+.breadcrumb {
+    margin: 1rem 0;
+    padding: 0.5rem 0;
+}
+
+.breadcrumb-item a {
+    color: #6c757d;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: #7749F8;
+    text-decoration: none;
+}
+
+.breadcrumb-item.active {
+    color: #7749F8;
+}
+
+/* Common button styles */
+.btn-primary {
+    background: linear-gradient(135deg, #7749F8 0%, #9A6BFF 100%);
+    border: none;
+    padding: 0.7rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #6438E4 0%, #8A5BEF 100%);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: white;
+    border: 2px solid #7749F8;
+    color: #7749F8;
+    padding: 0.7rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: rgba(119, 73, 248, 0.1);
+    color: #7749F8;
+    transform: translateY(-2px);
+}
+
+/* Common container styles */
+.main-content {
+    min-height: calc(100vh - 200px);
+    padding: 2rem 0;
+    background: #f8f9fa;
+}
+
+.content-container {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Common text styles */
+.section-title {
+    color: #333;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.text-primary {
+    color: #7749F8 !important;
+}
+
+.text-secondary {
+    color: #6c757d !important;
+}
+
+/* Common form styles */
+.form-control:focus {
+    border-color: #7749F8;
+    box-shadow: 0 0 0 0.2rem rgba(119, 73, 248, 0.25);
+}
+
+.form-label {
+    font-weight: 500;
+    color: #333;
+}
+
+/* Common alert styles */
+.alert {
+    border: none;
+    border-radius: 10px;
+}
+
+.alert-primary {
+    background: rgba(119, 73, 248, 0.1);
+    color: #7749F8;
+}
+
+.alert-success {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.alert-danger {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+/* Common badge styles */
+.badge {
+    padding: 0.5em 1em;
+    font-weight: 500;
+    border-radius: 30px;
+}
+
+.badge-primary {
+    background: rgba(119, 73, 248, 0.1);
+    color: #7749F8;
+}
+
+.badge-success {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.badge-danger {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+/* Common card styles */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-title {
+    color: #333;
+    font-weight: 600;
+}
+
+.card-text {
+    color: #6c757d;
+}
+
+/* Common table styles */
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table thead th {
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    color: #333;
+    font-weight: 600;
+}
+
+.table tbody td {
+    vertical-align: middle;
+}
+
+/* Common pagination styles */
+.pagination {
+    gap: 0.5rem;
+}
+
+.page-link {
+    border: none;
+    border-radius: 8px;
+    color: #333;
+    padding: 0.7rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.page-link:hover {
+    background: rgba(119, 73, 248, 0.1);
+    color: #7749F8;
+}
+
+.page-item.active .page-link {
+    background: #7749F8;
+    color: white;
+}
+
+/* Common modal styles */
+.modal-content {
+    border: none;
+    border-radius: 15px;
+}
+
+.modal-header {
+    border-bottom: 2px solid #f8f9fa;
+}
+
+.modal-title {
+    color: #333;
+    font-weight: 600;
+}
+
+.modal-footer {
+    border-top: 2px solid #f8f9fa;
+}
+
+/* Common tooltip styles */
+.tooltip {
+    font-size: 0.875rem;
+}
+
+.tooltip-inner {
+    background: #333;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+}
+
+/* Common spinner styles */
+.spinner-border {
+    color: #7749F8;
+}
+
+/* Common icon styles */
+.bi {
+    vertical-align: -0.125em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0.5rem 0;
+    }
+
+    .content-container {
+        padding: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+    }
+}
+
+.brand-text {
+    color: #333;
+    font-weight: 700;
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.navbar-brand:hover .brand-text {
+    color: #7749F8;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    color: #333;
+    text-decoration: none;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.user-info:hover {
+    color: #7749F8;
+    background: rgba(119, 73, 248, 0.1);
+}
+
+.user-name {
+    font-weight: 500;
+    margin-right: 0.5rem;
+} 

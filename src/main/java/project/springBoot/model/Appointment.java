@@ -1,11 +1,31 @@
 package project.springBoot.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -65,6 +85,78 @@ public class Appointment {
     @Column(nullable = false)
     private LocalDateTime modifiedAt = LocalDateTime.now();
 
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+    }
+
+    public Doctor getDoctor() {
+        return doctor;
+    }
+
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getAdminNotes() {
+        return adminNotes;
+    }
+
+    public void setAdminNotes(String adminNotes) {
+        this.adminNotes = adminNotes;
+    }
+
+    public String getPatientNotes() {
+        return patientNotes;
+    }
+
+    public void setPatientNotes(String patientNotes) {
+        this.patientNotes = patientNotes;
+    }
+
+    public LocalDateTime getAppointmentDate() {
+        return appointmentDate;
+    }
+
+    public void setAppointmentDate(LocalDateTime appointmentDate) {
+        this.appointmentDate = appointmentDate;
+    }
+
+    public String getAppointmentNumber() {
+        return appointmentNumber;
+    }
+
+    public void setAppointmentNumber(String appointmentNumber) {
+        this.appointmentNumber = appointmentNumber;
+    }
+
+    public void setModifiedAt(LocalDateTime modifiedAt) {
+        this.modifiedAt = modifiedAt;
+    }
+
+    public DoctorBookingSlot getBookingSlot() {
+        return bookingSlot;
+    }
+
+    public void setBookingSlot(DoctorBookingSlot bookingSlot) {
+        this.bookingSlot = bookingSlot;
+    }
+
+    public void setAppointmentType(AppointmentType appointmentType) {
+        this.appointmentType = appointmentType;
+    }
+
     @PrePersist
     @PreUpdate
     private void validateEnumLikeFields() {
@@ -80,9 +172,19 @@ public class Appointment {
     public String toString() {
         return "Appointment [appointmentID=" + appointmentID +
                 ", patientID=" + (patient != null ? patient.getPatientID() : null) +
+                ", doctorID=" + (doctor != null ? doctor.getDoctorID() : null) +
                 ", appointmentTypeID=" + (appointmentType != null ? appointmentType.getAppointmentTypeID() : null) +
                 ", appointmentDate=" + appointmentDate + ", appointmentNumber=" + appointmentNumber +
                 ", status=" + status + ", adminID=" + (admin != null ? admin.getUserID() : null) +
                 ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
+
+    public long getAppointmentID() {
+        return appointmentID;
+    }
+
+    public void setAppointmentID(long appointmentID) {
+        this.appointmentID = appointmentID;
+    }
+
 }

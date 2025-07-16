@@ -2,6 +2,7 @@ package project.springBoot.interceptor;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -14,8 +15,6 @@ public class AuthInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
         String requestURI = request.getRequestURI();
-
-        // Cho phép truy cập các tài nguyên tĩnh và URL công khai
         if (isPublicResource(requestURI)) {
             return true;
         }
@@ -27,6 +26,11 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (user == null) {
             response.sendRedirect("/login");
             return false;
+        }
+
+        // Chat URLs are allowed for all authenticated users
+        if (requestURI.startsWith("/chat")) {
+            return true;
         }
 
         // Kiểm tra quyền truy cập

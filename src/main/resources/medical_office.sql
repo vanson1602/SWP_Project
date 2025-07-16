@@ -255,11 +255,11 @@ CREATE TABLE tblServices (
 -- 17. INVOICES TABLE
 CREATE TABLE tblInvoices (
   invoiceID INT IDENTITY(1,1) PRIMARY KEY,
-  examinationID INT NOT NULL,
+  examinationID INT NULL,
+  appointmentID INT NOT NULL,
   patientID INT NOT NULL,
   invoice_number NVARCHAR(20) UNIQUE NOT NULL,
   total_amount DECIMAL(10,2) NOT NULL,
-  discount_amount DECIMAL(10,2) DEFAULT 0,
   tax_amount DECIMAL(10,2) DEFAULT 0,
   final_amount DECIMAL(10,2) NOT NULL,
   payment_status NVARCHAR(20) DEFAULT 'Pending' CHECK (payment_status IN ('Pending', 'Partial', 'Paid', 'Cancelled')),
@@ -271,22 +271,33 @@ CREATE TABLE tblInvoices (
   created_at DATETIME DEFAULT GETDATE(),
   modified_at DATETIME DEFAULT GETDATE(),
   FOREIGN KEY (examinationID) REFERENCES tblExaminations(examinationID),
+  FOREIGN KEY (appointmentID) REFERENCES tblAppointments(appointmentID),
   FOREIGN KEY (patientID) REFERENCES tblPatients(patientID)
 );
+
+-- Add ALTER statement to ensure examinationID allows NULL
+ALTER TABLE tblInvoices ALTER COLUMN examinationID INT NULL;
 
 -- 18. INVOICE DETAILS TABLE
 CREATE TABLE tblInvoiceDetails (
   invoiceDetailID INT IDENTITY(1,1) PRIMARY KEY,
   invoiceID INT NOT NULL,
-  item_type NVARCHAR(20) CHECK (item_type IN ('Service', 'Medication', 'Other')),
-  item_id INT NOT NULL,
+  serviceID INT,
+  medicationID INT,
   description NVARCHAR(255) NOT NULL,
   quantity INT DEFAULT 1,
   unit_price DECIMAL(10,2) NOT NULL,
   total_price DECIMAL(10,2) NOT NULL,
   created_at DATETIME DEFAULT GETDATE(),
   modified_at DATETIME DEFAULT GETDATE(),
-  FOREIGN KEY (invoiceID) REFERENCES tblInvoices(invoiceID)
+  FOREIGN KEY (invoiceID) REFERENCES tblInvoices(invoiceID),
+  FOREIGN KEY (serviceID) REFERENCES tblServices(serviceID),
+  FOREIGN KEY (medicationID) REFERENCES tblMedications(medicationID),
+  CONSTRAINT CHK_OnlyOneItem CHECK (
+    (serviceID IS NULL AND medicationID IS NOT NULL) OR
+    (serviceID IS NOT NULL AND medicationID IS NULL) OR
+    (serviceID IS NULL AND medicationID IS NULL AND description LIKE 'Phí tư vấn%')
+  )
 );
 -- 19. DOCTOR SCHEDULES TABLE
 CREATE TABLE tblDoctorSchedules (

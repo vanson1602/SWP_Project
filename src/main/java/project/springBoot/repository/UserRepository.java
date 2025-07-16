@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+
 import project.springBoot.model.User;
 
 @Repository
@@ -14,7 +16,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findAll();
 
-    User findById(long id);
+    Optional<User> findById(long id);
+
+    User findByUserID(long id);
 
     User findByEmailOrUsername(String email, String username);
 
@@ -29,7 +33,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     void deleteById(Long id);
 
     User findByVerificationToken(String token);
-    
-  
+
+    Optional<User> findUserByEmail(String email);
+
+    List<User> findByRole(String role);
+
+    User findFirstByRole(String role);
+
+    User findByRoleAndUsername(String role, String username);
     
 }

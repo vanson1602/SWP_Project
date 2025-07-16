@@ -1,21 +1,28 @@
 package project.springBoot.controller;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+
+import jakarta.servlet.http.HttpSession;
 import project.springBoot.model.Notification;
+import project.springBoot.model.NotificationDTO;
 import project.springBoot.model.User;
 import project.springBoot.service.NotificationService;
 
-import jakarta.servlet.http.HttpSession;
-import java.util.List;
-import java.util.Map;
-
 @Controller
 @RequestMapping("/notifications")
+//@RequiredArgsConstructor
 public class NotificationController {
     private final NotificationService notificationService;
     private final ObjectMapper objectMapper;
@@ -40,21 +47,18 @@ public class NotificationController {
 
     @GetMapping("/list")
     @ResponseBody
-    public ResponseEntity<List<Notification>> getNotifications(HttpSession session) {
+    public ResponseEntity<List<NotificationDTO>> getNotifications(HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) {
             return ResponseEntity.badRequest().build();
         }
 
         List<Notification> notifications = notificationService.getRecentNotifications(currentUser.getUserID());
+        List<NotificationDTO> notificationDTOs = notifications.stream()
+                .map(NotificationDTO::fromEntity)
+                .collect(Collectors.toList());
 
-        try {
-            System.out.println("Debug - Notifications JSON: " + objectMapper.writeValueAsString(notifications));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return ResponseEntity.ok(notifications);
+        return ResponseEntity.ok(notificationDTOs);
     }
 
     @PostMapping("/{id}/mark-read")

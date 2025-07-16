@@ -1,12 +1,15 @@
 package project.springBoot.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter
@@ -74,6 +77,14 @@ public class User {
     @JoinColumn(name = "modified_by", referencedColumnName = "userID")
     private User modifiedBy;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Conversation> sentConversations;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Conversation> receivedConversations;
+
     @PrePersist
     protected void onCreate() {
         if (role == null) {
@@ -89,7 +100,7 @@ public class User {
             state = true;
         }
 
-        if (!role.matches("admin|patient|doctor")) {
+        if (!role.matches("admin|patient|doctor|receptionist")) {
             throw new IllegalArgumentException("Invalid role: " + role);
         }
         if (gender != null && !gender.matches("Male|Female|Other")) {
@@ -99,7 +110,7 @@ public class User {
 
     @PreUpdate
     protected void onUpdate() {
-        if (!role.matches("admin|patient|doctor")) {
+        if (!role.matches("admin|patient|doctor|receptionist")) {
             throw new IllegalArgumentException("Invalid role: " + role);
         }
         if (gender != null && !gender.matches("Male|Female|Other")) {
@@ -125,5 +136,17 @@ public class User {
 
     public String getFullName() {
         return firstName + " " + lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public long getUserID() {
+        return userID;
     }
 }

@@ -1,20 +1,25 @@
 package project.springBoot.controller.AuthController;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.ui.Model;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import jakarta.servlet.http.HttpSession;
 import project.springBoot.model.User;
 import project.springBoot.service.UserService;
-import org.json.JSONObject;
 
 @Controller
 public class LoginController {
@@ -47,30 +52,29 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String handleLogin(@RequestParam String emailorusername,
+    public String handleLogin(@RequestParam String emailOrUsername,
             @RequestParam String password,
             HttpSession session,
             Model model) {
-        System.out.println("Login controller received request for: " + emailorusername);
-
+        System.out.println("Login controller received request for: " + emailOrUsername);
         try {
             // Kiểm tra user có tồn tại không
-            User user = userService.getUserByEmailOrUsername(emailorusername, emailorusername);
+            User user = userService.getUserByEmailOrUsername(emailOrUsername, emailOrUsername);
             if (user == null) {
                 model.addAttribute("error", "Tài khoản không tồn tại!");
-                model.addAttribute("emailorusername", emailorusername);
+                model.addAttribute("emailorusername", emailOrUsername);
                 return "authentication/form-login";
             }
 
             // Kiểm tra đã xác thực email chưa
             if (!user.getIsVerified()) {
                 model.addAttribute("error", "Tài khoản chưa được xác thực! Vui lòng kiểm tra email để xác thực.");
-                model.addAttribute("emailorusername", emailorusername);
+                model.addAttribute("emailorusername", emailOrUsername);
                 return "authentication/form-login";
             }
 
             // Thử đăng nhập
-            user = userService.login(emailorusername, password);
+            user = userService.login(emailOrUsername, password);
             if (user != null) {
                 session.setAttribute("currentUser", user);
                 String role = user.getRole();
@@ -78,19 +82,31 @@ public class LoginController {
 
                 if ("admin".equalsIgnoreCase(role)) {
                     return "redirect:/admin";
+                } else if ("doctor".equalsIgnoreCase(role)) {
+                    // Get doctor ID and set it in session
+                    Long doctorId = userService.getDoctorIdByUserId(user.getUserID());
+                    if (doctorId != null) {
+                        session.setAttribute("doctorId", doctorId);
+                        System.out.println("Set doctorId in session: " + doctorId);
+                    } else {
+                        System.out.println("Could not find doctorId for user: " + user.getUserID());
+                    }
+                    return "redirect:/doctor/home";
+                } else if ("receptionist".equalsIgnoreCase(role)) {
+                    return "redirect:/receptionist";
                 } else {
                     return "redirect:/";
                 }
             } else {
                 model.addAttribute("error", "Tên đăng nhập hoăc mật khẩu không chính xác!");
-                model.addAttribute("emailorusername", emailorusername);
+                model.addAttribute("emailorusername", emailOrUsername);
                 return "authentication/form-login";
             }
         } catch (Exception e) {
             System.out.println("Login error: " + e.getMessage());
             e.printStackTrace();
             model.addAttribute("error", "Có lỗi xảy ra trong quá trình đăng nhập!");
-            model.addAttribute("emailorusername", emailorusername);
+            model.addAttribute("emailorusername", emailOrUsername);
             return "authentication/form-login";
         }
     }
@@ -156,9 +172,12 @@ public class LoginController {
                     String role = user.getRole();
                     if ("admin".equalsIgnoreCase(role)) {
                         return "redirect:/admin";
-                    } else if ("patient".equalsIgnoreCase(role) || "doctor".equalsIgnoreCase(role)
-                            || "receptionist".equalsIgnoreCase(role)) {
+                    } else if ("receptionist".equalsIgnoreCase(role)) {
+                        return "redirect:/receptionist";
+                    } else if ("patient".equalsIgnoreCase(role)) {
                         return "redirect:/";
+                    } else if ("doctor".equalsIgnoreCase(role)) {
+                        return "redirect:/doctor/home";
                     } else {
                         return "redirect:/";
                     }

@@ -1,8 +1,15 @@
 package project.springBoot.model;
 
-import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -30,10 +37,18 @@ public class ICDCode {
     @Column(nullable = false)
     private LocalDateTime modifiedAt = LocalDateTime.now();
 
+    public String getCodeAndDescription() {
+        return icdCode + " - " + description;
+    }
+
     @Override
     public String toString() {
         return "ICDCode [icdCode=" + icdCode + ", description=" + description +
                 ", category=" + category + ", isActive=" + isActive +
                 ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
+    }
+
+    public String getIcdCode() {
+        return icdCode;
     }
 }

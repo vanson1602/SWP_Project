@@ -6,10 +6,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import jakarta.servlet.http.HttpSession;
+import project.springBoot.model.Doctor;
 import project.springBoot.model.User;
 import project.springBoot.model.Doctor;
 import project.springBoot.repository.DoctorRepository;
@@ -42,9 +43,23 @@ public class PageController {
         return "admin/dashboard";
     }
 
+
     @RequestMapping("/register")
     public String getRegisterPage(User user, Model model) {
         model.addAttribute("user", user);
         return "authentication/form-register";
     }
+    @RequestMapping("/receptionist")
+    public String getReceptionistDashboard(Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null || !currentUser.getRole().equalsIgnoreCase("receptionist")) {
+            return "redirect:/access-denied";
+        }
+        return "receptionist/dashboard";
+    }
+    @RequestMapping("/doctor")
+    public String getDoctorPage(Model model) {
+        return "doctor/doctorpage";
+    }
+
 }

@@ -1,0 +1,581 @@
+/* Appointment Details Page Styles */
+.appointment-details-section {
+    background: linear-gradient(135deg, #f5f7ff 0%, #ffffff 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.details-card {
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid #e1e8ed;
+}
+
+.page-title {
+    color: #2c3e50;
+    font-size: 2.2rem;
+    margin-bottom: 2rem;
+    font-weight: 700;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.page-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: #4a90e2;
+    border-radius: 2px;
+}
+
+.patient-info {
+    background: #f8fafd;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid #4a90e2;
+}
+
+.info-group {
+    margin-bottom: 1.2rem;
+}
+
+.info-label {
+    color: #6c757d;
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+}
+
+.info-value {
+    color: #2c3e50;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 2rem;
+}
+
+.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.status-confirmed {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-completed {
+    background-color: #cce5ff;
+    color: #004085;
+    border: 1px solid #b8daff;
+}
+
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.btn-action {
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-create {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+}
+
+.btn-create:hover {
+    background-color: #357abd;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-history {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+}
+
+.btn-history:hover {
+    background-color: #5a6268;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-prescription {
+    background-color: #28a745;
+    color: white;
+    border: none;
+}
+
+.btn-prescription:hover {
+    background-color: #218838;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-back {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    padding: 0.8rem 2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-back:hover {
+    background-color: #e2e6ea;
+    color: #5a6268;
+    text-decoration: none;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.details-card {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .action-buttons {
+        grid-template-columns: 1fr;
+    }
+    
+    .details-card {
+        padding: 1.5rem;
+    }
+    
+    .page-title {
+        font-size: 1.8rem;
+    }
+}
+
+/* Custom tab styles */
+.nav-tabs {
+    border-bottom: 2px solid #e9ecef;
+    display: flex;
+    gap: 0.5rem; /* Reduce gap between tabs */
+    margin-left: 1rem; /* Add left margin */
+}
+
+.nav-tabs .nav-item {
+    margin-bottom: -2px;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    padding: 0.5rem 1rem;
+    color: #6c757d;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: transparent;
+    color: #0d6efd;
+}
+
+.nav-tabs .nav-link.active {
+    color: #0d6efd;
+    background: transparent;
+    border-bottom: 2px solid #0d6efd;
+}
+
+.nav-tabs .nav-link .badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+/* Tab content styles */
+.tab-content {
+    padding: 1.5rem;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+
+/* Medical record section styles */
+.medical-record-details {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.vital-signs, .symptoms-diagnosis, .treatment-plan {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Loading spinner */
+.loading-spinner {
+    display: none;
+    text-align: center;
+    padding: 2rem;
+}
+
+.loading-spinner .spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+.loading-spinner p {
+    margin-top: 1rem;
+    color: #6c757d;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    color: #495057;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state .btn {
+    margin-top: 1rem;
+}
+
+/* Notes tab */
+.notes-content {
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+}
+
+.notes-content textarea {
+    resize: vertical;
+    min-height: 120px;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    transition: border-color 0.15s ease-in-out;
+}
+
+.notes-content textarea:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.notes-content .form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.75rem;
+}
+
+.notes-content .form-label i {
+    font-size: 1.1rem;
+}
+
+.patient-notes {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    color: #495057;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Toast notifications */
+.toast-container {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 1050;
+}
+
+.toast {
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.toast-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 0.75rem 1rem;
+}
+
+.toast-body {
+    padding: 1rem;
+}
+
+/* Notification items */
+.notification-item {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease-in-out;
+}
+
+.notification-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+}
+
+.notification-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e9ecef;
+    border-radius: 50%;
+}
+
+.notification-content h6 {
+    font-weight: 600;
+    color: #212529;
+}
+
+.notification-content p {
+    color: #495057;
+    margin-bottom: 0.25rem;
+}
+
+.notification-content small {
+    font-size: 0.85rem;
+}
+
+.notification-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Prescription content */
+.prescription-content {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+}
+
+.prescription-list {
+    margin-top: 1.5rem;
+}
+
+.table-responsive {
+    border-radius: 0.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    color: #495057;
+    font-weight: 600;
+    padding: 1rem;
+    white-space: nowrap;
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    color: #212529;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.table tbody tr td:first-child {
+    font-weight: 500;
+    color: #0d6efd;
+}
+
+/* Tab transitions */
+.tab-pane {
+    transition: opacity 0.15s linear;
+}
+
+.tab-pane:not(.show) {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.tab-pane.show {
+    opacity: 1;
+}
+
+/* Examination tab styles */
+.examination-content {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+}
+
+.examination-details {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.vital-signs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.vital-sign-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.vital-sign-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.vital-sign-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* Updated button styles */
+.btn-examination {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+}
+
+.btn-examination:hover {
+    background-color: #357abd;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Tab indicator styles */
+.tab-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tab-indicator .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-dot.completed {
+    background-color: #28a745;
+}
+
+.status-dot.pending {
+    background-color: #ffc107;
+}
+
+.status-dot.in-progress {
+    background-color: #17a2b8;
+}
+
+/* Action button group styles */
+.action-button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.action-button-group .btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+/* Print styles */
+@media print {
+    .action-buttons,
+    .btn-back,
+    .nav-tabs {
+        display: none !important;
+    }
+
+    .tab-content {
+        border: none !important;
+        padding: 0 !important;
+    }
+
+    .details-card {
+        box-shadow: none !important;
+        border: none !important;
+    }
+} 
