@@ -54,10 +54,6 @@ public class ReceptionistBookingController {
     private final EmailService emailService;
     private final PayOS payOS;
 
-    @GetMapping("/receptionist")
-    public String getReceptionistPage() {
-        return "receptionist/receptionist-page";
-    }
 
     @GetMapping("/booking-receptionist/step-1")
     public String getSpecializationSelection(Model model, @RequestParam(required = false) String email,

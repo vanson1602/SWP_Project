@@ -1,70 +1,105 @@
 package project.springBoot.service.impl;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import project.springBoot.model.Appointment;
 import project.springBoot.model.Invoice;
-import project.springBoot.model.InvoiceDetail;
 import project.springBoot.repository.InvoiceRepository;
 import project.springBoot.service.InvoiceService;
-import project.springBoot.utils.InvoiceUtils;
 
+@Slf4j
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class InvoiceServiceImpl implements InvoiceService {
-    private final InvoiceRepository invoiceRepository;
+
+    @Autowired
+    private InvoiceRepository invoiceRepository;
 
     @Override
-    public Invoice createAppointmentInvoice(Appointment appointment, String paymentMethod) {
-        if (appointment == null) {
-            throw new IllegalArgumentException("Appointment cannot be null");
+    public List<Invoice> getInvoicesInDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        try {
+            log.info("Fetching invoices between {} and {}", startDate, endDate);
+            
+            // Validate input dates
+            if (startDate == null || endDate == null) {
+                log.error("Start date or end date is null");
+                return List.of();
+            }
+            
+            if (startDate.isAfter(endDate)) {
+                log.error("Start date {} is after end date {}", startDate, endDate);
+                return List.of();
+            }
+
+            // Fetch invoices
+            List<Invoice> invoices = invoiceRepository.findByInvoiceDateBetween(startDate, endDate);
+            
+            // Log results
+            if (invoices.isEmpty()) {
+                log.info("No invoices found for the date range");
+            } else {
+                log.info("Found {} invoices", invoices.size());
+                invoices.forEach(invoice -> {
+                    log.debug("Invoice: ID={}, Number={}, Date={}, Amount={}, Status={}, Patient={}",
+                        invoice.getInvoiceID(),
+                        invoice.getInvoiceNumber(),
+                        invoice.getInvoiceDate(),
+                        invoice.getFinalAmount(),
+                        invoice.getPaymentStatus(),
+                        invoice.getPatient() != null && invoice.getPatient().getUser() != null 
+                            ? invoice.getPatient().getUser().getFullName() 
+                            : "N/A"
+                    );
+                });
+            }
+            
+            return invoices;
+        } catch (Exception e) {
+            log.error("Error fetching invoices: ", e);
+            return List.of();
         }
-
-        Invoice invoice = new Invoice();
-
-        invoice.setAppointment(appointment);
-        invoice.setPatient(appointment.getPatient());
-        invoice.setInvoiceNumber(InvoiceUtils.generateInvoiceNumber());
-        invoice.setPaymentMethod(paymentMethod);
-        invoice.setPaymentStatus("Paid");
-        invoice.setInvoiceDate(LocalDateTime.now());
-        invoice.setPaidDate(LocalDateTime.now());
-
-        BigDecimal consultationFee = appointment.getBookingSlot().getSchedule().getDoctor().getConsultationFee();
-        invoice.setTotalAmount(consultationFee);
-        invoice.setTaxAmount(BigDecimal.ZERO);
-        invoice.setFinalAmount(consultationFee);
-        InvoiceDetail detail = new InvoiceDetail();
-        detail.setInvoice(invoice);
-        detail.setDescription("Phí tư vấn - " + appointment.getAppointmentType().getTypeName());
-        detail.setQuantity(1);
-        detail.setUnitPrice(consultationFee);
-        detail.setTotalPrice(consultationFee);
-        detail.setService(null);
-        detail.setMedication(null);
-
-        invoice.setInvoiceDetails(new ArrayList<>());
-        invoice.getInvoiceDetails().add(detail);
-
-        invoice.setExamination(null);
-
-        return invoiceRepository.save(invoice);
     }
 
     @Override
-    public Invoice getInvoiceById(Long invoiceId) {
-        return invoiceRepository.findById(invoiceId).orElse(null);
+    public Invoice getInvoiceById(Long id) {
+        try {
+            log.info("Fetching invoice with ID: {}", id);
+            if (id == null) {
+                log.error("Invoice ID is null");
+                return null;
+            }
+
+            Optional<Invoice> invoice = invoiceRepository.findById(id);
+            if (invoice.isEmpty()) {
+                log.warn("No invoice found with ID: {}", id);
+                return null;
+            }
+
+            log.info("Found invoice: {}", invoice.get().getInvoiceNumber());
+            return invoice.get();
+        } catch (Exception e) {
+            log.error("Error fetching invoice by ID: ", e);
+            return null;
+        }
+    }
+
+    @Override
+    public Invoice createAppointmentInvoice(Appointment appointment, String paymentMethod) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'createAppointmentInvoice'");
     }
 
     @Override
     public Invoice getInvoiceByAppointment(Long appointmentId) {
-        return invoiceRepository.findByAppointmentId(appointmentId);
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getInvoiceByAppointment'");
     }
-}
+    
+} 

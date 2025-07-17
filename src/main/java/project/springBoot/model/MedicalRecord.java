@@ -97,4 +97,12 @@ public class MedicalRecord {
                 ", smokingStatus=" + smokingStatus + ", alcoholUse=" + alcoholUse +
                 ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
+
+    public long getMedicalRecordID() {
+        return medicalRecordID;
+    }
+    
+    public void setMedicalRecordID(long medicalRecordID) {
+        this.medicalRecordID = medicalRecordID;
+    }
 }

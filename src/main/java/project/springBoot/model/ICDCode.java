@@ -47,4 +47,8 @@ public class ICDCode {
                 ", category=" + category + ", isActive=" + isActive +
                 ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
     }
+
+    public String getIcdCode() {
+        return icdCode;
+    }
 }

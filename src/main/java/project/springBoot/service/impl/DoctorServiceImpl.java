@@ -1,11 +1,17 @@
 package project.springBoot.service.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.Hibernate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +32,7 @@ import java.util.*;
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -36,6 +43,7 @@ public class DoctorServiceImpl implements DoctorService {
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
     private static final Logger logger = LoggerFactory.getLogger(DoctorServiceImpl.class);
+ 
 
     @Override
     public List<Doctor> getDoctorsBySpecialization(Long specializationId) {
@@ -60,6 +68,8 @@ public class DoctorServiceImpl implements DoctorService {
             slot.setModifiedAt(LocalDateTime.now());
             bookingSlotRepository.save(slot);
         }
+
+      
 
         // Only return slots that are in the future
         return bookingSlotRepository.findAvailableSlotsByDoctorAndTimeRange(doctorId,
@@ -87,23 +97,6 @@ public class DoctorServiceImpl implements DoctorService {
         Hibernate.initialize(doctor.getSpecializations());
         return doctor;
     }
-
-    @Override
-    public Optional<Doctor> findByUserId(long userId) {
-        return doctorRepository.findByUserId(userId);
-    }
-
-    @Override
-    public Doctor getDoctorByUserId(long userId) {
-        return doctorRepository.findByUserId(userId).orElse(null);
-    }
-
-
-    @Override
-    public Doctor findById(Long id) {
-        return doctorRepository.findById(id).orElse(null);
-    }
-
 
     @Override
     public Doctor save(Doctor doctor) {
@@ -150,6 +143,19 @@ public class DoctorServiceImpl implements DoctorService {
         Set<String> specializations = parseSpecializations(specializationNames);
         List<Doctor> doctors = doctorRepository.findDoctorsAdvanced(keyword, specializations, experienceYears,
                 consultationFee);
+
+        // Filter doctors who have all the requested specializations
+        if (specializations != null && !specializations.isEmpty()) {
+            doctors = doctors.stream()
+                    .filter(doctor -> {
+                        Set<String> doctorSpecializations = doctor.getSpecializations().stream()
+                                .map(spec -> spec.getSpecializationName())
+                                .collect(Collectors.toSet());
+                        return doctorSpecializations.containsAll(specializations);
+                    })
+                    .collect(Collectors.toList());
+        }
+
         logger.info("Found {} doctors", doctors.size());
         return doctors;
     }
@@ -166,7 +172,37 @@ public class DoctorServiceImpl implements DoctorService {
         Set<String> specializations = parseSpecializations(specializationNames);
         List<Doctor> doctors = doctorRepository.findDoctorsAdvanced(keyword, specializations, experienceYears,
                 consultationFee);
+
+        // Filter doctors who have all the requested specializations
+        if (specializations != null && !specializations.isEmpty()) {
+            doctors = doctors.stream()
+                    .filter(doctor -> {
+                        Set<String> doctorSpecializations = doctor.getSpecializations().stream()
+                                .map(spec -> spec.getSpecializationName())
+                                .collect(Collectors.toSet());
+                        return doctorSpecializations.containsAll(specializations);
+                    })
+                    .collect(Collectors.toList());
+        }
+
         logger.info("Found {} doctors", doctors.size());
         return doctors;
+    }
+
+    @Override
+    public Optional<Doctor> findByUserId(long userId) {
+        return doctorRepository.findByUserId(userId);
+    }
+
+    @Override
+    public Doctor getDoctorByUserId(long userId) {
+        return doctorRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+    }
+
+    @Override
+    public Doctor findById(Long id) {
+        return doctorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
     }
 }

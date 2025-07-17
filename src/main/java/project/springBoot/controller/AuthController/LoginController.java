@@ -65,6 +65,7 @@ public class LoginController {
                 model.addAttribute("emailorusername", emailOrUsername);
                 return "authentication/form-login";
             }
+
             // Kiểm tra đã xác thực email chưa
             if (!user.getIsVerified()) {
                 model.addAttribute("error", "Tài khoản chưa được xác thực! Vui lòng kiểm tra email để xác thực.");
@@ -91,6 +92,8 @@ public class LoginController {
                         System.out.println("Could not find doctorId for user: " + user.getUserID());
                     }
                     return "redirect:/doctor/home";
+                } else if ("receptionist".equalsIgnoreCase(role)) {
+                    return "redirect:/receptionist";
                 } else {
                     return "redirect:/";
                 }
@@ -169,8 +172,9 @@ public class LoginController {
                     String role = user.getRole();
                     if ("admin".equalsIgnoreCase(role)) {
                         return "redirect:/admin";
-                    } else if ("patient".equalsIgnoreCase(role)
-                            || "receptionist".equalsIgnoreCase(role)) {
+                    } else if ("receptionist".equalsIgnoreCase(role)) {
+                        return "redirect:/receptionist";
+                    } else if ("patient".equalsIgnoreCase(role)) {
                         return "redirect:/";
                     } else if ("doctor".equalsIgnoreCase(role)) {
                         return "redirect:/doctor/home";

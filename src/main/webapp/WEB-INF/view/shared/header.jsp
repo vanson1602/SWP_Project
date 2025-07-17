@@ -47,39 +47,56 @@
                         <c:choose>
                             <c:when test="${not empty sessionScope.currentUser}">
                                 <!-- Notification Dropdown -->
+                                <!-- Notification Dropdown -->
                                 <div class="notification-wrapper">
                                     <button type="button" class="notification-btn" id="notificationBtn">
-                                        <i class="bi bi-bell"></i>
-                                        <span class="notification-badge">0</span>
-                                    </button>
-                                    <div class="notification-dropdown" id="notificationDropdown">
-                                        <div class="notification-header">
-                                            <h3>Thông báo</h3>
+                                        <button type="button" class="notification-btn" id="notificationBtn">
+                                            <i class="bi bi-bell"></i>
+                                            <span class="notification-badge">0</span>
+                                        </button>
+                                        <div class="notification-dropdown" id="notificationDropdown">
+                                            <div class="notification-header">
+                                                <h3>Thông báo</h3>
+                                            </div>
+                                            <div class="notification-list">
+                                                <!-- Notifications will be loaded here -->
+                                            </div>
+                                            <div class="notification-dropdown" id="notificationDropdown">
+                                                <div class="notification-header">
+                                                    <h3>Thông báo</h3>
+                                                </div>
+                                                <div class="notification-list">
+                                                    <!-- Notifications will be loaded here -->
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="notification-list">
-                                            <!-- Notifications will be loaded here -->
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <!-- User Dropdown -->
-                                <div class="dropdown">
-                                    <button class="profile-btn" id="profileDropdownBtn">
-                                        <i class="bi bi-person-circle"></i>
-                                        ${sessionScope.currentUser.firstName} ${sessionScope.currentUser.lastName}
-                                    </button>
-                                    <ul class="dropdown-menu" id="profileDropdown">
-                                        <li><a class="dropdown-item" href="/profile"><i class="bi bi-person"></i> Trang
-                                                cá nhân</a></li>
-                                        <li><a class="dropdown-item" href="/settings"><i class="bi bi-gear"></i> Cài
-                                                đặt</a></li>
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                        <li><a class="dropdown-item" href="/logout"><i
-                                                    class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
-                                    </ul>
-                                </div>
+                                        <!-- Chat Button -->
+                                        <a href="/chat" class="chat-btn" title="Tin nhắn">
+                                            <i class="bi bi-chat-dots"></i>
+                                        </a>
+
+                                        <!-- User Dropdown -->
+                                        <div class="dropdown">
+                                            <button class="profile-btn" id="profileDropdownBtn">
+                                                <i class="bi bi-person-circle"></i>
+                                                ${sessionScope.currentUser.firstName}
+                                                ${sessionScope.currentUser.lastName}
+                                            </button>
+                                            <ul class="dropdown-menu" id="profileDropdown">
+                                                <li><a class="dropdown-item" href="/profile"><i
+                                                            class="bi bi-person"></i> Trang
+                                                        cá nhân</a></li>
+                                                <li><a class="dropdown-item" href="/settings"><i class="bi bi-gear"></i>
+                                                        Cài
+                                                        đặt</a></li>
+                                                <li>
+                                                    <hr class="dropdown-divider">
+                                                </li>
+                                                <li><a class="dropdown-item" href="/logout"><i
+                                                            class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
+                                            </ul>
+                                        </div>
                             </c:when>
                             <c:otherwise>
                                 <a href="/login" class="profile-btn">
@@ -117,6 +134,11 @@
                 color: #333;
                 font-weight: bold;
                 font-size: 1.5rem;
+                transition: color 0.3s;
+            }
+
+            .logo:hover {
+                color: #007bff;
                 transition: color 0.3s;
             }
 
@@ -185,6 +207,8 @@
                 border-radius: 0.5rem;
                 transition: all 0.3s ease;
                 text-decoration: none;
+                transition: all 0.3s ease;
+                text-decoration: none;
             }
 
             .profile-btn:hover {
@@ -194,6 +218,29 @@
             .profile-btn i {
                 font-size: 1.2rem;
                 transition: color 0.3s ease;
+            }
+
+            /* Chat Button Styles */
+            .chat-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: none;
+                border: none;
+                color: #333;
+                font-size: 1.2rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                padding: 0;
+            }
+
+            .chat-btn:hover {
+                color: #007bff;
+                background-color: rgba(0, 123, 255, 0.1);
             }
 
             .dropdown {
@@ -225,6 +272,7 @@
                 color: #333;
                 text-decoration: none;
                 transition: all 0.3s ease;
+                transition: all 0.3s ease;
             }
 
             .dropdown-item:hover {
@@ -234,9 +282,17 @@
 
             .dropdown-item i {
                 font-size: 1.1rem;
+                color: #007bff;
+            }
+
+            .dropdown-item i {
+                font-size: 1.1rem;
             }
 
             .dropdown-divider {
+                height: 1px;
+                background-color: #e9ecef;
+                border: none;
                 height: 1px;
                 background-color: #e9ecef;
                 border: none;
@@ -256,6 +312,7 @@
                     right: 0;
                     background-color: #fff;
                     padding: 1rem;
+                    padding: 1rem;
                     flex-direction: column;
                     gap: 1rem;
                     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -267,13 +324,11 @@
             }
         </style>
 
-        <!-- Header JavaScript -->
+
         <script>
             // Set moment.js locale to Vietnamese
             moment.locale('vi');
-        </script>
 
-        <script>
             // Mobile menu toggle
             document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
                 document.getElementById('navLinks').classList.toggle('show');
@@ -289,4 +344,5 @@
             document.addEventListener('click', () => {
                 document.getElementById('profileDropdown')?.classList.remove('show');
             });
+        </script>
         </script>

@@ -45,19 +45,12 @@ public class UserService {
     }
 
     public User handleUpdateUser(User user) {
-        User existingUser = userRepository.findById(user.getUserID());
+        User existingUser = userRepository.findByUserID(user.getUserID());
         if (existingUser != null) {
-            // Nếu password không được gửi lên từ form (null hoặc rỗng) thì giữ nguyên
-            if (user.getPassword() == null || user.getPassword().isEmpty()) {
-                user.setPassword(existingUser.getPassword());
-            } else {
-                // Nếu người dùng có thay đổi password (không trùng hoặc chưa mã hoá), thì mã
-                // hoá lại
-                if (!isPasswordEncoded(user.getPassword()) ||
-                        !BCrypt.checkpw(user.getPassword(), existingUser.getPassword())) {
-                    String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-                    user.setPassword(hashed);
-                }
+            // Only hash the password if it's different from the existing one
+            if (!user.getPassword().equals(existingUser.getPassword()) && !isPasswordEncoded(user.getPassword())) {
+                String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+                user.setPassword(hashed);
             }
         }
         return this.userRepository.save(user);

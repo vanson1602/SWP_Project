@@ -101,6 +101,18 @@
     border: 1px solid #bbdefb;
 }
 
+.status-completed {
+    background-color: #cce5ff;
+    color: #004085;
+    border: 1px solid #b8daff;
+}
+
+.status-cancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
 .action-button {
     padding: 0.5rem 1.2rem;
     border-radius: 8px;

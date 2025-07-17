@@ -13,7 +13,7 @@ import project.springBoot.model.Medication;
 import project.springBoot.service.MedicationService;
 
 @RestController
-@RequestMapping("/api/medications")
+@RequestMapping("/medications")
 public class MedicationController {
 
     @Autowired

@@ -4,8 +4,10 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,21 +29,12 @@ import project.springBoot.model.User;
 import project.springBoot.service.AppointmentService;
 import project.springBoot.service.DoctorService;
 import project.springBoot.service.EmailService;
-import project.springBoot.service.InvoiceService;
 import project.springBoot.service.PatientService;
 import project.springBoot.service.SpecializationService;
 import vn.payos.PayOS;
 import vn.payos.type.CheckoutResponseData;
 import vn.payos.type.ItemData;
 import vn.payos.type.PaymentData;
-import org.springframework.data.domain.Page;
-
-import java.security.Principal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -53,7 +46,6 @@ public class AppointmentController {
     private final PayOS payOS;
     private final EmailService emailService;
     private final PatientService patientService;
-    private final InvoiceService invoiceService;
 
     @GetMapping("")
     public String showAppointmentForm(Model model, Principal principal, HttpSession session) {
@@ -133,6 +125,7 @@ public class AppointmentController {
             Model model) {
         DoctorBookingSlot slot = doctorService.getSlotById(slotId);
         System.out.println("Slot: " + slot);
+        System.out.println("Slot: " + slot);
         User user = (User) session.getAttribute("currentUser");
         Patient patient = doctorService.getPatientByUsername(user.getUsername());
         Specialization specialization = (Specialization) session.getAttribute("selectedSpecialization");
@@ -199,6 +192,7 @@ public class AppointmentController {
                     return "redirect:/appointments/my-appointments?error=This appointment cannot be paid";
                 }
 
+                // Kiểm tra xem người dùng hiện tại có phải là chủ của appointment không
                 User currentUser = (User) session.getAttribute("currentUser");
                 if (currentUser.getUserID() != appointment.getPatient().getUser().getUserID()) {
                     return "redirect:/appointments/my-appointments?error=Unauthorized access";
@@ -209,6 +203,7 @@ public class AppointmentController {
                 return "redirect:/appointments/my-appointments?error=" + e.getMessage();
             }
         } else {
+            // Nếu không có appointmentId, lấy từ session như cũ
             appointment = (Appointment) session.getAttribute("pendingAppointment");
             if (appointment == null) {
                 return "redirect:/appointments/booking";
@@ -277,11 +272,6 @@ public class AppointmentController {
             if (appointment != null) {
                 appointmentService.updatePaymentStatus(appointment.getAppointmentID(), "Confirmed");
                 appointment = appointmentService.getAppointmentByIdWithDetails(appointment.getAppointmentID());
-
-                // Create invoice for the appointment
-                invoiceService.createAppointmentInvoice(appointment, "PayOS");
-
-                // Send confirmation emails
                 emailService.sendAppointmentConfirmationEmail(
                         appointment.getPatient().getUser().getEmail(),
                         appointment);

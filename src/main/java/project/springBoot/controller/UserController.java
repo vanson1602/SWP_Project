@@ -79,6 +79,7 @@ public class UserController {
     public String getUserPage(Model model) {
         List<User> users = this.userService.getAllUser();
         model.addAttribute("users", users);
+        System.out.printf("user {}", users);
         return "user/list-user";
     }
 
@@ -141,10 +142,5 @@ public class UserController {
         }
     }
 
-    @GetMapping("/admin/doctor/create")
-    public String getCreateDoctorPage(Model model) {
-        model.addAttribute("newDoctor", new Doctor());
-        return "doctor/create-doctor";
-    }
-
+    
 }

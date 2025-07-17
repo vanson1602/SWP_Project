@@ -45,8 +45,7 @@ public class PatientServiceImpl implements PatientService {
         User user = userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
 
-        return patientRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Patient not found with email: " + email));
+        return patientRepository.findByUser(user);
     }
 
     @Override

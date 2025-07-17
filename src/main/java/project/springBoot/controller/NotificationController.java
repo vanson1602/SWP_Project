@@ -1,26 +1,37 @@
 package project.springBoot.controller;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+
+import jakarta.servlet.http.HttpSession;
 import project.springBoot.model.Notification;
 import project.springBoot.model.NotificationDTO;
 import project.springBoot.model.User;
 import project.springBoot.service.NotificationService;
 
-import jakarta.servlet.http.HttpSession;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 @Controller
 @RequestMapping("/notifications")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class NotificationController {
     private final NotificationService notificationService;
+    private final ObjectMapper objectMapper;
+
+    public NotificationController(NotificationService notificationService, ObjectMapper objectMapper) {
+        this.notificationService = notificationService;
+        this.objectMapper = objectMapper;
+        this.objectMapper.registerModule(new JavaTimeModule());
+    }
 
     @GetMapping("/unread-count")
     @ResponseBody

@@ -22,6 +22,7 @@
                             <link rel="stylesheet"
                                 href="${pageContext.request.contextPath}/resources/css/patient-info.css">
                             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common.css">
                         </head>
 
                         <body>

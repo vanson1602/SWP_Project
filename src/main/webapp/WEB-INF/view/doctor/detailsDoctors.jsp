@@ -184,7 +184,12 @@
                                         <p class="contact-info mb-4"><i
                                                 class="bi bi-geo-alt text-primary"></i>${doctor.user.address}</p>
                                     </c:if>
-                                    <a href="/appointments/time?doctorId=${doctor.doctorID}" class="booking-btn">
+                                    <a href="/appointments/time?doctorId=${doctor.doctorID}"
+                                        class="booking-btn btn btn-outline-primary me-2">
+                                        <i class="bi bi-clock me-2"></i>Chọn thời gian
+                                    </a>
+                                    <a href="/search/doctors/${doctor.doctorID}/booking"
+                                        class="booking-btn btn btn-primary">
                                         <i class="bi bi-calendar-check me-2"></i>Đặt lịch khám
                                     </a>
                                 </div>

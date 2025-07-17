@@ -18,7 +18,7 @@ public interface DoctorBookingSlotRepository extends JpaRepository<DoctorBooking
                         String status,
                         LocalDateTime startTime);
 
-        @Query("SELECT bs FROM DoctorBookingSlot bs " +
+                        @Query("SELECT bs FROM DoctorBookingSlot bs " +
                         "WHERE bs.schedule.doctor.doctorID = :doctorId " +
                         "AND bs.startTime BETWEEN :startTime AND :endTime " +
                         "AND bs.status = 'Available' " +
