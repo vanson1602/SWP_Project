@@ -17,9 +17,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import project.springBoot.model.User;
 import project.springBoot.service.UserService;
+import project.springBoot.utils.JwtTokenUtil;
 
 @Controller
 public class LoginController {
@@ -31,16 +35,53 @@ public class LoginController {
     @Value("${google.client.secret}")
     private String clientSecret;
     private final UserService userService;
+    private final JwtTokenUtil jwtTokenUtil;
 
-    public LoginController(UserService userService) {
+    public LoginController(UserService userService, JwtTokenUtil jwtTokenUtil) {
         this.userService = userService;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     @GetMapping("/login")
-    public String loginPage(Model model, @RequestParam(required = false) String error) {
+    public String loginPage(Model model, @RequestParam(required = false) String error, HttpServletRequest request) {
         if (error != null) {
             model.addAttribute("error", "Email/tên đăng nhập hoặc mật khẩu không chính xác!");
         }
+
+        // Check remember-me cookie
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("remember-me")) {
+                    try {
+                        String email = jwtTokenUtil.extractEmail(cookie.getValue());
+                        User user = userService.getUserByEmail(email);
+                        if (user != null) {
+                            request.getSession().setAttribute("currentUser", user);
+                            String role = user.getRole();
+                            if ("admin".equalsIgnoreCase(role)) {
+                                return "redirect:/admin";
+                            } else if ("doctor".equalsIgnoreCase(role)) {
+                                Long doctorId = userService.getDoctorIdByUserId(user.getUserID());
+                                if (doctorId != null) {
+                                    request.getSession().setAttribute("doctorId", doctorId);
+                                }
+                                return "redirect:/doctor/home";
+                            } else if ("receptionist".equalsIgnoreCase(role)) {
+                                return "redirect:/receptionist";
+                            } else {
+                                return "redirect:/";
+                            }
+                        }
+                    } catch (Exception e) {
+                        // Token invalid or expired, delete cookie
+                        cookie.setMaxAge(0);
+                        cookie.setPath("/");
+                    }
+                }
+            }
+        }
+
         String googleLoginUrl = "https://accounts.google.com/o/oauth2/v2/auth?" +
                 "client_id=" + clientId +
                 "&redirect_uri=" + redirectUri +
@@ -54,7 +95,9 @@ public class LoginController {
     @PostMapping("/login")
     public String handleLogin(@RequestParam String emailOrUsername,
             @RequestParam String password,
+            @RequestParam(required = false) boolean remember,
             HttpSession session,
+            HttpServletResponse response,
             Model model) {
         System.out.println("Login controller received request for: " + emailOrUsername);
         try {
@@ -80,6 +123,15 @@ public class LoginController {
                 String role = user.getRole();
                 System.out.println("Login successful. User role: " + role);
 
+                // Handle remember me
+                if (remember) {
+                    String token = JwtTokenUtil.generateToken(user.getEmail());
+                    Cookie cookie = new Cookie("remember-me", token);
+                    cookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
+                    cookie.setPath("/");
+                    response.addCookie(cookie);
+                }
+
                 if ("admin".equalsIgnoreCase(role)) {
                     return "redirect:/admin";
                 } else if ("doctor".equalsIgnoreCase(role)) {
@@ -98,7 +150,7 @@ public class LoginController {
                     return "redirect:/";
                 }
             } else {
-                model.addAttribute("error", "Tên đăng nhập hoăc mật khẩu không chính xác!");
+                model.addAttribute("error", "Tên đăng nhập hoăc mật khẩu không chính xác!");
                 model.addAttribute("emailorusername", emailOrUsername);
                 return "authentication/form-login";
             }
@@ -112,8 +164,15 @@ public class LoginController {
     }
 
     @GetMapping("/logout")
-    public String logout(HttpSession session) {
+    public String logout(HttpSession session, HttpServletResponse response) {
         session.invalidate();
+
+        // Delete remember-me cookie
+        Cookie cookie = new Cookie("remember-me", "");
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
         return "redirect:/";
     }
 
