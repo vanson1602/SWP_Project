@@ -12,7 +12,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
- 
+
 @Entity
 @Getter
 @Setter
@@ -121,10 +121,12 @@ public class User {
         }
 
         if (!role.matches("admin|patient|doctor|receptionist")) {
-            throw new IllegalArgumentException("Invalid role: " + role);
-        }
-        if (gender != null && !gender.matches("Male|Female|Other")) {
-            throw new IllegalArgumentException("Invalid gender: " + gender);
+            if (!role.matches("admin|patient|doctor|receptionist")) {
+                throw new IllegalArgumentException("Invalid role: " + role);
+            }
+            if (gender != null && !gender.matches("Male|Female|Other")) {
+                throw new IllegalArgumentException("Invalid gender: " + gender);
+            }
         }
     }
 
@@ -190,4 +192,5 @@ public class User {
     public long getUserID() {
         return userID;
     }
+
 }

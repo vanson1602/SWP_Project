@@ -3,6 +3,7 @@ package project.springBoot.service.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,16 +19,19 @@ import project.springBoot.model.AppointmentType;
 import project.springBoot.model.Doctor;
 import project.springBoot.model.DoctorBookingSlot;
 import project.springBoot.model.Invoice;
+import project.springBoot.model.Invoice;
 import project.springBoot.model.Notification;
 import project.springBoot.model.Patient;
 import project.springBoot.repository.AppointmentRepository;
 import project.springBoot.repository.AppointmentTypeRepository;
 import project.springBoot.repository.DoctorBookingSlotRepository;
 import project.springBoot.repository.InvoiceRepository;
+import project.springBoot.repository.InvoiceRepository;
 import project.springBoot.repository.NotificationRepository;
 import project.springBoot.repository.PatientRepository;
 import project.springBoot.service.AppointmentService;
 import project.springBoot.service.EmailService;
+import project.springBoot.utils.AppointmentUtils;
 import project.springBoot.utils.AppointmentUtils;
 import project.springBoot.utils.AppointmentUtils;
 
@@ -171,6 +175,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         // Lưu appointment sau
         return appointmentRepository.save(appointment);
+
     }
 
     @Override
@@ -178,6 +183,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
+        if ("Cancelled".equals(appointment.getStatus())) {
+            throw new RuntimeException("Appointment is already cancelled");
+        }
         if ("Cancelled".equals(appointment.getStatus())) {
             throw new RuntimeException("Appointment is already cancelled");
         }

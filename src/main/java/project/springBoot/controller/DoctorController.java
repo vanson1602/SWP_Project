@@ -3,9 +3,12 @@ package project.springBoot.controller;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,29 +19,37 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 import project.springBoot.model.Appointment;
 import project.springBoot.model.Doctor;
 import project.springBoot.model.DoctorBookingSlot;
+import project.springBoot.model.DoctorSchedule;
 import project.springBoot.model.DoctorSchedule;
 import project.springBoot.model.Examination;
 import project.springBoot.model.MedicalRecord;
 import project.springBoot.model.Medication;
 import project.springBoot.model.Prescription;
 import project.springBoot.model.Specialization;
+import project.springBoot.model.Specialization;
 import project.springBoot.model.User;
 import project.springBoot.service.AppointmentService;
 import project.springBoot.service.DoctorBookingSlotService;
+import project.springBoot.service.DoctorScheduleService;
 import project.springBoot.service.DoctorScheduleService;
 import project.springBoot.service.DoctorScheduleService;
 import project.springBoot.service.DoctorService;
@@ -47,6 +58,8 @@ import project.springBoot.service.ICDCodeService;
 import project.springBoot.service.MedicalRecordService;
 import project.springBoot.service.MedicationService;
 import project.springBoot.service.PrescriptionService;
+import project.springBoot.service.SpecializationService;
+import project.springBoot.service.UploadFileService;
 import project.springBoot.service.SpecializationService;
 import project.springBoot.service.UploadFileService;
 import project.springBoot.service.UserService;
@@ -81,6 +94,8 @@ public class DoctorController {
     private UploadFileService uploadFileService;
     @Autowired
     private SpecializationService specializationService;
+    
+    
 
     @GetMapping("/doctor/home")
     public String getDoctorHomePage(Model model, HttpSession session) {
@@ -88,7 +103,6 @@ public class DoctorController {
         if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/login";
         }
-
 
         Long doctorId = (Long) session.getAttribute("doctorId");
         if (doctorId == null) {
@@ -100,7 +114,6 @@ public class DoctorController {
                 return "redirect:/access-denied";
             }
         }
-
 
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("doctorId", doctorId);
@@ -201,7 +214,26 @@ public class DoctorController {
                 examination.setModifiedAt(LocalDateTime.now());
             }
 
+            if (examination.getExaminationID() == 0) {
+                examination.setExaminationDate(LocalDateTime.now());
+                examination.setCreatedAt(LocalDateTime.now());
+            } else {
+                Examination existingExamination = examinationService.getExaminationById(examination.getExaminationID());
+                if (existingExamination != null && existingExamination.getPrescriptions() != null) {
+                    examination.setPrescriptions(existingExamination.getPrescriptions());
+                }
+                examination.setModifiedAt(LocalDateTime.now());
+            }
+
             examinationService.saveExamination(examination);
+            if (examination.getExaminationID() == 0 || !appointment.getStatus().equals("Completed")) {
+                appointmentService.updateAppointmentStatus(appointment.getAppointmentID(), "Completed",
+                        "Khám bệnh hoàn tất vào " + LocalDateTime.now()
+                                .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+            }
+
+            System.out.println("Examination saved for appointmentId: " + appointmentId + ", examinationId: "
+                    + examination.getExaminationID());
             if (examination.getExaminationID() == 0 || !appointment.getStatus().equals("Completed")) {
                 appointmentService.updateAppointmentStatus(appointment.getAppointmentID(), "Completed",
                         "Khám bệnh hoàn tất vào " + LocalDateTime.now()
@@ -247,6 +279,8 @@ public class DoctorController {
                 + examination.getExaminationID());
         return "doctors/doctor-create-exam";
     }
+
+   
 
     @GetMapping("/doctor/appointments/{appointmentId}/prescriptions")
     public String getPrescriptionPage(@PathVariable Long appointmentId, @RequestParam(required = false) Long edit,
@@ -320,12 +354,10 @@ public class DoctorController {
             // Create new prescription
             Prescription prescription = new Prescription();
 
-
             // Set basic fields
             if (requestData.get("prescription_id") != null) {
                 prescription.setPrescriptionID(Long.parseLong(requestData.get("prescription_id").toString()));
             }
-
 
             // Get medication
             Long medicationId = Long.parseLong(requestData.get("medication_id").toString());
@@ -334,14 +366,12 @@ public class DoctorController {
                 throw new IllegalArgumentException("Không tìm thấy thuốc");
             }
 
-
             // Set quantity and validate stock
             int quantity = Integer.parseInt(requestData.get("quantity").toString());
             if (quantity > medication.getStockQuantity()) {
                 throw new IllegalArgumentException("Số lượng yêu cầu vượt quá số lượng tồn kho");
             }
             prescription.setQuantity(quantity);
-
 
             // Update medication stock
             medication.setStockQuantity(medication.getStockQuantity() - quantity);
@@ -351,7 +381,6 @@ public class DoctorController {
             prescription.setMedication(medication);
             prescription.setExamination(examination);
 
-
             // Set doctor directly from prescribed_by
             Long doctorId = Long.parseLong(requestData.get("prescribed_by").toString());
             Doctor doctor = doctorService.findById(doctorId);
@@ -359,7 +388,6 @@ public class DoctorController {
                 throw new IllegalArgumentException("Không tìm thấy bác sĩ");
             }
             prescription.setPrescribedBy(doctor);
-
 
             prescription.setDosage(requestData.get("dosage").toString());
             prescription.setFrequency(requestData.get("frequency").toString());
@@ -371,9 +399,12 @@ public class DoctorController {
                     .setDuration(requestData.get("duration") != null ? requestData.get("duration").toString() : null);
             prescription.setInstructions(
                     requestData.get("instructions") != null ? requestData.get("instructions").toString() : null);
+            prescription
+                    .setDuration(requestData.get("duration") != null ? requestData.get("duration").toString() : null);
+            prescription.setInstructions(
+                    requestData.get("instructions") != null ? requestData.get("instructions").toString() : null);
             prescription.setIsRefillable(Boolean.parseBoolean(requestData.get("is_refillable").toString()));
             prescription.setStatus("PENDING");
-
 
             if (prescription.getPrescriptionID() == null) {
                 prescription.setCreatedAt(LocalDateTime.now());
@@ -411,7 +442,6 @@ public class DoctorController {
 
             // Update status of prescriptions
             prescriptionService.completePrescriptions(prescriptionIds);
-
 
             response.put("success", true);
             response.put("message", "Đơn thuốc đã được hoàn thành");
@@ -600,6 +630,7 @@ public class DoctorController {
             return "doctor/create-doctor";
         }
     }
+
     @RequestMapping("/doctors")
     public String getDoctorsPage(Model model) {
         List<Doctor> doctors = doctorService.findAll();

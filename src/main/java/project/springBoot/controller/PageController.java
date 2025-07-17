@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
 import project.springBoot.model.Doctor;
+
+import jakarta.servlet.http.HttpSession;
+import project.springBoot.model.Doctor;
 import project.springBoot.model.User;
 import project.springBoot.model.Doctor;
 import project.springBoot.repository.DoctorRepository;
@@ -42,6 +45,7 @@ public class PageController {
     public String getAdminPage(Model model) {
         return "admin/dashboard";
     }
+
 
 
     @RequestMapping("/register")

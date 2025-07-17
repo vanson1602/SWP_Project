@@ -47,6 +47,12 @@ public class AppointmentController {
     private final EmailService emailService;
     private final PatientService patientService;
 
+    private void clearBookingSession(HttpSession session) {
+        session.removeAttribute("selectedDoctor");
+        session.removeAttribute("selectedSpecialization");
+        session.removeAttribute("pendingAppointment");
+    }
+
     @GetMapping("")
     public String showAppointmentForm(Model model, Principal principal, HttpSession session) {
         User user = (User) session.getAttribute("currentUser");
@@ -61,26 +67,44 @@ public class AppointmentController {
 
         session.setAttribute("currentUser", user);
         session.setAttribute("currentPatient", patient);
+        clearBookingSession(session);
         return "appointment/appointment-page";
     }
 
     @GetMapping("/booking")
-    public String showAppointmentBooking(Model model) {
-        // Hiển thị form đặt lịch
+    public String showAppointmentBooking(@RequestParam(required = false) Long doctorId, Model model,
+            HttpSession session) {
+        clearBookingSession(session);
+        if (doctorId != null) {
+            Doctor doctor = doctorService.getDoctorById(doctorId);
+            session.setAttribute("selectedDoctor", doctor);
+        }
         return "appointment/appointment-booking";
     }
 
     @GetMapping("/specialty")
-    public String showSpecialtySelection(Model model) {
-        List<Specialization> specializations = specializationService.getAllActiveSpecializations();
+    public String showSpecialtySelection(Model model, HttpSession session) {
+        Doctor doctor = (Doctor) session.getAttribute("selectedDoctor");
+        List<Specialization> specializations;
+        if (doctor == null) {
+            specializations = specializationService.getAllActiveSpecializations();
+        } else {
+            specializations = new ArrayList<>(doctor.getSpecializations());
+        }
         model.addAttribute("specializations", specializations);
         return "appointment/specialty-selection";
     }
 
     @GetMapping("/doctor")
     public String showDoctorSelection(@RequestParam Long specializationId, Model model, HttpSession session) {
-        List<Doctor> doctors = doctorService.getDoctorsBySpecialization(specializationId);
+        Doctor doctor = (Doctor) session.getAttribute("selectedDoctor");
         Specialization specialization = specializationService.getSpecializationById(specializationId);
+        if (doctor != null) {
+            session.setAttribute("selectedDoctor", doctor);
+            session.setAttribute("selectedSpecialization", specialization);
+            return "redirect:/appointments/time?doctorId=" + doctor.getDoctorID();
+        }
+        List<Doctor> doctors = doctorService.getDoctorsBySpecialization(specializationId);
         session.setAttribute("selectedSpecialization", specialization);
         model.addAttribute("doctors", doctors);
         return "appointment/doctor-selection";
@@ -92,7 +116,6 @@ public class AppointmentController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
             Model model,
             HttpSession session) {
-
         if (date == null) {
             date = LocalDate.now();
         }
@@ -346,5 +369,11 @@ public class AppointmentController {
             model.addAttribute("error", e.getMessage());
             return "redirect:/appointments/my-appointments?error=" + e.getMessage();
         }
+    }
+
+    @GetMapping("/cancel-booking")
+    public String cancelBooking(HttpSession session) {
+        clearBookingSession(session);
+        return "redirect:/appointments";
     }
 }

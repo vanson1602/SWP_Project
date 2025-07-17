@@ -18,6 +18,13 @@
                         <a href="https://www.linkedin.com/in/qu%C3%A2n-nguy%E1%BB%85n-2a5ba636b/"
                             class="text-light me-3"><i class="bi bi-linkedin"></i></a>
 
+                        <a href="https://www.facebook.com/quann089" class="text-light me-3"><i
+                                class="bi bi-facebook"></i></a>
+                        <a href="https://www.youtube.com/@QuanNguyen-ce5sw" class="text-light me-3"><i
+                                class="bi bi-youtube"></i></a>
+                        <a href="https://www.linkedin.com/in/qu%C3%A2n-nguy%E1%BB%85n-2a5ba636b/"
+                            class="text-light me-3"><i class="bi bi-linkedin"></i></a>
+
                     </div>
                 </div>
 
