@@ -47,12 +47,12 @@ public class MedicationServiceImpl implements MedicationService {
         if (Objects.isNull(id)) {
             throw new IllegalArgumentException("ID không được để trống");
         }
-        
+
         // Check if medication exists before deleting
         if (!medicationRepository.existsById(id)) {
             throw new IllegalArgumentException("Không tìm thấy thuốc với ID: " + id);
         }
-        
+
         medicationRepository.deleteById(id);
     }
 
@@ -69,24 +69,24 @@ public class MedicationServiceImpl implements MedicationService {
         if (Objects.isNull(medication)) {
             throw new IllegalArgumentException("Thông tin thuốc không được để trống");
         }
-        
+
         // Validate required fields
         if (Objects.isNull(medication.getMedicationName()) || medication.getMedicationName().trim().isEmpty()) {
             throw new IllegalArgumentException("Tên thuốc không được để trống");
         }
-        
+
         if (Objects.isNull(medication.getStockQuantity())) {
             throw new IllegalArgumentException("Số lượng tồn kho không được để trống");
         }
-        
+
         if (medication.getStockQuantity() < 0) {
             throw new IllegalArgumentException("Số lượng tồn kho không được âm");
         }
-        
+
         if (Objects.isNull(medication.getPrice())) {
             throw new IllegalArgumentException("Giá thuốc không được để trống");
         }
-        
+
         if (medication.getPrice().compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Giá thuốc không được âm");
         }
@@ -117,11 +117,11 @@ public class MedicationServiceImpl implements MedicationService {
     public void updateStock(Long id, int quantity) {
         Medication medication = findById(id);
         int newQuantity = medication.getStockQuantity() + quantity;
-        
+
         if (newQuantity < 0) {
             throw new IllegalArgumentException("Số lượng tồn kho không đủ");
         }
-        
+
         medication.setStockQuantity(newQuantity);
         medicationRepository.save(medication);
     }
@@ -137,4 +137,9 @@ public class MedicationServiceImpl implements MedicationService {
     public List<Medication> findExpiringMedications(LocalDate date) {
         return medicationRepository.findByExpiryDateBefore(date);
     }
-} 
+
+    @Override
+    public Medication findByMedicationID(Long medicationID) {
+        return medicationRepository.findByMedicationID(medicationID);
+    }
+}

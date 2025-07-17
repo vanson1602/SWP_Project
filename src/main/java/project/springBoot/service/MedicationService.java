@@ -7,6 +7,8 @@ import project.springBoot.model.Medication;
 
 public interface MedicationService {
 
+    Medication findByMedicationID(Long medicationID);
+
     List<Medication> getAllMedications();
 
     Medication findById(Long id);
