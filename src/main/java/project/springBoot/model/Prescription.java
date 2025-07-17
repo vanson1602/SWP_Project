@@ -78,9 +78,6 @@ public class Prescription {
     @Column(name = "modified_at", nullable = false)
     private LocalDateTime modifiedAt;
 
-    @Column(name = "status", length = 20)
-    private String status = "PENDING";
-
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 

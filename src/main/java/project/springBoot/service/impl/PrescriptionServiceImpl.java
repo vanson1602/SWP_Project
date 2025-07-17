@@ -137,4 +137,9 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     public List<Prescription> getAllPrescriptionsByExaminationId(Long examinationId) {
         return prescriptionRepository.findByExaminationExaminationID(examinationId);
     }
+
+    @Override
+    public List<Prescription> findByExaminationId(Long examinationId) {
+        return prescriptionRepository.findByExaminationExaminationID(examinationId);
+    }
 }

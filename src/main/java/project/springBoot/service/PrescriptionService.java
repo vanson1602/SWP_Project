@@ -32,4 +32,6 @@ public interface PrescriptionService {
     Prescription getPrescriptionByExaminationId(Long examinationId);
 
     List<Prescription> getAllPrescriptionsByExaminationId(Long examinationId);
+
+    List<Prescription> findByExaminationId(Long examinationId);
 }
