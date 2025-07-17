@@ -600,5 +600,11 @@ public class DoctorController {
             return "doctor/create-doctor";
         }
     }
+    @RequestMapping("/doctors")
+    public String getDoctorsPage(Model model) {
+        List<Doctor> doctors = doctorService.findAll();
+        model.addAttribute("doctors", doctors);
+        return "doctor/list-doctor";
+    }
 
 }

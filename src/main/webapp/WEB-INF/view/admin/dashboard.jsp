@@ -399,22 +399,23 @@
                     </style>
                 </head>
 
-      <body>
-        <!-- Sidebar -->
-        <nav class="sidebar">
-          <div class="sidebar-header">
-            <h3>Admin Panel</h3>
-          </div>
-          <ul class="sidebar-menu">
-            <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
-            <li><a href="/admin/user"><i class="fas fa-users"></i> Users</a></li>
-            <li><a href="/admin/schedules/processing"><i class="fas fa-calendar-check"></i> Phê duyệt lịch bận</a></li>
+                <body>
+                    <!-- Sidebar -->
+                    <nav class="sidebar">
+                        <div class="sidebar-header">
+                            <h3>Admin Panel</h3>
+                        </div>
+                        <ul class="sidebar-menu">
+                            <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                            <li><a href="/admin/user"><i class="fas fa-users"></i> Users</a></li>
+                            <li><a href="/admin/schedules/processing"><i class="fas fa-calendar-check"></i> Phê duyệt
+                                    lịch bận</a></li>
 
-            <li><a href="/admin/schedules/doctors"><i class="fas fa-user-md"></i> Lịch Bác Sĩ</a></li>
-            <li><a href="/feedback/list"><i class="fas fa-user-md"></i> Quản lí feedback</a></li>
-            <li><a href="/"><i class="fas fa-sign-out-alt"></i> Home Page</a></li>
-          </ul>
-        </nav>
+                            <li><a href="/admin/schedules/doctors"><i class="fas fa-user-md"></i> Lịch Bác Sĩ</a></li>
+                            <li><a href="/feedback/list"><i class="fas fa-user-md"></i> Quản lí feedback</a></li>
+                            <li><a href="/admin"><i class="fas fa-sign-out-alt"></i> Home Page</a></li>
+                        </ul>
+                    </nav>
 
                     <div class="main-content">
                         <div class="d-flex justify-content-between align-items-center mb-4">

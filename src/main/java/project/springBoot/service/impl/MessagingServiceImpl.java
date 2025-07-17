@@ -114,4 +114,38 @@ public class MessagingServiceImpl implements MessagingService {
 
         return message;
     }
+
+    @Override
+    public Conversation findById(Long id) {
+        return conversationRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public boolean markConversationAsRead(Conversation conversation, User reader) {
+        try {
+            // Lấy tất cả tin nhắn chưa đọc trong cuộc trò chuyện mà người dùng hiện tại là
+            // người nhận
+            List<Message> unreadMessages = messageRepository.findByConversationAndReceiverAndIsReadFalse(
+                    conversation, reader);
+
+            // Đánh dấu tất cả là đã đọc
+            for (Message message : unreadMessages) {
+                message.setRead(true);
+            }
+
+            // Lưu các thay đổi
+            messageRepository.saveAll(unreadMessages);
+
+            return true;
+        } catch (Exception e) {
+            // log.error("Error marking conversation as read: ", e); // Original code had
+            // this line commented out
+            return false;
+        }
+    }
+
+    @Override
+    public Message sendMessage(Message message) {
+        return messageRepository.save(message);
+    }
 }

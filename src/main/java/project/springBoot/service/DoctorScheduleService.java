@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 @Service
 public class DoctorScheduleService {
@@ -85,15 +86,18 @@ public class DoctorScheduleService {
     }
 
     public DoctorSchedule updateScheduleStatus(Long scheduleId, String status) {
-        DoctorSchedule schedule = doctorScheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new RuntimeException("Schedule not found with ID: " + scheduleId));
+        DoctorSchedule schedule = doctorScheduleRepository.findById(scheduleId).orElse(null);
+        if (schedule == null)
+            return null;
+
         schedule.setStatus(status);
         schedule.setModifiedAt(LocalDateTime.now());
 
-        if ("Busy".equals(status)) { // Generate slots only when approved
-            bookingSlotService.deleteByScheduleId(scheduleId);
-        } else if ("Available".equals(status)) { // Clear slots when rejected
-            generateAndSaveSlots(schedule);
+        if ("Busy".equalsIgnoreCase(status)) {
+            // ✅ Xóa hết các slot cũ một cách an toàn
+            if (schedule.getBookingSlots() != null) {
+                schedule.getBookingSlots().clear(); // Hibernate sẽ xử lý orphan delete đúng
+            }
         }
 
         return doctorScheduleRepository.save(schedule);

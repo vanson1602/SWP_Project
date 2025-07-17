@@ -1,7 +1,6 @@
 let stompClient = null;
 let currentConversation = null;
 
-
 const chatData = document.getElementById('chatData');
 
 const currentUser = {
@@ -33,17 +32,24 @@ function connect() {
     stompClient.connect({}, function (frame) {
         console.log('Connected: ' + frame);
 
-        // Subscribe to conversation messages
-        const conversationQueue = `/topic/conversation/${currentConversation.id}`;
-        console.log('Subscribing to conversation topic:', conversationQueue);
-
-        stompClient.subscribe(conversationQueue, function (message) {
-            const messageBody = JSON.parse(message.body);
-            console.log('Received message from topic:', messageBody);
-            displayMessage(messageBody);
+        // Subscribe to personal conversation updates
+        const personalUpdatesQueue = `/topic/user/${currentUser.id}/conversations`;
+        stompClient.subscribe(personalUpdatesQueue, function (message) {
+            const messageData = JSON.parse(message.body);
+            updateConversationLastMessage(messageData);
         });
 
-        // Subscribe to new conversations (for receptionist)
+        if (currentConversation) {
+            const conversationQueue = `/topic/conversation/${currentConversation.id}`;
+            console.log('Subscribing to conversation topic:', conversationQueue);
+
+            stompClient.subscribe(conversationQueue, function (message) {
+                const messageBody = JSON.parse(message.body);
+                console.log('Received message from topic:', messageBody);
+                displayMessage(messageBody);
+            });
+        }
+
         if (currentUser.role === 'receptionist') {
             const newConversationsQueue = `/topic/conversations/${currentUser.id}`;
             console.log('Subscribing to new conversations topic:', newConversationsQueue);
@@ -57,7 +63,7 @@ function connect() {
 
     }, function (error) {
         console.error('WebSocket error:', error);
-        setTimeout(connect, 5000); // Tự reconnect nếu mất kết nối
+        setTimeout(connect, 5000); // reconnect nếu mất kết nối
     });
 }
 
@@ -107,7 +113,7 @@ function formatTime(timestamp) {
         if (diff < 60) return `${diff} phút trước`;
         if (diff < 1440) return momentDate.format('HH:mm [hôm nay]');
         if (diff < 2880) return momentDate.format('HH:mm [hôm qua]');
-        if (diff < 7200) return momentDate.format('HH:mm [• ] DD/MM');
+        if (diff < 7200) return momentDate.format('HH:mm [•] DD/MM');
         return momentDate.format('HH:mm [•] DD/MM/YYYY');
     } catch (error) {
         console.error('Error formatting date:', error);
@@ -119,17 +125,32 @@ function displayMessage(message) {
     const messageArea = document.getElementById('messageArea');
     if (!messageArea) return;
 
-    const messageDiv = document.createElement('div');
-    const isSent = message.sender.userID === currentUser.id;
+    const sender = message.sender || {};
+    const currentUserId = currentUser.userID || currentUser.id;
+    const senderId = sender.userID || sender.id;
 
+    const isSent = senderId === currentUserId;
+
+    const senderFullName = sender.fullName ||
+        (`${sender.firstName || ''} ${sender.lastName || ''}`.trim()) ||
+        'Người dùng';
+
+    const firstLetter = senderFullName.charAt(0).toUpperCase();
+
+    const messageDiv = document.createElement('div');
     messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
 
     messageDiv.innerHTML = `
-        <div class="message-header">
-            <strong>${message.sender.fullName}</strong>
-            <span class="time">${formatTime(message.createdAt)}</span>
+        <div class="message-container">
+            <div class="avatar">${firstLetter}</div>
+            <div class="message-content-wrapper">
+                <div class="message-header">
+                    <strong>${senderFullName}</strong>
+                    <span class="time">${formatTime(message.createdAt)}</span>
+                </div>
+                <div class="message-content">${message.content}</div>
+            </div>
         </div>
-        <div class="message-content">${message.content}</div>
     `;
 
     messageArea.appendChild(messageDiv);
@@ -153,39 +174,88 @@ function loadConversation(conversationId) {
         .catch(error => console.error('Error loading conversation:', error));
 }
 
-function addNewConversationToUI(conversation) {
-    const conversationsContainer = document.querySelector('.tab-pane#conversations');
-    if (!conversationsContainer) return;
+function findConversationItem(conversationId) {
+    // Try different possible selectors since the data attribute might be in different formats
+    const selectors = [
+        `.conversation-item[data-conversation-id="${conversationId}"]`,
+        `.conversation-item[data-id="${conversationId}"]`,
+        `.conversation-item[data-conversationid="${conversationId}"]`
+    ];
 
-    // Remove "no conversations" message if it exists
+    for (const selector of selectors) {
+        const item = document.querySelector(selector);
+        if (item) return item;
+    }
+    return null;
+}
+
+function updateConversationLastMessage(messageData) {
+    const conversationItem = findConversationItem(messageData.conversationId);
+
+    if (conversationItem) {
+        // Update existing conversation
+        const lastMessageDiv = conversationItem.querySelector('.last-message');
+        if (lastMessageDiv) {
+            lastMessageDiv.textContent = messageData.content;
+        }
+
+        // Move conversation to top of list
+        const parent = conversationItem.parentNode;
+        if (parent && parent.firstChild) {
+            parent.insertBefore(conversationItem, parent.firstChild);
+        }
+    } else {
+        console.warn('Conversation not found for update:', messageData.conversationId);
+    }
+}
+
+function addNewConversationToUI(conversation) {
+    // Check if conversation already exists
+    const existingConversation = findConversationItem(conversation.id);
+    if (existingConversation) {
+        console.log('Conversation already exists, updating instead of creating new');
+        return updateConversationLastMessage({
+            conversationId: conversation.id,
+            content: conversation.messages?.[conversation.messages.length - 1]?.content || ''
+        });
+    }
+
+    const conversationsContainer = document.querySelector('.tab-pane#conversations') ||
+        document.querySelector('#conversations') ||
+        document.querySelector('.conversations-container');
+
+    if (!conversationsContainer) {
+        console.error('Could not find conversations container');
+        return;
+    }
+
     const noConversationsDiv = conversationsContainer.querySelector('.no-conversations');
     if (noConversationsDiv) {
         noConversationsDiv.remove();
     }
 
     const otherUser = conversation.sender.userID === currentUser.id ? conversation.receiver : conversation.sender;
+    const firstName = otherUser.firstName || otherUser.fullName?.split(' ')[0] || 'U';
 
     const conversationDiv = document.createElement('div');
-    conversationDiv.className = 'd-flex align-items-center p-3 border rounded mb-2 conversation-item';
+    conversationDiv.className = 'conversation-item';
+    conversationDiv.setAttribute('data-conversation-id', conversation.id);
     conversationDiv.onclick = () => window.location.href = `/chat/conversation/${conversation.id}`;
 
     conversationDiv.innerHTML = `
-        <div class="avatar">
-            ${otherUser.firstName.charAt(0)}
-        </div>
-        <div>
-            <div class="fw-bold">
-                ${otherUser.firstName} ${otherUser.lastName}
+        <div class="avatar">${firstName.charAt(0).toUpperCase()}</div>
+        <div class="user-info">
+            <div class="user-name">
+                ${otherUser.firstName || ''} ${otherUser.lastName || ''}
             </div>
             ${conversation.messages && conversation.messages.length > 0 ? `
-                <div class="text-muted small">
+                <div class="last-message">
                     ${conversation.messages[conversation.messages.length - 1].content}
                 </div>
             ` : ''}
         </div>
     `;
 
-    // Add new conversation at the top of the list
     conversationsContainer.insertBefore(conversationDiv, conversationsContainer.firstChild);
 }
 
@@ -252,5 +322,3 @@ async function startChatWithReceptionist() {
         console.error(error);
     }
 }
-
-

@@ -54,11 +54,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         DoctorBookingSlot slot = bookingSlotRepository.findById(slotId)
                 .orElseThrow(() -> new RuntimeException("Booking slot not found"));
-   
 
         AppointmentType appointmentType = appointmentTypeRepository.findById(appointmentTypeId)
                 .orElseThrow(() -> new RuntimeException("Appointment type not found"));
-        
 
         if (!slot.getStatus().equalsIgnoreCase("Available")) {
             throw new RuntimeException("This slot is no longer available. Current status: " + slot.getStatus());
@@ -115,29 +113,47 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointment;
     }
 
-    
     @Override
+    @Transactional
     public Appointment updateAppointmentStatus(Long appointmentId, String status, String notes) {
-        Appointment appointment = appointmentRepository.findById(appointmentId)
+        // Load appointment with all relationships
+        Appointment appointment = appointmentRepository.findByIdWithDetails(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
-        appointment.setStatus(status);
-        if (notes != null) {
-            appointment.setAdminNotes(notes);
+        DoctorBookingSlot slot = appointment.getBookingSlot();
+        if (slot == null) {
+            throw new RuntimeException("Booking slot not found for appointment");
         }
-        appointment.setModifiedAt(LocalDateTime.now());
+
+        // Cập nhật trạng thái của slot trước
+        if ("Cancelled".equals(status) || "Rejected".equals(status)) {
+            slot.setStatus("Available");
+            slot.setAppointment(null);
+        } else if ("Confirmed".equals(status)) {
+            slot.setStatus("Booked");
+        }
+        slot.setModifiedAt(LocalDateTime.now());
+
+        // Cập nhật trạng thái của appointment
         appointment.setStatus(status);
         if (notes != null) {
             appointment.setAdminNotes(notes);
         }
         appointment.setModifiedAt(LocalDateTime.now());
 
+        // Cập nhật mối quan hệ hai chiều
         if ("Cancelled".equals(status) || "Rejected".equals(status)) {
-            DoctorBookingSlot slot = appointment.getBookingSlot();
-            slot.setStatus("Available");
-            slot.setAppointment(null);
-            bookingSlotRepository.save(slot);
-        } else if ("Confirmed".equals(status)) {
+            appointment.setBookingSlot(null);
+        } else {
+            appointment.setBookingSlot(slot);
+            slot.setAppointment(appointment);
+        }
+
+        // Lưu slot trước
+        bookingSlotRepository.save(slot);
+
+        // Gửi thông báo nếu xác nhận
+        if ("Confirmed".equals(status)) {
             Notification patientNotification = new Notification();
             patientNotification.setUser(appointment.getPatient().getUser());
             patientNotification.setTitle("Xác nhận lịch hẹn");
@@ -145,23 +161,18 @@ public class AppointmentServiceImpl implements AppointmentService {
             patientNotification.setNotificationType("Confirmation");
             patientNotification.setRead(false);
             notificationRepository.save(patientNotification);
-       
-           
+
             String patientEmail = appointment.getPatient().getUser().getEmail();
             emailService.sendAppointmentConfirmationEmail(patientEmail, appointment);
 
-            String doctorEmail = appointment.getBookingSlot().getSchedule().getDoctor().getUser().getEmail();
+            String doctorEmail = slot.getSchedule().getDoctor().getUser().getEmail();
             emailService.sendDoctorAppointmentNotificationEmail(doctorEmail, appointment);
         }
-            String doctorEmail = appointment.getBookingSlot().getSchedule().getDoctor().getUser().getEmail();
-            emailService.sendDoctorAppointmentNotificationEmail(doctorEmail, appointment);
-        
 
+        // Lưu appointment sau
         return appointmentRepository.save(appointment);
-   
     }
 
-   
     @Override
     public void cancelAppointment(Long appointmentId, String reason) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
@@ -189,7 +200,6 @@ public class AppointmentServiceImpl implements AppointmentService {
             slot.setAppointment(null);
             bookingSlotRepository.save(slot);
         }
-      
 
         Notification doctorNotification = new Notification();
         doctorNotification.setUser(doctor.getUser());
@@ -252,13 +262,11 @@ public class AppointmentServiceImpl implements AppointmentService {
         return pendingCount < 2;
     }
 
-
     @Override
     public AppointmentType getAppointmentTypeById(Long appointmentTypeId) {
         return appointmentTypeRepository.findById(appointmentTypeId)
                 .orElseThrow(() -> new RuntimeException("Appointment type not found"));
     }
-
 
     @Override
     public List<AppointmentType> getAllAppointmentTypes() {
@@ -323,7 +331,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Scheduled(fixedRate = 300000)
     public void cancelUnpaidAppointments() {
         LocalDateTime cutoffTime = LocalDateTime.now().minusHours(3);
-    
+
         List<Appointment> unpaidAppointments = appointmentRepository.findUnpaidAppointments(cutoffTime);
 
         for (Appointment appointment : unpaidAppointments) {
@@ -446,19 +454,20 @@ public class AppointmentServiceImpl implements AppointmentService {
     public List<Map<String, Object>> getDailyAppointmentReport(LocalDateTime startDate, LocalDateTime endDate) {
         return appointmentRepository.getDailyAppointmentCounts(startDate, endDate);
     }
-    
+
     @Override
     public Map<String, Long> getAppointmentStatusDistributionBetween(LocalDateTime startDate, LocalDateTime endDate) {
-        List<Map<String, Object>> results = appointmentRepository.getAppointmentStatusDistributionBetween(startDate, endDate);
+        List<Map<String, Object>> results = appointmentRepository.getAppointmentStatusDistributionBetween(startDate,
+                endDate);
         Map<String, Long> distribution = new java.util.HashMap<>();
-        
+
         // Initialize with 0 for all possible statuses
         distribution.put("Pending", 0L);
         distribution.put("Confirmed", 0L);
         distribution.put("Completed", 0L);
         distribution.put("Cancelled", 0L);
         distribution.put("Rejected", 0L);
-        
+
         // Fill with actual data
         for (Map<String, Object> result : results) {
             String status = (String) result.get("status");
@@ -467,10 +476,9 @@ public class AppointmentServiceImpl implements AppointmentService {
                 distribution.put(status, count);
             }
         }
-        
+
         return distribution;
     }
-
 
     @Override
     public List<Invoice> getInvoicesInDateRange(LocalDateTime startDate, LocalDateTime endDate) {
@@ -482,5 +490,4 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointmentRepository.getRevenueByDoctor(startDate, endDate);
     }
 
-    
 }

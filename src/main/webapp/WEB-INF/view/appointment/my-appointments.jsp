@@ -489,6 +489,10 @@
                                                     class="btn ${param.status == 'Confirmed' ? 'btn-success' : 'btn-outline-success'}">
                                                     <i class="bi bi-check-circle"></i> Đã xác nhận
                                                 </a>
+                                                <a href="/appointments/my-appointments?status=Completed"
+                                                    class="btn ${param.status == 'Completed' ? 'btn-info' : 'btn-outline-info'}">
+                                                    <i class="bi bi-check-all"></i> Hoàn thành
+                                                </a>
                                                 <a href="/appointments/my-appointments?status=Cancelled"
                                                     class="btn ${param.status == 'Cancelled' ? 'btn-danger' : 'btn-outline-danger'}">
                                                     <i class="bi bi-x-circle"></i> Đã hủy
@@ -520,10 +524,12 @@
                                                     <span class="status-badge 
                                                 ${appointment.status == 'Pending' ? 'status-pending' : ''}
                                                 ${appointment.status == 'Confirmed' ? 'status-confirmed' : ''}
+                                                ${appointment.status == 'Completed' ? 'status-completed' : ''}
                                                 ${appointment.status == 'Cancelled' ? 'status-cancelled' : ''}">
                                                         <i class="bi 
                                                     ${appointment.status == 'Pending' ? 'bi-hourglass-split' : ''}
                                                     ${appointment.status == 'Confirmed' ? 'bi-check-circle' : ''}
+                                                    ${appointment.status == 'Completed' ? 'bi-check-all' : ''}
                                                     ${appointment.status == 'Cancelled' ? 'bi-x-circle' : ''}">
                                                         </i>
                                                         ${appointment.status}

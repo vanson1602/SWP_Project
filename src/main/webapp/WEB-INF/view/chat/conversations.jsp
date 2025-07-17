@@ -7,7 +7,9 @@
             <meta charset="UTF-8">
             <title>Conversations | HealthCare+</title>
             <link href="<c:url value='/resources/css/base.css'/>" rel="stylesheet">
-          
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
             <style>
                 body {
                     font-family: 'Segoe UI', sans-serif;
@@ -114,6 +116,10 @@
 
         <body>
 
+            <div id="chatData" data-user-id="${currentUser.userID}" data-username="${currentUser.username}"
+                data-fullname="${currentUser.firstName} ${currentUser.lastName}" data-role="${currentUser.role}">
+            </div>
+
             <div class="container">
                 <div class="header">
                     <h2>🗨️ Cuộc hội thoại</h2>
@@ -131,7 +137,8 @@
                 </c:if>
 
                 <c:forEach items="${conversations}" var="conv">
-                    <div class="conversation-item" onclick="location.href='/chat/conversation/${conv.id}'">
+                    <div class="conversation-item" data-conversation-id="${conv.id}"
+                        onclick="location.href='/chat/conversation/${conv.id}'">
                         <div class="avatar">
                             ${conv.receiver.userID == currentUser.userID ? conv.sender.firstName.charAt(0) :
                             conv.receiver.firstName.charAt(0)}

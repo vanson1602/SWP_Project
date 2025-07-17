@@ -205,4 +205,9 @@ public class DoctorServiceImpl implements DoctorService {
         return doctorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Doctor not found"));
     }
+
+    @Override
+    public List<Doctor> findAll() {
+        return doctorRepository.findAll();
+    }
 }

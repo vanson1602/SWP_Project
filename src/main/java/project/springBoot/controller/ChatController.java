@@ -17,6 +17,8 @@ import project.springBoot.service.MessagingService;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Controller
 public class ChatController {
@@ -41,6 +43,8 @@ public class ChatController {
 
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new RuntimeException("Sender not found"));
+        User receiver = userRepository.findById(receiverId)
+                .orElseThrow(() -> new RuntimeException("Receiver not found"));
 
         Message savedMessage = messagingService.addMessageToConversation(
                 conversationId,
@@ -48,18 +52,39 @@ public class ChatController {
                 receiverId,
                 content);
 
+        // Lấy conversation đã cập nhật
+        Conversation updatedConversation = messagingService.getConversation(sender, conversationId);
+
         // Gửi tin nhắn đến topic của cuộc trò chuyện
         messagingTemplate.convertAndSend(
                 "/topic/conversation/" + conversationId,
                 savedMessage);
 
+        // Gửi cập nhật conversation cho cả người gửi và người nhận
+        Map<String, Object> conversationUpdate = Map.of(
+                "conversationId", conversationId,
+                "content", content,
+                "sender", Map.of(
+                        "userID", sender.getUserID(),
+                        "firstName", sender.getFirstName(),
+                        "lastName", sender.getLastName()),
+                "receiver", Map.of(
+                        "userID", receiver.getUserID(),
+                        "firstName", receiver.getFirstName(),
+                        "lastName", receiver.getLastName()));
+
+        messagingTemplate.convertAndSend(
+                "/topic/user/" + senderId + "/conversations",
+                conversationUpdate);
+
+        messagingTemplate.convertAndSend(
+                "/topic/user/" + receiverId + "/conversations",
+                conversationUpdate);
+
         // Gửi thông báo về cuộc hội thoại mới cho receptionist
-        User receiver = userRepository.findById(receiverId)
-                .orElseThrow(() -> new RuntimeException("Receiver not found"));
-        if (receiver.getRole().equals("receptionist")) {
-            Conversation updatedConversation = messagingService.getConversation(sender, conversationId);
+        if (receiver.getRole().equals("receptionist") || sender.getRole().equals("receptionist")) {
             messagingTemplate.convertAndSend(
-                    "/topic/conversations/" + receiverId,
+                    "/topic/conversations/" + (receiver.getRole().equals("receptionist") ? receiverId : senderId),
                     updatedConversation);
         }
     }
@@ -166,6 +191,27 @@ public class ChatController {
             return ResponseEntity.ok(conversation);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error creating conversation: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/api/chat/conversation/{conversationId}/mark-read")
+    @ResponseBody
+    public ResponseEntity<?> markConversationAsRead(
+            @PathVariable Long conversationId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            Conversation conversation = messagingService.findById(conversationId);
+            if (conversation == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            boolean updated = messagingService.markConversationAsRead(conversation, currentUser);
+            return updated ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

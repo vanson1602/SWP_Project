@@ -57,9 +57,5 @@ public class PageController {
         }
         return "receptionist/dashboard";
     }
-    @RequestMapping("/doctor")
-    public String getDoctorPage(Model model) {
-        return "doctor/doctorpage";
-    }
 
 }

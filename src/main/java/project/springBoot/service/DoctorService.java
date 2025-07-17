@@ -16,6 +16,7 @@ import project.springBoot.model.Patient;
 
 @Service
 public interface DoctorService {
+        List<Doctor> findAll();
         List<Doctor> getDoctorsBySpecialization(Long specializationId);
 
         List<DoctorBookingSlot> getAvailableSlots(Long doctorId, LocalDate date);
