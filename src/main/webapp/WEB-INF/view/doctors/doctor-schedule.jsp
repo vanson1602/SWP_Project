@@ -7,6 +7,7 @@
             <meta charset="UTF-8">
             <title>Lịch làm việc</title>
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
             <link rel="stylesheet" href="/css/homepage.css">
             <style>
                 .schedule-container {
@@ -15,6 +16,23 @@
                     padding: 30px;
                     border-radius: 16px;
                     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                }
+
+                .view-toggle-container {
+                    margin-bottom: 20px;
+                    text-align: right;
+                }
+
+                #calendar {
+                    margin-top: 20px;
+                }
+
+                .table-view {
+                    display: none;
+                }
+
+                .calendar-view {
+                    display: block;
                 }
 
                 .table th,
@@ -40,6 +58,19 @@
 
                 .btn-back:hover {
                     background-color: #5a6268;
+                }
+
+                .fc-event {
+                    cursor: pointer;
+                }
+
+                .fc-event-title {
+                    font-weight: bold;
+                }
+
+                .fc-toolbar-title {
+                    font-size: 1.5em !important;
+                    font-weight: 600;
                 }
             </style>
         </head>
@@ -113,49 +144,147 @@
 
             <div class="container schedule-container">
                 <h2 class="text-center">Lịch làm việc của tôi</h2>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover text-center">
-                        <thead>
-                            <tr>
-                                <th>Ngày</th>
-                                <th>Giờ bắt đầu</th>
-                                <th>Giờ kết thúc</th>
-                                <th>Phòng khám</th>
-                                <th>Trạng thái</th>
-                                <th>Số BN tối đa</th>
-                                <th>Ghi chú</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:forEach var="schedule" items="${schedules}">
-                                <tr>
-                                    <td>${schedule.workDate}</td>
-                                    <td>${schedule.startTime}</td>
-                                    <td>${schedule.endTime}</td>
-                                    <td>${schedule.clinicRoom}</td>
-                                    <td>
-                                        <span class="badge 
-                                ${schedule.status == 'Available' ? 'bg-success' :
-                                  schedule.status == 'Busy' ? 'bg-warning text-dark' :
-                                  schedule.status == 'Done' ? 'bg-danger' :
-                                  'bg-secondary'}">
-                                            ${schedule.status}
-                                        </span>
-                                    </td>
-                                    <td>${schedule.maxPatients}</td>
-                                    <td>${schedule.notes}</td>
-                                </tr>
-                            </c:forEach>
-                        </tbody>
-                    </table>
+
+                <!-- Hidden inputs for schedule data -->
+                <c:forEach var="schedule" items="${schedules}">
+                    <input type="hidden" class="schedule-data" data-room="${schedule.clinicRoom}"
+                        data-date="${schedule.workDate}" data-start="${schedule.startTime}"
+                        data-end="${schedule.endTime}" data-status="${schedule.status}"
+                        data-max-patients="${schedule.maxPatients}" data-notes="${schedule.notes}">
+                </c:forEach>
+
+                <div class="view-toggle-container">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary" id="calendarViewBtn">Xem lịch</button>
+                        <button type="button" class="btn btn-outline-primary" id="tableViewBtn">Xem bảng</button>
+                    </div>
                 </div>
-                <div class="text-center">
+
+                <div id="calendar" class="calendar-view"></div>
+
+                <div class="table-view">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover text-center">
+                            <thead>
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th>Giờ bắt đầu</th>
+                                    <th>Giờ kết thúc</th>
+                                    <th>Phòng khám</th>
+                                    <th>Trạng thái</th>
+                                    <th>Số BN tối đa</th>
+                                    <th>Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach var="schedule" items="${schedules}">
+                                    <tr>
+                                        <td>${schedule.workDate}</td>
+                                        <td>${schedule.startTime}</td>
+                                        <td>${schedule.endTime}</td>
+                                        <td>${schedule.clinicRoom}</td>
+                                        <td>
+                                            <span class="badge 
+                                    ${schedule.status == 'Available' ? 'bg-success' :
+                                      schedule.status == 'Busy' ? 'bg-warning text-dark' :
+                                      schedule.status == 'Done' ? 'bg-danger' :
+                                      'bg-secondary'}">
+                                                ${schedule.status}
+                                            </span>
+                                        </td>
+                                        <td>${schedule.maxPatients}</td>
+                                        <td>${schedule.notes}</td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
                     <a href="/doctor/home" class="btn btn-back text-white">← Quay lại</a>
                     <a href="/doctor/busy/schedule" class="btn btn-danger">Xin nghỉ trước</a>
                 </div>
             </div>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Parse schedule data from hidden inputs
+                    var calendarEvents = [];
+                    document.querySelectorAll('.schedule-data').forEach(function (input) {
+                        var status = input.dataset.status;
+                        var backgroundColor = status === 'Available' ? '#198754' :
+                            status === 'Busy' ? '#ffc107' :
+                                status === 'Done' ? '#dc3545' : '#6c757d';
+
+                        calendarEvents.push({
+                            title: 'Phòng ' + input.dataset.room,
+                            start: input.dataset.date + 'T' + input.dataset.start,
+                            end: input.dataset.date + 'T' + input.dataset.end,
+                            backgroundColor: backgroundColor,
+                            extendedProps: {
+                                status: status,
+                                maxPatients: input.dataset.maxPatients,
+                                notes: input.dataset.notes
+                            }
+                        });
+                    });
+
+                    // Initialize FullCalendar
+                    var calendarEl = document.getElementById('calendar');
+                    var calendar = new FullCalendar.Calendar(calendarEl, {
+                        initialView: 'timeGridWeek',
+                        headerToolbar: {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                        },
+                        locale: 'vi',
+                        slotMinTime: '07:00:00',
+                        slotMaxTime: '20:00:00',
+                        allDaySlot: false,
+                        height: 'auto',
+                        events: calendarEvents,
+                        eventClick: function (info) {
+                            alert(
+                                'Thông tin ca khám:\n' +
+                                'Phòng: ' + info.event.title + '\n' +
+                                'Trạng thái: ' + info.event.extendedProps.status + '\n' +
+                                'Số BN tối đa: ' + info.event.extendedProps.maxPatients + '\n' +
+                                'Ghi chú: ' + info.event.extendedProps.notes
+                            );
+                        }
+                    });
+                    calendar.render();
+
+                    // View toggle functionality
+                    const calendarView = document.getElementById('calendar');
+                    const tableView = document.querySelector('.table-view');
+                    const calendarViewBtn = document.getElementById('calendarViewBtn');
+                    const tableViewBtn = document.getElementById('tableViewBtn');
+
+                    calendarViewBtn.addEventListener('click', function () {
+                        calendarView.style.display = 'block';
+                        tableView.style.display = 'none';
+                        calendarViewBtn.classList.add('btn-primary');
+                        calendarViewBtn.classList.remove('btn-outline-primary');
+                        tableViewBtn.classList.add('btn-outline-primary');
+                        tableViewBtn.classList.remove('btn-primary');
+                        calendar.render();
+                    });
+
+                    tableViewBtn.addEventListener('click', function () {
+                        calendarView.style.display = 'none';
+                        tableView.style.display = 'block';
+                        tableViewBtn.classList.add('btn-primary');
+                        tableViewBtn.classList.remove('btn-outline-primary');
+                        calendarViewBtn.classList.add('btn-outline-primary');
+                        calendarViewBtn.classList.remove('btn-primary');
+                    });
+                });
+            </script>
         </body>
 
         </html>
