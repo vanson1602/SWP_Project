@@ -59,10 +59,10 @@ import project.springBoot.service.MedicalRecordService;
 import project.springBoot.service.MedicationService;
 import project.springBoot.service.PrescriptionService;
 import project.springBoot.service.SpecializationService;
-import project.springBoot.service.UploadFileService;
 import project.springBoot.service.SpecializationService;
 import project.springBoot.service.UploadFileService;
 import project.springBoot.service.UserService;
+import project.springBoot.service.NotificationService;
 import project.springBoot.model.DoctorSchedule;
 import project.springBoot.service.DoctorScheduleService;
 
@@ -94,8 +94,8 @@ public class DoctorController {
     private UploadFileService uploadFileService;
     @Autowired
     private SpecializationService specializationService;
-    
-    
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/doctor/home")
     public String getDoctorHomePage(Model model, HttpSession session) {
@@ -115,6 +115,9 @@ public class DoctorController {
             }
         }
 
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("doctorId", doctorId);
         return "doctors/doctor-home";
@@ -138,6 +141,10 @@ public class DoctorController {
                 doctorId, startDate,
                 endDate);
         List<DoctorBookingSlot> bookingSlots = bookingSlotService.getBookingSlotsByDoctorId(doctorId);
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
         model.addAttribute("appointments", appointments);
         model.addAttribute("bookingSlots", bookingSlots);
         model.addAttribute("currentUser", currentUser);
@@ -165,6 +172,9 @@ public class DoctorController {
                         .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
             }
 
+            // Add notification count
+            int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+            model.addAttribute("notificationCount", notificationCount);
             model.addAttribute("appointment", appointment);
             model.addAttribute("examination", latestExamination);
             model.addAttribute("followUpDateStr", followUpDateStr);
@@ -180,6 +190,10 @@ public class DoctorController {
         if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/access-denied";
         }
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
         model.addAttribute("appointmentId", appointmentId);
         model.addAttribute("examination", new Examination());
         model.addAttribute("icdCodes", icdCodeService.getAllActiveCodes());
@@ -270,6 +284,9 @@ public class DoctorController {
             return "redirect:/doctor/appointments/" + appointmentId + "/examination/create";
         }
 
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
         model.addAttribute("appointmentId", appointmentId);
         model.addAttribute("examination", examination);
         model.addAttribute("isEdit", true);
@@ -279,8 +296,6 @@ public class DoctorController {
                 + examination.getExaminationID());
         return "doctors/doctor-create-exam";
     }
-
-   
 
     @GetMapping("/doctor/appointments/{appointmentId}/prescriptions")
     public String getPrescriptionPage(@PathVariable Long appointmentId, @RequestParam(required = false) Long edit,
@@ -317,6 +332,10 @@ public class DoctorController {
             }
 
             List<Prescription> prescriptions = prescriptionService.findByExaminationId(examination.getExaminationID());
+
+            // Add notification count
+            int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+            model.addAttribute("notificationCount", notificationCount);
             model.addAttribute("appointment", appointment);
             model.addAttribute("examination", examination);
             model.addAttribute("prescriptions", prescriptions);
@@ -516,6 +535,10 @@ public class DoctorController {
             schedule.setBookingSlots(
                     doctorScheduleService.getScheduleWithSlots(schedule.getScheduleID()).getBookingSlots());
         }
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
         model.addAttribute("schedules", schedules);
         model.addAttribute("currentUser", currentUser);
         return "doctors/doctor-schedule";
@@ -540,6 +563,10 @@ public class DoctorController {
                 endTimes.add("N/A");
             }
         }
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
         model.addAttribute("startTime", startTime);
         model.addAttribute("endTimes", endTimes);
         model.addAttribute("formatter", formatter);
@@ -556,6 +583,10 @@ public class DoctorController {
         Examination examination = examinationService.getExaminationByAppointmentId(appointmentID);
         DateTimeFormatter date = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         DateTimeFormatter time = DateTimeFormatter.ofPattern("HH:mm");
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
         model.addAttribute("examination", examination);
         model.addAttribute("time", time);
         model.addAttribute("date", date);

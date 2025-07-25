@@ -157,13 +157,23 @@ public class Appointment {
         this.appointmentType = appointmentType;
     }
 
+    public LocalDateTime getAppointmentTime() {
+        if (this.bookingSlot != null) {
+            return this.bookingSlot.getStartTime();
+        }
+        return null;
+    }
+
     @PrePersist
     @PreUpdate
     private void validateEnumLikeFields() {
         if (status != null && !status.matches("Pending|Confirmed|Rejected|Completed|Cancelled|NoShow")) {
             throw new IllegalArgumentException("Invalid status: " + status);
         }
-        if (appointmentDate != null && appointmentDate.isBefore(LocalDateTime.now())) {
+        // Only validate appointment date is in future for new appointments or when not
+        // cancelling
+        if (appointmentDate != null && appointmentDate.isBefore(LocalDateTime.now())
+                && !"Cancelled".equals(status) && !"Completed".equals(status) && !"NoShow".equals(status)) {
             throw new IllegalArgumentException("Appointment date must be in the future");
         }
     }

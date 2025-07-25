@@ -26,13 +26,13 @@ public class InvoiceServiceImpl implements InvoiceService {
     public List<Invoice> getInvoicesInDateRange(LocalDateTime startDate, LocalDateTime endDate) {
         try {
             log.info("Fetching invoices between {} and {}", startDate, endDate);
-            
+
             // Validate input dates
             if (startDate == null || endDate == null) {
                 log.error("Start date or end date is null");
                 return List.of();
             }
-            
+
             if (startDate.isAfter(endDate)) {
                 log.error("Start date {} is after end date {}", startDate, endDate);
                 return List.of();
@@ -40,7 +40,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
             // Fetch invoices
             List<Invoice> invoices = invoiceRepository.findByInvoiceDateBetween(startDate, endDate);
-            
+
             // Log results
             if (invoices.isEmpty()) {
                 log.info("No invoices found for the date range");
@@ -48,18 +48,17 @@ public class InvoiceServiceImpl implements InvoiceService {
                 log.info("Found {} invoices", invoices.size());
                 invoices.forEach(invoice -> {
                     log.debug("Invoice: ID={}, Number={}, Date={}, Amount={}, Status={}, Patient={}",
-                        invoice.getInvoiceID(),
-                        invoice.getInvoiceNumber(),
-                        invoice.getInvoiceDate(),
-                        invoice.getFinalAmount(),
-                        invoice.getPaymentStatus(),
-                        invoice.getPatient() != null && invoice.getPatient().getUser() != null 
-                            ? invoice.getPatient().getUser().getFullName() 
-                            : "N/A"
-                    );
+                            invoice.getInvoiceID(),
+                            invoice.getInvoiceNumber(),
+                            invoice.getInvoiceDate(),
+                            invoice.getFinalAmount(),
+                            invoice.getPaymentStatus(),
+                            invoice.getPatient() != null && invoice.getPatient().getUser() != null
+                                    ? invoice.getPatient().getUser().getFullName()
+                                    : "N/A");
                 });
             }
-            
+
             return invoices;
         } catch (Exception e) {
             log.error("Error fetching invoices: ", e);
@@ -92,8 +91,24 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public Invoice createAppointmentInvoice(Appointment appointment, String paymentMethod) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createAppointmentInvoice'");
+        // Kiểm tra đã có hóa đơn cho appointment này chưa
+        if (appointment == null)
+            throw new IllegalArgumentException("Appointment is null");
+        if (invoiceRepository.findByAppointment(appointment).isPresent()) {
+            return invoiceRepository.findByAppointment(appointment).get();
+        }
+        Invoice invoice = new Invoice();
+        invoice.setAppointment(appointment);
+        invoice.setPatient(appointment.getPatient());
+        invoice.setInvoiceNumber(project.springBoot.utils.InvoiceUtils.generateInvoiceNumber());
+        invoice.setTotalAmount(appointment.getBookingSlot().getSchedule().getDoctor().getConsultationFee());
+        invoice.setFinalAmount(invoice.getTotalAmount());
+        invoice.setPaymentStatus("Paid");
+        invoice.setPaymentMethod(paymentMethod);
+        invoice.setInvoiceDate(java.time.LocalDateTime.now());
+        invoice.setCreatedAt(java.time.LocalDateTime.now());
+        invoice.setModifiedAt(java.time.LocalDateTime.now());
+        return invoiceRepository.save(invoice);
     }
 
     @Override
@@ -101,5 +116,5 @@ public class InvoiceServiceImpl implements InvoiceService {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getInvoiceByAppointment'");
     }
-    
-} 
+
+}

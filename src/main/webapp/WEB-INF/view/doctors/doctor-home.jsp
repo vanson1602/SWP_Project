@@ -8,10 +8,15 @@
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>HealthCare+ - Đặt lịch khám chữa bệnh</title>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+      <jsp:include page="../shared/head.jsp" />
       <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/base.css">
       <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/homepage.css">
+
+      <!-- Required scripts -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/vi.js"></script>
+      <script defer src="/resources/js/notifications.js"></script>
+
       <style>
         .search-section {
           background: linear-gradient(135deg, #6f42c1, #8655e0);

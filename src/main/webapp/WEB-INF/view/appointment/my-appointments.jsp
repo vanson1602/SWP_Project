@@ -5,6 +5,7 @@
                 <%@ page import="java.time.format.DateTimeFormatter" %>
                     <% pageContext.setAttribute("dateFormatter", DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                         pageContext.setAttribute("timeFormatter", DateTimeFormatter.ofPattern("HH:00")); %>
+
                         <!DOCTYPE html>
                         <html lang="vi">
 
@@ -12,10 +13,7 @@
                             <meta charset="UTF-8">
                             <meta name="viewport" content="width=device-width, initial-scale=1.0">
                             <title>Lịch hẹn của tôi - HealthCare+</title>
-                            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-                                rel="stylesheet">
-                            <link rel="stylesheet"
-                                href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+                            <jsp:include page="../shared/head.jsp" />
                             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/base.css">
                             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/homepage.css">
                             <style>
@@ -678,7 +676,8 @@
                                                             <button type="button" class="btn-close btn-close-white"
                                                                 data-bs-dismiss="modal"></button>
                                                         </div>
-                                                        <form action="/appointments/${appointment.appointmentID}/cancel"
+                                                        <form
+                                                            action="${pageContext.request.contextPath}/appointments/${appointment.appointmentID}/cancel"
                                                             method="post">
                                                             <div class="modal-body">
                                                                 <div class="mb-3">

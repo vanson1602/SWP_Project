@@ -54,7 +54,6 @@ public class ReceptionistBookingController {
     private final EmailService emailService;
     private final PayOS payOS;
 
-
     @GetMapping("/booking-receptionist/step-1")
     public String getSpecializationSelection(Model model, @RequestParam(required = false) String email,
             @RequestParam(required = false) Long specializationId) {

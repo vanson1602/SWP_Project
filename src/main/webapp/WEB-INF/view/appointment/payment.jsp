@@ -150,21 +150,43 @@
                                                             <input type="hidden" name="appointmentId"
                                                                 value="${appointment.appointmentID}">
 
+
                                                             <div class="payment-methods mb-4">
                                                                 <h4 class="section-title">
                                                                     <i class="bi bi-credit-card me-2"></i>
                                                                     Phương thức thanh toán
                                                                 </h4>
                                                                 <div class="methods-grid">
-                                                                    <div class="payment-method disabled">
-                                                                        <img src="${pageContext.request.contextPath}/resources/images/vnpay-logo.png"
-                                                                            alt="VNPAY">
-                                                                        <span>Thanh toán qua VNPAY</span>
-                                                                        <small class="text-muted">(Đang bảo trì)</small>
+                                                                    <div class="payment-method${not walletEnough ? ' disabled' : ''}"
+                                                                        style="position:relative;"
+                                                                        onclick="if(walletEnough) selectPaymentMethod('WALLET', this);">
+                                                                        <img src="${pageContext.request.contextPath}/resources/images/wallet.png"
+                                                                            alt="Ví điện tử"
+                                                                            style="height:40px; margin-bottom:0.5rem;">
+                                                                        <span>Thanh toán bằng ví điện tử</span>
+                                                                        <div style="margin-top: 0.5rem;">
+                                                                            <span class="badge text-dark"><i
+                                                                                    class="bi bi-wallet2"></i> Số dư ví:
+                                                                                <strong>${walletBalance}đ</strong></span>
+                                                                        </div>
+
+                                                                        <c:if test="${not walletEnough}">
+                                                                            <div class="alert alert-danger mt-2 mb-0 p-2"
+                                                                                style="font-size:0.95rem;">
+                                                                                <i
+                                                                                    class="bi bi-exclamation-triangle"></i>
+                                                                                Số dư ví của bạn không đủ để thanh toán!
+                                                                            </div>
+                                                                        </c:if>
+                                                                        <c:if test="${walletEnough}">
+                                                                            <small class="text-success">Số dư ví sẽ bị
+                                                                                trừ
+                                                                                trực tiếp</small>
+                                                                        </c:if>
                                                                     </div>
                                                                     <div class="payment-method"
                                                                         onclick="selectPaymentMethod('PAYOS', this)">
-                                                                        <img src="${pageContext.request.contextPath}/resources/images/payos-logo.png"
+                                                                        <img src="${pageContext.request.contextPath}/resources/images/payos.png"
                                                                             alt="PAYOS">
                                                                         <span>Thanh toán qua PAYOS</span>
                                                                     </div>
@@ -194,6 +216,7 @@
                             <script
                                 src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
                             <script>
+                                var walletEnough = "${walletEnough}" === "true";
                                 function selectPaymentMethod(method, el) {
                                     // Remove selected class from all methods
                                     document.querySelectorAll('.payment-method').forEach(e => e.classList.remove('selected'));
@@ -201,10 +224,23 @@
                                     // Add selected class to clicked method
                                     el.classList.add('selected');
 
-                                    // Update hidden input and enable button
+                                    // Update hidden input và enable/disable button
                                     document.getElementById('paymentMethod').value = method;
-                                    document.getElementById('paymentButton').disabled = false;
+                                    if (method === 'WALLET' && !walletEnough) {
+                                        document.getElementById('paymentButton').disabled = true;
+                                    } else {
+                                        document.getElementById('paymentButton').disabled = false;
+                                    }
                                 }
+
+                                // Disable submit nếu chọn ví mà không đủ tiền
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    var walletDiv = document.querySelector('.payment-method');
+                                    if (!walletEnough && walletDiv) {
+                                        walletDiv.classList.add('disabled');
+                                        walletDiv.style.pointerEvents = 'none';
+                                    }
+                                });
                             </script>
 
                             <style>

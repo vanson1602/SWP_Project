@@ -60,6 +60,11 @@ public class DoctorBookingSlot {
         if (status != null && !status.matches("Available|Booked|Blocked")) {
             throw new IllegalArgumentException("Invalid status: " + status);
         }
+
+        // Prevent setting Available status for past slots
+        if ("Available".equals(status) && startTime != null && startTime.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Cannot set Available status for past slots");
+        }
     }
 
     public String getStatus() {

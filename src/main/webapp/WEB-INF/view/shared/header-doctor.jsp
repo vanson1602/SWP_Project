@@ -1,18 +1,15 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-        <!-- Required scripts for notifications -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/vi.js"></script>
-        <link rel="stylesheet" href="/resources/css/notifications.css">
-        <script src="/resources/js/notifications.js"></script>
+        <!-- Include head.jsp for shared dependencies -->
+        <jsp:include page="head.jsp" />
 
         <!-- Header -->
         <header class="header">
             <div class="container">
                 <nav class="nav">
                     <!-- Logo -->
-                    <a href="/" class="logo">
+                    <a href="/doctor/home" class="logo">
                         <div class="logo-icon">⚕️</div>
                         HealthCare+
                     </a>
@@ -25,35 +22,50 @@
                     <!-- Navigation Links -->
                     <ul class="nav-links" id="navLinks">
                         <li><a href="<c:url value='/doctor/home' />" class="active"><i class="bi bi-house-door"></i>
-                                Trang
-                                chủ</a></li>
+                                Trang chủ</a></li>
                         <li><a href="/feedback/list"><i class="bi bi-person-badge"></i> Feedback</a></li>
                         <li><a href="/doctor/schedules"><i class="bi bi-clipboard2-pulse"></i> Xem lịch làm việc </a>
                         </li>
                         <li><a href="<c:url value='/doctor/appointments' />"><i class="bi bi-calendar-check"></i> Lịch
-                                hẹn</a>
-                        </li>
+                                hẹn</a></li>
                     </ul>
 
                     <!-- User Menu -->
                     <div class="user-menu">
                         <c:choose>
                             <c:when test="${not empty sessionScope.currentUser}">
-                                <!-- Notification Dropdown -->
+                                <!-- Notification Button -->
                                 <div class="notification-wrapper">
                                     <button type="button" class="notification-btn" id="notificationBtn">
-                                        <i class="bi bi-bell"></i>
-                                        <span class="notification-badge">0</span>
+                                        <i class="bi bi-bell-fill"></i>
+                                        <c:if test="${notificationCount > 0}">
+                                            <span class="notification-badge">${notificationCount}</span>
+                                        </c:if>
                                     </button>
                                     <div class="notification-dropdown" id="notificationDropdown">
                                         <div class="notification-header">
                                             <h3>Thông báo</h3>
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="mark-all-read btn btn-sm btn-light">
+                                                    <i class="bi bi-check2-all"></i> Đánh dấu đã đọc
+                                                </button>
+                                                <select class="notification-filter">
+                                                    <option value="all">Tất cả</option>
+                                                    <option value="unread">Chưa đọc</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                        <div class="notification-list">
-                                            <!-- Notifications will be loaded here -->
+                                        <div class="notification-list" id="notificationList">
+                                            <!-- Notifications will be inserted here -->
                                         </div>
+                                        <button type="button" class="load-more" style="display: none;">Xem thêm</button>
                                     </div>
                                 </div>
+
+                                <!-- Chat Button -->
+                                <a href="/chat" class="chat-btn" title="Tin nhắn">
+                                    <i class="bi bi-chat-dots"></i>
+                                </a>
 
                                 <!-- User Dropdown -->
                                 <div class="dropdown">
@@ -64,6 +76,8 @@
                                     <ul class="dropdown-menu" id="profileDropdown">
                                         <li><a class="dropdown-item" href="/profile"><i class="bi bi-person"></i> Trang
                                                 cá nhân</a></li>
+                                        <li><a class="dropdown-item" href="/wallet"><i class="bi bi-wallet2"></i> Ví
+                                                điện tử</a></li>
                                         <li><a class="dropdown-item" href="/settings"><i class="bi bi-gear"></i> Cài
                                                 đặt</a></li>
                                         <li>
@@ -88,6 +102,7 @@
 
         <!-- Header CSS -->
         <style>
+            /* Base styles */
             .header {
                 background-color: #fff;
                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -103,6 +118,7 @@
                 padding: 1rem 0;
             }
 
+            /* Logo */
             .logo {
                 display: flex;
                 align-items: center;
@@ -122,15 +138,7 @@
                 font-size: 1.8rem;
             }
 
-            .mobile-menu-btn {
-                display: none;
-                background: none;
-                border: none;
-                font-size: 1.5rem;
-                cursor: pointer;
-                padding: 0.5rem;
-            }
-
+            /* Navigation */
             .nav-links {
                 display: flex;
                 list-style: none;
@@ -147,95 +155,342 @@
                 align-items: center;
                 gap: 0.5rem;
                 padding: 0.5rem;
-                transition: color 0.3s;
+                transition: all 0.3s ease;
             }
 
             .nav-links a:hover,
             .nav-links a.active {
                 color: #007bff;
+                transform: translateY(-2px);
             }
 
             .nav-links i {
                 font-size: 1.2rem;
             }
 
+            /* User Menu */
             .user-menu {
                 display: flex;
                 align-items: center;
                 gap: 1rem;
             }
 
-            .profile-btn {
+            /* Notification */
+            .notification-wrapper {
+                position: relative;
+                margin-right: 0.5rem;
+            }
+
+            .notification-btn {
+                position: relative;
+                background: #f0f2f5;
+                border: none;
+                padding: 0.5rem;
+                cursor: pointer;
+                color: #1a1a1a;
                 display: flex;
                 align-items: center;
-                gap: 0.5rem;
-                background: none;
-                border: none;
-                color: #333;
-                font-weight: 500;
-                cursor: pointer;
-                padding: 0.5rem 1rem;
-                border-radius: 0.5rem;
+                justify-content: center;
                 transition: all 0.3s ease;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
                 text-decoration: none;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             }
 
-            .profile-btn:hover {
-                color: #007bff;
+            .notification-btn i {
+                font-size: 1.3rem;
+                color: #1a1a1a;
             }
 
-            .profile-btn i {
-                font-size: 1.2rem;
-                transition: color 0.3s ease;
+            .notification-btn:hover {
+                background: #e4e6eb;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
             }
 
-            .dropdown {
-                position: relative;
+            .notification-badge {
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                background-color: #f03e3e;
+                color: white;
+                border-radius: 50%;
+                min-width: 20px;
+                height: 20px;
+                padding: 0 6px;
+                font-size: 12px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 2px solid #fff;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                animation: pulse 2s infinite;
             }
 
-            .dropdown-menu {
+            /* Notification Dropdown */
+            .notification-dropdown {
                 display: none;
                 position: absolute;
-                right: 0;
                 top: 100%;
-                background-color: #fff;
-                border-radius: 0.5rem;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                padding: 0.5rem 0;
-                min-width: 200px;
+                right: 0;
+                width: 400px;
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
                 z-index: 1000;
+                max-height: 90vh;
+                overflow-y: auto;
+                animation: fadeIn 0.3s ease-out;
             }
 
-            .dropdown-menu.show {
+            .notification-dropdown.show {
                 display: block;
             }
 
-            .dropdown-item {
+            /* Notification Header */
+            .notification-header {
+                padding: 20px;
+                border-bottom: 1px solid #e4e6eb;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                position: sticky;
+                top: 0;
+                background: white;
+                z-index: 1;
+            }
+
+            .notification-header h3 {
+                margin: 0;
+                font-size: 24px;
+                font-weight: bold;
+                color: #1c1e21;
+            }
+
+            /* Mark all as read button */
+            .mark-all-read {
+                padding: 8px 16px;
+                border: none;
+                border-radius: 20px;
+                font-size: 14px;
+                color: #1c1e21;
+                background: #e4e6eb;
+                cursor: pointer;
+                transition: all 0.3s ease;
                 display: flex;
                 align-items: center;
-                gap: 0.5rem;
-                padding: 0.5rem 1rem;
-                color: #333;
-                text-decoration: none;
-                transition: all 0.3s ease;
+                gap: 8px;
+                font-weight: 500;
             }
 
-            .dropdown-item:hover {
-                background-color: #f8f9fa;
-                color: #007bff;
+            .mark-all-read:hover {
+                background: #d8dadf;
+                transform: translateY(-1px);
             }
 
-            .dropdown-item i {
-                font-size: 1.1rem;
+            .mark-all-read i {
+                font-size: 18px;
             }
 
-            .dropdown-divider {
-                height: 1px;
-                background-color: #e9ecef;
+            /* Notification Filter */
+            .notification-filter {
+                padding: 8px 16px;
                 border: none;
-                margin: 0.5rem 0;
+                border-radius: 20px;
+                font-size: 14px;
+                color: #1c1e21;
+                background: #e4e6eb;
+                cursor: pointer;
+                outline: none;
+                transition: all 0.3s ease;
+                font-weight: 500;
             }
 
+            .notification-filter:hover {
+                background: #d8dadf;
+            }
+
+            /* Notification List */
+            .notification-list {
+                padding: 8px 0;
+            }
+
+            /* Notification Item */
+            .notification-item {
+                padding: 16px 20px;
+                display: flex;
+                align-items: flex-start;
+                gap: 16px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                border-bottom: 1px solid #f0f2f5;
+            }
+
+            .notification-item:hover {
+                background-color: #f0f2f5;
+                transform: translateY(-1px);
+            }
+
+            .notification-item.unread {
+                background-color: #e7f3ff;
+            }
+
+            .notification-item.unread:hover {
+                background-color: #dbe7f2;
+            }
+
+            .notification-icon {
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                background: #e4e6eb;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .notification-icon i {
+                font-size: 20px;
+            }
+
+            .notification-content {
+                flex-grow: 1;
+            }
+
+            .notification-message {
+                margin: 0;
+                font-size: 14px;
+                line-height: 1.5;
+                color: #1c1e21;
+                font-weight: 500;
+            }
+
+            .notification-time {
+                font-size: 12px;
+                color: #65676b;
+                margin-top: 6px;
+                display: block;
+            }
+
+            /* Section Headers */
+            .notification-section {
+                padding: 16px 16px 8px;
+                font-size: 16px;
+                font-weight: 600;
+                color: #1c1e21;
+            }
+
+            /* Empty State */
+            .empty-state {
+                padding: 40px 20px;
+                text-align: center;
+                color: #65676b;
+                font-size: 15px;
+                font-weight: 500;
+            }
+
+            /* Load More Button */
+            .load-more {
+                display: none;
+                width: 100%;
+                padding: 12px;
+                background: none;
+                border: none;
+                color: #1877f2;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-size: 14px;
+            }
+
+            .load-more:hover {
+                background-color: #f0f2f5;
+            }
+
+            .load-more.pulse-animation {
+                animation: pulse 2s infinite;
+            }
+
+            /* Chat Button */
+            .chat-btn {
+                position: relative;
+                background: #f0f2f5;
+                border: none;
+                padding: 0.5rem;
+                cursor: pointer;
+                color: #1a1a1a;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                text-decoration: none;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
+
+            .chat-btn i {
+                font-size: 1.3rem;
+                color: #1a1a1a;
+            }
+
+            .chat-btn:hover {
+                background: #e4e6eb;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            }
+
+            /* Animations */
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes pulse {
+                0% {
+                    transform: scale(1);
+                }
+
+                50% {
+                    transform: scale(1.05);
+                }
+
+                100% {
+                    transform: scale(1);
+                }
+            }
+
+            /* Colors */
+            .text-primary {
+                color: #007bff !important;
+            }
+
+            .text-success {
+                color: #28a745 !important;
+            }
+
+            .text-warning {
+                color: #ffc107 !important;
+            }
+
+            .text-info {
+                color: #17a2b8 !important;
+            }
+
+            /* Responsive */
             @media (max-width: 768px) {
                 .mobile-menu-btn {
                     display: block;
@@ -252,20 +507,26 @@
                     flex-direction: column;
                     gap: 1rem;
                     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    animation: fadeIn 0.3s ease-out;
                 }
 
                 .nav-links.show {
                     display: flex;
                 }
+
+                .notification-dropdown {
+                    width: 100%;
+                    position: fixed;
+                    top: 60px;
+                    left: 0;
+                    right: 0;
+                    max-height: calc(100vh - 60px);
+                    border-radius: 0;
+                }
             }
         </style>
 
         <!-- Header JavaScript -->
-        <script>
-            // Set moment.js locale to Vietnamese
-            moment.locale('vi');
-        </script>
-
         <script>
             // Mobile menu toggle
             document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
