@@ -109,7 +109,7 @@ prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
   <body>
     <div class="card">
-      <h1>Medical Record Details</h1>
+      <h1>Hồ Sơ Bệnh Án</h1>
 
       <c:if test="${examination != null}">
         <div class="section-title">Dấu hiệu sinh tồn</div>

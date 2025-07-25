@@ -101,7 +101,7 @@ public class PatientHistoryController {
         }
         List<Prescription> prescriptions = prescriptionService
                 .getAllPrescriptionsByExaminationId(examination.getExaminationID());
-        if (prescriptions == null) {
+        if (prescriptions == null || prescriptions.isEmpty()) {
             model.addAttribute("errorMessage", "Không tìm thấy đơn thuốc nào cho cuộc hẹn này.");
         } else {
             model.addAttribute("prescriptions", prescriptions);
