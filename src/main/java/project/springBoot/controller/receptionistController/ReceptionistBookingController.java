@@ -54,7 +54,6 @@ public class ReceptionistBookingController {
     private final EmailService emailService;
     private final PayOS payOS;
 
-
     @GetMapping("/booking-receptionist/step-1")
     public String getSpecializationSelection(Model model, @RequestParam(required = false) String email,
             @RequestParam(required = false) Long specializationId) {
@@ -70,6 +69,11 @@ public class ReceptionistBookingController {
             RedirectAttributes redirectAttributes, Model model) {
         User user = userService.getUserByEmail(email);
         if (user == null) {
+            redirectAttributes.addFlashAttribute("error", "Không tìm thấy bệnh nhân với email: " + email);
+            redirectAttributes.addFlashAttribute("email", email);
+            return "redirect:/booking-receptionist/step-1";
+        }
+        if (user.getRole() != "patient") {
             redirectAttributes.addFlashAttribute("error", "Không tìm thấy bệnh nhân với email: " + email);
             redirectAttributes.addFlashAttribute("email", email);
             return "redirect:/booking-receptionist/step-1";
@@ -189,6 +193,16 @@ public class ReceptionistBookingController {
         DoctorBookingSlot slot = doctorService.getSlotById(slotId);
         Patient patient = patientService.getPatientByEmail(email);
 
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        String date = slot.getStartTime().format(dateFormatter);
+        String startTime = slot.getStartTime().format(timeFormatter);
+        String endTime = slot.getEndTime().format(timeFormatter);
+
+        model.addAttribute("date", date);
+        model.addAttribute("startTime", startTime);
+        model.addAttribute("endTime", endTime);
         model.addAttribute("doctor", doctor);
         model.addAttribute("appointmentType", type);
         model.addAttribute("slot", slot);

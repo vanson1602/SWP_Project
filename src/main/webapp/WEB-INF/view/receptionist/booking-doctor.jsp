@@ -13,53 +13,66 @@
 
           <style>
             body {
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-              background-color: #eef2f7;
+              font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+              background-color: #f0f4f8;
               margin: 0;
-              padding: 20px;
+              padding: 30px;
             }
 
             form {
               max-width: 900px;
-              margin: 0 auto;
+              margin: auto;
               background-color: #ffffff;
               padding: 40px;
-              border-radius: 16px;
-              box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+              border-radius: 20px;
+              box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
             }
 
             label {
               font-weight: 600;
+              font-size: 18px;
               display: block;
-              margin-bottom: 10px;
-              font-size: 17px;
-              color: #333;
+              margin-bottom: 16px;
+              color: #2d3e50;
             }
 
             .card-grid {
               display: grid;
-              grid-template-columns: repeat(3, 1fr);
+              grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
               gap: 20px;
-              margin-top: 16px;
             }
 
             .card {
-              background-color: #f9fafc;
+              background-color: #f8fafc;
+              border: 2px solid transparent;
               padding: 20px;
-              border: 2px solid #dbe2ea;
-              border-radius: 12px;
+              border-radius: 14px;
               text-align: center;
               cursor: pointer;
               transition: all 0.3s ease;
-              height: 100%;
               position: relative;
-              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+              box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+            }
+
+            .card:hover {
+              background-color: #f1f5f9;
+              transform: translateY(-2px);
+              box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+            }
+
+            .card img {
+              width: 100px;
+              height: 100px;
+              object-fit: cover;
+              border-radius: 50%;
+              margin-bottom: 14px;
+              border: 2px solid #dce3ed;
             }
 
             .card h4 {
-              margin: 10px 0 6px;
-              color: #007bff;
               font-size: 18px;
+              color: #007bff;
+              margin: 8px 0 4px;
             }
 
             .card p {
@@ -74,8 +87,9 @@
 
             input[type="radio"]:checked+label.card {
               border-color: #007bff;
-              background-color: #e6f0ff;
+              background-color: #e9f3ff;
               box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+              transform: scale(1.02);
             }
 
             input[type="radio"]:checked+label.card::after {
@@ -86,28 +100,22 @@
               background-color: #007bff;
               color: #fff;
               font-size: 14px;
-              padding: 4px 6px;
+              padding: 5px 7px;
               border-radius: 50%;
             }
 
-            label.card:hover {
-              background-color: #f1f5f9;
-              transform: translateY(-2px);
-              box-shadow: 0 6px 15px rgba(0, 0, 0, 0.04);
-            }
-
             button[type="submit"] {
-              display: block;
               width: 100%;
               background-color: #007bff;
               color: white;
-              padding: 14px;
+              padding: 16px;
               font-size: 17px;
+              font-weight: 600;
               border: none;
-              border-radius: 10px;
+              border-radius: 12px;
+              margin-top: 36px;
               cursor: pointer;
               transition: background-color 0.3s ease, transform 0.2s ease;
-              margin-top: 30px;
             }
 
             button[type="submit"]:hover {
@@ -115,18 +123,18 @@
               transform: translateY(-1px);
             }
 
-            @media (max-width: 768px) {
-              .card-grid {
-                grid-template-columns: repeat(2, 1fr);
+            @media (max-width: 600px) {
+              form {
+                padding: 30px 20px;
               }
-            }
 
-            @media (max-width: 480px) {
-              .card-grid {
-                grid-template-columns: 1fr;
+              .card img {
+                width: 80px;
+                height: 80px;
               }
             }
           </style>
+
         </head>
 
         <body>
@@ -140,8 +148,20 @@
                 <input type="radio" name="doctorId" id="doctor-${doctor.doctorID}" value="${doctor.doctorID}"
                   required />
                 <label for="doctor-${doctor.doctorID}" class="card">
+                  <c:choose>
+                    <c:when test="${not empty doctor.user.avatarUrl}">
+                      <img src="${doctor.user.avatarUrl}" class="card-img-top"
+                        alt="BS. ${doctor.user.firstName} ${doctor.user.lastName}">
+                    </c:when>
+                    <c:otherwise>
+                      <img src="/resources/images/defaultImg.jpg" class="card-img-top" alt="Default doctor photo">
+                    </c:otherwise>
+                  </c:choose>
                   <h4>${doctor.user.fullName}</h4>
                   <p>${doctor.qualification}</p>
+                  <p>kinh nghiệm:
+                    <fmt:formatNumber value="${doctor.experienceYears}" type="currency" currencySymbol="năm " />
+                  </p>
                   <p>Phí khám:
                     <fmt:formatNumber value="${doctor.consultationFee}" type="currency" currencySymbol="₫" />
                   </p>

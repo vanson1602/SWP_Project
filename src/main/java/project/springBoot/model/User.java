@@ -60,7 +60,7 @@ public class User {
     private String phone;
 
     @NotBlank(message = "Email is required")
-    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@gmail\\.com$", message = "Email must be a valid Gmail address")
+    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@(gmail\\.com|fpt\\.edu\\.vn)$", message = "Email must be a valid Gmail or FPT email address")
     @Column(nullable = false, length = 100)
     private String email;
 
@@ -147,9 +147,8 @@ public class User {
             throw new IllegalArgumentException("Username can only contain letters, numbers and underscore");
         }
 
-        if (email != null && !email.matches(
-                "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")) {
-            throw new IllegalArgumentException("Email must be a valid gmail address");
+        if (email != null && !email.matches("^[a-zA-Z0-9._%+-]+@(gmail\\.com|fpt\\.edu\\.vn)$")) {
+            throw new IllegalArgumentException("Email must be a valid Gmail or FPT email address");
         }
 
         if (phone != null && !phone.matches("^0\\d{9}$")) {

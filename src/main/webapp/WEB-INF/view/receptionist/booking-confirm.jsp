@@ -12,89 +12,116 @@
           background-color: #f4f6f9;
           padding: 20px;
           margin: 0;
+          color: #1a1a1a;
         }
 
         .confirm-box {
-          border: 1px solid #ddd;
-          border-radius: 12px;
-          padding: 30px;
-          max-width: 700px;
+          border-radius: 16px;
+          padding: 40px;
+          max-width: 720px;
           margin: 40px auto;
-          background-color: #ffffff;
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+          background: #ffffff;
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+          border-left: 6px solid #3cb371;
+          transition: all 0.3s ease;
         }
 
         .confirm-box h2 {
           text-align: center;
-          color: #007bff;
+          color: #2e8b57;
+          font-size: 26px;
           margin-bottom: 30px;
+          font-weight: 600;
         }
 
         .confirm-box p {
           font-size: 17px;
-          margin: 12px 0;
+          margin: 14px 0;
           color: #333;
+          line-height: 1.6;
         }
 
         .confirm-box strong {
-          color: #007bff;
-        }
-
-        .confirm-box label {
-          font-size: 16px;
-          margin-right: 15px;
-          display: inline-block;
-          margin-top: 10px;
+          color: #2e8b57;
         }
 
         .payment-methods {
-          margin: 20px 0;
+          margin: 30px 0;
+        }
+
+        .payment-methods p {
+          font-weight: 600;
+          margin-bottom: 10px;
+          color: #2e8b57;
+        }
+
+        .payment-methods label {
+          display: inline-block;
+          background-color: #f0fdf4;
+          border: 2px solid #c6f6d5;
+          padding: 10px 16px;
+          border-radius: 10px;
+          margin-right: 15px;
+          cursor: pointer;
+          font-size: 15px;
+          transition: 0.3s ease;
+          color: #1a1a1a;
+        }
+
+        .payment-methods input[type="radio"] {
+          margin-right: 6px;
+        }
+
+        .payment-methods label:hover {
+          background-color: #d9fbe6;
+          border-color: #a0e6b1;
         }
 
         .confirm-actions {
           text-align: center;
-          margin-top: 30px;
+          margin-top: 35px;
         }
 
         .confirm-actions button {
-          padding: 12px 30px;
+          padding: 14px 32px;
           font-size: 16px;
           border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: 0.3s;
-        }
-
-        .btn-confirm {
-          background-color: #007bff;
+          border-radius: 10px;
+          background-color: #2e8b57;
           color: white;
+          cursor: pointer;
+          font-weight: 600;
+          box-shadow: 0 6px 16px rgba(46, 139, 87, 0.2);
+          transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-        .btn-confirm:hover {
-          background-color: #0056b3;
-        }
-
-        .btn-cancel {
-          background-color: #ccc;
-          margin-left: 10px;
+        .confirm-actions button:hover {
+          background-color: #24824d;
+          transform: translateY(-2px);
         }
 
         .alert {
-          background-color: #f8d7da;
-          color: #721c24;
-          padding: 12px 20px;
-          border-radius: 6px;
+          background-color: #ffe5e5;
+          color: #b30000;
+          padding: 14px 20px;
+          border-left: 5px solid #b30000;
+          border-radius: 8px;
           margin-bottom: 20px;
+          font-weight: 500;
         }
 
         @media (max-width: 600px) {
           .confirm-box {
-            padding: 20px;
+            padding: 25px;
+          }
+
+          .payment-methods label {
+            display: block;
+            margin-bottom: 10px;
           }
 
           .confirm-actions button {
             width: 100%;
-            margin-bottom: 10px;
           }
         }
       </style>
@@ -110,7 +137,7 @@
 
         <p>Bệnh nhân: <strong>${patient.user.username}</strong></p>
         <p>Bác sĩ: <strong>${doctor.user.username}</strong></p>
-        <p>Thời gian: <strong>${slot.startTime} - ${slot.endTime}</strong></p>
+        <p>Thời gian: <strong>${date} | ${startTime} - ${endTime}</strong></p>
         <p>Loại cuộc hẹn: <strong>${appointmentType.typeName} (${doctor.consultationFee} VND)</strong></p>
         <p>Ghi chú: <strong>${note}</strong></p>
 

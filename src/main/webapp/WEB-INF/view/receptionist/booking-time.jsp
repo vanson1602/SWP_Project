@@ -13,18 +13,21 @@
             background-color: #f4f6f9;
             margin: 0;
             padding: 20px;
+            color: #1a1a1a;
           }
 
           h2,
           h3 {
-            color: #333;
+            color: #1a1a1a;
             margin-top: 30px;
+            font-weight: 600;
           }
 
           .alert {
-            background-color: #f8d7da;
-            color: #721c24;
+            background-color: #ffe5e5;
+            color: #cc0000;
             padding: 12px 20px;
+            border-left: 6px solid #cc0000;
             border-radius: 6px;
             margin-bottom: 20px;
           }
@@ -33,94 +36,75 @@
             max-width: 960px;
             margin: 0 auto;
             background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
           }
 
-          .date-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 10px;
-          }
-
-          .date-card {
-            border: 2px solid #ccc;
-            border-radius: 10px;
-            padding: 12px 20px;
-            background-color: #f8f9fa;
-            cursor: pointer;
-            transition: 0.3s;
-            text-decoration: none;
-            color: #000;
-          }
-
-          .date-card:hover {
-            background-color: #e6f0ff;
-            border-color: #007bff;
-          }
-
-          .selected-date {
-            background-color: #007bff !important;
-            color: white !important;
-            border-color: #0056b3 !important;
-          }
-
+          .date-options,
           .time-slots,
           .appointment-types {
             display: flex;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 14px;
             margin-top: 15px;
+          }
+
+          .date-card,
+          .time-slot-card,
+          .appointment-type-card {
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            padding: 14px 20px;
+            background-color: #f9fafb;
+            transition: 0.3s;
+            cursor: pointer;
+            text-align: center;
+            flex: 1 1 160px;
+            min-width: 160px;
+            font-size: 15px;
+            font-weight: 500;
+          }
+
+          .date-card:hover,
+          .time-slot-card:hover,
+          .appointment-type-card:hover {
+            background-color: #e9f2ff;
+            border-color: #0066cc;
+          }
+
+          .selected-date {
+            background-color: #0066cc !important;
+            color: #fff !important;
+            border-color: #005bb5 !important;
           }
 
           .radio-hidden {
             display: none;
           }
 
-          .time-slot-card,
-          .appointment-type-card {
-            border: 2px solid #ccc;
-            border-radius: 10px;
-            padding: 16px;
-            background-color: #f8f9fa;
-            color: black;
-            cursor: pointer;
-            transition: 0.3s;
-            min-width: 180px;
-            text-align: center;
-            flex-grow: 1;
-          }
-
-          .time-slot-card:hover,
-          .appointment-type-card:hover {
-            background-color: #e6f0ff;
-            border-color: #007bff;
-          }
-
-          .radio-hidden:checked+label.time-slot-card,
-          .radio-hidden:checked+label.appointment-type-card {
-            background-color: #007bff;
-            color: white;
-            border-color: #0056b3;
+          .radio-hidden:checked+label {
+            background-color: #0066cc;
+            color: #fff;
+            border-color: #005bb5;
           }
 
           .time-slot-card.unavailable {
             opacity: 0.5;
-            cursor: not-allowed;
-            background-color: #eee;
+            background-color: #eeeeee;
             border-color: #bbb;
+            cursor: not-allowed;
           }
 
           .booked-indicator {
-            font-size: 13px;
             display: block;
+            font-size: 13px;
             margin-top: 6px;
+            font-weight: 500;
           }
 
           .text-green {
-            color: green;
+            color: #2e8b57;
           }
 
           textarea {
@@ -128,37 +112,104 @@
             border-radius: 10px;
             padding: 12px;
             font-size: 15px;
-            border: 1px solid #ccc;
+            border: 1.5px solid #ccc;
             margin-top: 10px;
             resize: vertical;
+            transition: border-color 0.3s ease;
+          }
+
+          textarea:focus {
+            border-color: #0066cc;
+            outline: none;
           }
 
           .submit-button {
             margin-top: 30px;
-            padding: 14px 28px;
+            padding: 16px;
             font-size: 16px;
             border: none;
-            border-radius: 8px;
-            background-color: #007bff;
+            border-radius: 10px;
+            background-color: #0066cc;
             color: white;
             cursor: pointer;
             width: 100%;
-            transition: background-color 0.3s ease;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+          }
+
+          .date-options a {
+            text-decoration: none;
+            color: inherit;
+          }
+
+          .appointment-type-card span {
+            font-size: 14px;
+            color: black;
           }
 
           .submit-button:hover {
-            background-color: #0056b3;
+            background-color: #004f9e;
+            transform: translateY(-1px);
           }
+
+          /* Hover rõ ràng hơn cho các card */
+          .date-card:hover,
+          .time-slot-card:hover,
+          .appointment-type-card:hover {
+            background-color: #d0e7ff;
+            border-color: #3399ff;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.2);
+            transform: translateY(-2px);
+          }
+
+          /* Chọn radio thì hiện hiệu ứng */
+          .radio-hidden:checked+label {
+            background-color: #3399ff;
+            color: #fff;
+            border-color: #2a85d0;
+            box-shadow: 0 0 0 3px rgba(51, 153, 255, 0.4);
+            transform: translateY(-1px);
+          }
+
+          /* Hover cho nút submit */
+          .submit-button:hover {
+            background-color: #0053b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 83, 179, 0.3);
+          }
+
+          /* Loại cuộc hẹn - mô tả nhẹ nhàng */
+          .appointment-type-card span {
+            font-size: 14px;
+            color: #444;
+          }
+
+          /* Tăng hiệu ứng khi di chuột vào ô ghi chú */
+          textarea:focus {
+            border-color: #3399ff;
+            box-shadow: 0 0 5px rgba(0, 102, 204, 0.2);
+          }
+
+          /* Nhẹ nhàng hơn cho phần chọn ngày */
+          .date-options a {
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease;
+          }
+
 
           @media (max-width: 768px) {
 
+            .date-options,
+            .time-slots,
+            .appointment-types {
+              flex-direction: column;
+            }
+
+            .date-card,
             .time-slot-card,
             .appointment-type-card {
               min-width: 100%;
-            }
-
-            .date-options {
-              flex-direction: column;
             }
           }
         </style>
@@ -225,8 +276,8 @@
               <input type="radio" class="radio-hidden" id="type-${type.appointmentTypeID}" name="appointmentTypeId"
                 value="${type.appointmentTypeID}" required />
               <label for="type-${type.appointmentTypeID}" class="appointment-type-card">
-                <strong>${type.typeName}</strong><br />
-                <span style="font-size: 14px; color: #eee">${type.description}</span>
+                <strong>${type.typeName}</strong><br /><br />
+                <span style="font-size: 14px; color: #2e8b57">${type.description}</span>
               </label>
             </c:forEach>
           </div>

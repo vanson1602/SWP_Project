@@ -13,68 +13,98 @@
 
             <style>
               body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background-color: #eef2f7;
+                font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                background-color: #f0f4f8;
                 margin: 0;
-                padding: 20px;
+                padding: 30px;
               }
 
               form {
                 max-width: 900px;
-                margin: 0 auto;
+                margin: auto;
                 background-color: #ffffff;
                 padding: 40px;
-                border-radius: 16px;
-                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+                border-radius: 20px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+                transition: all 0.3s ease;
               }
 
               label {
                 font-weight: 600;
+                font-size: 18px;
                 display: block;
-                margin-bottom: 10px;
-                font-size: 17px;
-                color: #333;
+                margin-bottom: 16px;
+                color: #2d3e50;
               }
 
               input[type="email"] {
                 width: 100%;
-                padding: 12px 16px;
+                padding: 14px 18px;
                 font-size: 16px;
-                border: 1px solid #ccc;
-                border-radius: 10px;
-                margin-bottom: 24px;
-                box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+                border: 1.5px solid #ccc;
+                border-radius: 12px;
+                margin-bottom: 28px;
+                transition: border 0.3s ease;
+              }
+
+              input[type="email"]:focus {
+                border-color: #007bff;
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
               }
 
               .card-grid {
                 display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 20px;
+                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                gap: 24px;
                 margin-top: 10px;
               }
 
               .card {
-                background-color: #f9fafc;
-                padding: 20px;
-                border: 2px solid #dbe2ea;
-                border-radius: 12px;
+                background-color: #f8fafc;
+                border: 2px solid transparent;
+                padding: 0;
+                border-radius: 16px;
                 text-align: center;
                 cursor: pointer;
                 transition: all 0.3s ease;
-                height: 100%;
                 position: relative;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+                overflow: hidden;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+              }
+
+              .card img {
+                width: 100%;
+                height: 160px;
+                object-fit: cover;
+                display: block;
+                transition: transform 0.3s ease;
+              }
+
+              .card:hover img {
+                transform: scale(1.02);
+              }
+
+              .card-content {
+                padding: 16px 16px 20px;
+                flex-grow: 1;
               }
 
               .card h4 {
-                margin: 10px 0 6px;
-                color: #007bff;
                 font-size: 18px;
+                color: #007bff;
+                margin-bottom: 8px;
+                font-weight: 600;
               }
 
               .card p {
                 font-size: 14px;
                 color: #555;
+                line-height: 1.5;
               }
 
               input[type="radio"] {
@@ -83,8 +113,9 @@
 
               input[type="radio"]:checked+label.card {
                 border-color: #007bff;
-                background-color: #e6f0ff;
+                background-color: #e9f3ff;
                 box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+                transform: scale(1.01);
               }
 
               input[type="radio"]:checked+label.card::after {
@@ -95,34 +126,34 @@
                 background-color: #007bff;
                 color: #fff;
                 font-size: 14px;
-                padding: 4px 6px;
+                padding: 5px 7px;
                 border-radius: 50%;
               }
 
               label.card:hover {
                 background-color: #f1f5f9;
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
                 transform: translateY(-2px);
-                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.04);
               }
 
               .error-msg {
-                color: red;
+                color: #d9534f;
                 font-size: 15px;
-                margin-bottom: 16px;
+                margin-bottom: 20px;
               }
 
               button[type="submit"] {
-                display: block;
                 width: 100%;
                 background-color: #007bff;
                 color: white;
-                padding: 14px;
+                padding: 16px;
                 font-size: 17px;
+                font-weight: 600;
                 border: none;
-                border-radius: 10px;
+                border-radius: 12px;
+                margin-top: 36px;
                 cursor: pointer;
                 transition: background-color 0.3s ease, transform 0.2s ease;
-                margin-top: 30px;
               }
 
               button[type="submit"]:hover {
@@ -131,8 +162,16 @@
               }
 
               @media (max-width: 768px) {
-                .card-grid {
-                  grid-template-columns: repeat(2, 1fr);
+                form {
+                  padding: 30px 24px;
+                }
+
+                button[type="submit"] {
+                  font-size: 16px;
+                }
+
+                .card img {
+                  height: 140px;
                 }
               }
 
@@ -140,8 +179,14 @@
                 .card-grid {
                   grid-template-columns: 1fr;
                 }
+
+                .card img {
+                  height: 120px;
+                }
               }
             </style>
+
+
           </head>
 
           <body>
@@ -159,8 +204,12 @@
                   <input type="radio" name="specializationId" id="spec-${spec.specializationID}"
                     value="${spec.specializationID}" required />
                   <label for="spec-${spec.specializationID}" class="card">
-                    <h4>${spec.specializationName}</h4>
-                    <p>${spec.description}</p>
+                    <img src="/resources/images/specialties/${spec.specializationID}.png"
+                      alt="${spec.specializationName}">
+                    <div class="card-content">
+                      <h4>${spec.specializationName}</h4>
+                      <p>${spec.description}</p>
+                    </div>
                   </label>
                 </c:forEach>
               </div>
