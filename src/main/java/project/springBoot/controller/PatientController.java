@@ -1,9 +1,13 @@
 package project.springBoot.controller;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.servlet.http.HttpServletRequest;
 import project.springBoot.model.Patient;
 import project.springBoot.model.User;
 import project.springBoot.service.PatientService;

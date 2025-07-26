@@ -1,6 +1,7 @@
 package project.springBoot.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,9 @@ public class PageController {
     @Autowired
     private DoctorRepository doctorRepository;
 
+    @Value("${coze.bot.token}")
+    private String cozeToken;
+
     @RequestMapping("/")
     public String getHomePage(Model model, @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int size) {
@@ -33,6 +37,7 @@ public class PageController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", doctorPage.getTotalPages());
         model.addAttribute("totalItems", doctorPage.getTotalElements());
+        model.addAttribute("cozeToken", cozeToken);
         return "authentication/homepage";
     }
 
@@ -46,13 +51,12 @@ public class PageController {
         return "admin/dashboard";
     }
 
-
-
     @RequestMapping("/register")
     public String getRegisterPage(User user, Model model) {
         model.addAttribute("user", user);
         return "authentication/form-register";
     }
+
     @RequestMapping("/receptionist")
     public String getReceptionistDashboard(Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
