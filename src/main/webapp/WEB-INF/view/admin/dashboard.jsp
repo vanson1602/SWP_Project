@@ -417,6 +417,8 @@
                                     lịch bận</a></li>
                             <li><a href="/admin/schedules/doctors"><i class="fas fa-user-md"></i> Lịch Bác Sĩ</a></li>
                             <li><a href="/feedback/list"><i class="fas fa-user-md"></i> Quản lí feedback</a></li>
+                            <li><a href="/booking-receptionist/step-1"><i class="fas fa-user-md"></i> Đặt Lịch</a>
+                            </li>
                             <li><a href="/admin"><i class="fas fa-sign-out-alt"></i> Home Page</a></li>
                         </ul>
                     </nav>

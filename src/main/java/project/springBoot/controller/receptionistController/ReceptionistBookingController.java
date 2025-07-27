@@ -73,11 +73,12 @@ public class ReceptionistBookingController {
             redirectAttributes.addFlashAttribute("email", email);
             return "redirect:/booking-receptionist/step-1";
         }
-        if (user.getRole() != "patient") {
-            redirectAttributes.addFlashAttribute("error", "Không tìm thấy bệnh nhân với email: " + email);
-            redirectAttributes.addFlashAttribute("email", email);
-            return "redirect:/booking-receptionist/step-1";
-        }
+        // if (user.getRole() != "patient") {
+        // redirectAttributes.addFlashAttribute("error", "Không tìm thấy bệnh nhân với
+        // email: " + email);
+        // redirectAttributes.addFlashAttribute("email", email);
+        // return "redirect:/booking-receptionist/step-1";
+        // }
         redirectAttributes.addAttribute("email", email);
         redirectAttributes.addAttribute("specializationId", specializationId);
         return "redirect:/booking-receptionist/step-2";
@@ -318,7 +319,15 @@ public class ReceptionistBookingController {
     }
 
     @GetMapping("/booking-success")
-    public String showBookingSuccessPage() {
-        return "receptionist/booking-success"; // cần có file JSP tương ứng
+    public String showBookingSuccessPage(HttpSession session, Model model) {
+        User currentUser = (User) session.getAttribute("currentUser");
+
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        String role = currentUser.getRole().toLowerCase();
+        model.addAttribute("role", role);
+        return "receptionist/booking-success";
     }
 }
