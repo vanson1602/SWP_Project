@@ -229,6 +229,11 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
+    public Doctor getDoctorByUsername(String username) {
+        return doctorRepository.findByUsername(username);
+    }
+
+    @Override
     public Doctor findById(Long id) {
         return doctorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Doctor not found"));

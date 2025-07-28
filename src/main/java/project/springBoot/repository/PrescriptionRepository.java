@@ -17,5 +17,4 @@ public interface PrescriptionRepository extends JpaRepository<Prescription, Long
     long countByExaminationExaminationID(Long examinationId);
     Optional<Prescription> findFirstByExaminationExaminationID(Long examinationId);
 
-    
 }

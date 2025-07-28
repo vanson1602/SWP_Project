@@ -62,7 +62,8 @@
                                         ${sessionScope.currentUser.firstName} ${sessionScope.currentUser.lastName}
                                     </button>
                                     <ul class="dropdown-menu" id="profileDropdown">
-                                        <li><a class="dropdown-item" href="/profile"><i class="bi bi-person"></i> Trang
+                                        <li><a class="dropdown-item" href="/doctor/profile"><i class="bi bi-person"></i>
+                                                Trang
                                                 cá nhân</a></li>
                                         <li><a class="dropdown-item" href="/settings"><i class="bi bi-gear"></i> Cài
                                                 đặt</a></li>
