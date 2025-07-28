@@ -14,6 +14,11 @@
             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/shared.css">
             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common.css">
             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/specialty-selection.css">
+
+            <!-- Required scripts -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/vi.js"></script>
+            <script defer src="/resources/js/notifications.js"></script>
         </head>
 
         <body>

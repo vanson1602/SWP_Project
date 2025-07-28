@@ -26,6 +26,7 @@ import project.springBoot.model.User;
 import project.springBoot.service.AppointmentService;
 import project.springBoot.service.ExaminationService;
 import project.springBoot.service.MedicationService;
+import project.springBoot.service.NotificationService;
 import project.springBoot.service.PatientService;
 import project.springBoot.service.PrescriptionService;
 import project.springBoot.service.UserService;
@@ -44,6 +45,8 @@ public class PatientHistoryController {
     private PrescriptionService prescriptionService;
     @Autowired
     private MedicationService medicationService;
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/medical-history")
     public String viewPatientHistory(HttpSession session, Model model) {
@@ -51,6 +54,11 @@ public class PatientHistoryController {
         if (currentUser == null || !"patient".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/access-denied";
         }
+
+        // Add notification count for header
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
+
         Patient patient = patientService.getPatientByUsername(currentUser.getUsername());
         List<Appointment> appointments = appointmentService.findAppointmentByPatientID(patient.getPatientID());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -78,6 +86,11 @@ public class PatientHistoryController {
         if (currentUser == null || !"patient".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/login";
         }
+
+        // Add notification count for header
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
+
         Examination examination = examinationService.getExaminationByAppointmentId(appointmentID);
         DateTimeFormatter date = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         DateTimeFormatter time = DateTimeFormatter.ofPattern("HH:mm");
@@ -93,6 +106,10 @@ public class PatientHistoryController {
         if (currentUser == null || !"patient".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/login";
         }
+
+        // Add notification count for header
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
 
         Examination examination = examinationService.getExaminationByAppointmentId(appointmentID);
         if (examination == null) {

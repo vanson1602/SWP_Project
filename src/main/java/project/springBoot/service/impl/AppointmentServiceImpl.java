@@ -431,8 +431,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         System.out.println("Running cancelExpiredAppointments at: " + LocalDateTime.now());
         LocalDateTime now = LocalDateTime.now();
 
-        List<Appointment> expiredAppointments = appointmentRepository.findByStatusAndAppointmentDateBefore("Confirmed",
-                now);
+        List<Appointment> expiredAppointments = appointmentRepository.findByStatusAndAppointmentDateBefore(now);
         System.out.println("Found " + expiredAppointments.size() + " expired appointments");
 
         for (Appointment appointment : expiredAppointments) {

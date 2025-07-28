@@ -43,6 +43,7 @@ import vn.payos.type.CheckoutResponseData;
 import vn.payos.type.ItemData;
 import vn.payos.type.PaymentData;
 import project.springBoot.service.WalletService;
+import project.springBoot.service.NotificationService;
 
 @Controller
 @RequiredArgsConstructor
@@ -56,6 +57,7 @@ public class AppointmentController {
     private final PatientService patientService;
     private final InvoiceService invoiceService;
     private final WalletService walletService;
+    private final NotificationService notificationService;
 
     private void clearBookingSession(HttpSession session) {
         session.removeAttribute("selectedDoctor");
@@ -82,6 +84,10 @@ public class AppointmentController {
             return "redirect:/login";
         }
 
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(user.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
+
         session.setAttribute("currentUser", user);
         session.setAttribute("currentPatient", patient);
         clearBookingSession(session);
@@ -101,6 +107,11 @@ public class AppointmentController {
 
     @GetMapping("/specialty")
     public String showSpecialtySelection(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("currentUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
         Doctor doctor = (Doctor) session.getAttribute("selectedDoctor");
         List<Specialization> specializations;
         if (doctor == null) {
@@ -108,12 +119,22 @@ public class AppointmentController {
         } else {
             specializations = new ArrayList<>(doctor.getSpecializations());
         }
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(user.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
+
         model.addAttribute("specializations", specializations);
         return "appointment/specialty-selection";
     }
 
     @GetMapping("/doctor")
     public String showDoctorSelection(@RequestParam Long specializationId, Model model, HttpSession session) {
+        User user = (User) session.getAttribute("currentUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
         Doctor doctor = (Doctor) session.getAttribute("selectedDoctor");
         Specialization specialization = specializationService.getSpecializationById(specializationId);
         if (doctor != null) {
@@ -123,6 +144,11 @@ public class AppointmentController {
         }
         List<Doctor> doctors = doctorService.getDoctorsBySpecialization(specializationId);
         session.setAttribute("selectedSpecialization", specialization);
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(user.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
+
         model.addAttribute("doctors", doctors);
         return "appointment/doctor-selection";
     }
@@ -133,6 +159,11 @@ public class AppointmentController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
             Model model,
             HttpSession session) {
+        User user = (User) session.getAttribute("currentUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
         if (date == null) {
             date = LocalDate.now();
         }
@@ -150,6 +181,10 @@ public class AppointmentController {
             startTime = startTime.plusHours(1);
         }
 
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(user.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
+
         model.addAttribute("today", LocalDate.now());
         model.addAttribute("selectedDate", date);
         model.addAttribute("availableSlots", availableSlots);
@@ -163,10 +198,18 @@ public class AppointmentController {
             @RequestParam Long slotId,
             HttpSession session,
             Model model) {
+        User user = (User) session.getAttribute("currentUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
         DoctorBookingSlot slot = doctorService.getSlotById(slotId);
         System.out.println("Slot: " + slot);
         System.out.println("Slot: " + slot);
-        User user = (User) session.getAttribute("currentUser");
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(user.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
         Patient patient = doctorService.getPatientByUsername(user.getUsername());
         Specialization specialization = (Specialization) session.getAttribute("selectedSpecialization");
         List<AppointmentType> appointmentTypes = appointmentService.getAllAppointmentTypes();
@@ -220,39 +263,33 @@ public class AppointmentController {
     @GetMapping("/payment")
     public String showPaymentPage(@RequestParam(required = false) Long appointmentId, HttpSession session,
             Model model) {
+        User user = (User) session.getAttribute("currentUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
         Appointment appointment;
-
         if (appointmentId != null) {
-            try {
-                appointment = appointmentService.getAppointmentByIdWithDetails(appointmentId);
-                if (appointment == null) {
-                    return "redirect:/appointments/my-appointments?error=Appointment not found";
-                }
-                if (!appointment.getStatus().equals("Pending")) {
-                    return "redirect:/appointments/my-appointments?error=This appointment cannot be paid";
-                }
-
-                // Kiểm tra xem người dùng hiện tại có phải là chủ của appointment không
-                User currentUser = (User) session.getAttribute("currentUser");
-                if (currentUser.getUserID() != appointment.getPatient().getUser().getUserID()) {
-                    return "redirect:/appointments/my-appointments?error=Unauthorized access";
-                }
-
-                session.setAttribute("pendingAppointment", appointment);
-            } catch (Exception e) {
-                return "redirect:/appointments/my-appointments?error=" + e.getMessage();
-            }
+            appointment = appointmentService.findByIdAppointment(appointmentId);
         } else {
-            // Nếu không có appointmentId, lấy từ session như cũ
             appointment = (Appointment) session.getAttribute("pendingAppointment");
-            if (appointment == null) {
-                return "redirect:/appointments/booking";
-            }
-            try {
-                appointment = appointmentService.getAppointmentByIdWithDetails(appointment.getAppointmentID());
-            } catch (Exception e) {
-                return "redirect:/appointments/booking?error=" + e.getMessage();
-            }
+        }
+
+        if (appointment == null) {
+            return "redirect:/appointments";
+        }
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(user.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
+
+        if (appointment == null) {
+            return "redirect:/appointments/booking";
+        }
+        try {
+            appointment = appointmentService.getAppointmentByIdWithDetails(appointment.getAppointmentID());
+        } catch (Exception e) {
+            return "redirect:/appointments/booking?error=" + e.getMessage();
         }
 
         // Lấy số dư ví và kiểm tra đủ tiền không
@@ -376,10 +413,14 @@ public class AppointmentController {
             return "redirect:/login";
         }
 
-        Patient patient = doctorService.getPatientByUsername(user.getUsername());
+        Patient patient = patientService.getPatientByUsername(user.getUsername());
         if (patient == null) {
             return "redirect:/login";
         }
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(user.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
 
         final int PAGE_SIZE = 5;
         Page<Appointment> appointmentPage;

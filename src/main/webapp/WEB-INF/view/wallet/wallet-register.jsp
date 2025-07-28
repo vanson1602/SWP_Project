@@ -9,6 +9,13 @@
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Đăng ký ví điện tử - HealthCare+</title>
             <jsp:include page="../shared/head.jsp" />
+            <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/base.css">
+            <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/homepage.css">
+
+            <!-- Required scripts -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/vi.js"></script>
+            <script defer src="/resources/js/notifications.js"></script>
             <meta name="_csrf" content="${_csrf.token}">
             <meta name="_csrf_header" content="${_csrf.headerName}">
 

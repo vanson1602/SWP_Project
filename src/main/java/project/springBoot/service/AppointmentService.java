@@ -46,19 +46,7 @@ public interface AppointmentService {
                         LocalDateTime endDate);
 
         Appointment findByIdAppointment(Long appointmentId);
-        Appointment findByIdAppointment(Long appointmentId);
 
-        long countTotalPatients();
-
-        long countTodaysAppointments();
-
-        double getTotalRevenue(); // Updated to use consultation_fee
-
-        List<Map<String, Object>> getMonthlyAppointments(int months);
-
-        Map<String, Long> getAppointmentStatusDistribution();
-
-        List<Appointment> findTop5ByStatusOrderByCreatedAtDesc(String status);
         long countTotalPatients();
 
         long countTodaysAppointments();
@@ -76,17 +64,7 @@ public interface AppointmentService {
         List<Map<String, Object>> getMonthlyAppointmentReport(LocalDateTime startDate, LocalDateTime endDate);
 
         Map<String, Object> getDashboardStatistics();
-        List<Map<String, Object>> getRevenueReport(LocalDateTime startDate, LocalDateTime endDate);
 
-        List<Map<String, Object>> getMonthlyAppointmentReport(LocalDateTime startDate, LocalDateTime endDate);
-
-        Map<String, Object> getDashboardStatistics();
-
-        long getDistinctAppointmentsCompletedBetween(LocalDateTime start, LocalDateTime end);
-
-        long getDistinctPatientsCompletedBetween(LocalDateTime start, LocalDateTime end);
-
-        double getRevenueBetween(LocalDateTime start, LocalDateTime end);
         long getDistinctAppointmentsCompletedBetween(LocalDateTime start, LocalDateTime end);
 
         long getDistinctPatientsCompletedBetween(LocalDateTime start, LocalDateTime end);
@@ -96,14 +74,9 @@ public interface AppointmentService {
         List<Map<String, Object>> getDailyAppointmentReport(LocalDateTime startDate, LocalDateTime endDate);
 
         Map<String, Long> getAppointmentStatusDistributionBetween(LocalDateTime startDate, LocalDateTime endDate);
-        List<Map<String, Object>> getDailyAppointmentReport(LocalDateTime startDate, LocalDateTime endDate);
-
-        Map<String, Long> getAppointmentStatusDistributionBetween(LocalDateTime startDate, LocalDateTime endDate);
 
         List<Invoice> getInvoicesInDateRange(LocalDateTime startDate, LocalDateTime endDate);
-        List<Invoice> getInvoicesInDateRange(LocalDateTime startDate, LocalDateTime endDate);
 
-        List<Map<String, Object>> getDoctorRevenueReport(LocalDateTime startDate, LocalDateTime endDate);
         List<Map<String, Object>> getDoctorRevenueReport(LocalDateTime startDate, LocalDateTime endDate);
 
         List<Appointment> getAppointmentsByDoctorAndDateRangeIncludingCompleted(Long doctorId, LocalDateTime startDate,

@@ -574,18 +574,35 @@
         <!-- Header JavaScript -->
         <script>
             // Mobile menu toggle
-            document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
-                document.getElementById('navLinks').classList.toggle('show');
-            });
+            document.addEventListener('DOMContentLoaded', function () {
+                const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+                const navLinks = document.getElementById('navLinks');
 
-            // Profile dropdown toggle
-            document.getElementById('profileDropdownBtn')?.addEventListener('click', (e) => {
-                e.stopPropagation();
-                document.getElementById('profileDropdown').classList.toggle('show');
-            });
+                if (mobileMenuBtn && navLinks) {
+                    mobileMenuBtn.addEventListener('click', () => {
+                        navLinks.classList.toggle('show');
+                    });
+                }
 
-            // Close dropdown when clicking outside
-            document.addEventListener('click', () => {
-                document.getElementById('profileDropdown')?.classList.remove('show');
+                // Profile dropdown toggle
+                const profileDropdownBtn = document.getElementById('profileDropdownBtn');
+                const profileDropdown = document.getElementById('profileDropdown');
+
+                if (profileDropdownBtn && profileDropdown) {
+                    profileDropdownBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        profileDropdown.classList.toggle('show');
+                    });
+                }
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', () => {
+                    if (profileDropdown) {
+                        profileDropdown.classList.remove('show');
+                    }
+                });
+
+                // Notification handling is now managed by notifications.js
+                // Removed inline notification JavaScript to avoid conflicts
             });
         </script>

@@ -72,14 +72,34 @@ async function initNotifications() {
         return;
     }
 
-    console.log('Các elements:', {
-        notificationBtn,
-        notificationDropdown,
-        notificationList
+    console.log('Elements found:', {
+        notificationBtn: !!notificationBtn,
+        notificationDropdown: !!notificationDropdown,
+        notificationList: !!notificationList
     });
 
-    await updateUnreadCount();
-    setupEventListeners();
+    // Kiểm tra trạng thái ban đầu của dropdown
+    console.log('Trạng thái ban đầu của dropdown:', {
+        hasShowClass: notificationDropdown.classList.contains('show'),
+        display: window.getComputedStyle(notificationDropdown).display,
+        classes: notificationDropdown.className
+    });
+
+    // Đảm bảo dropdown bắt đầu ở trạng thái ẩn
+    notificationDropdown.classList.remove('show');
+
+    console.log('All elements found, proceeding with initialization...');
+    try {
+        console.log('Calling updateUnreadCount...');
+        await updateUnreadCount();
+        console.log('updateUnreadCount completed');
+        console.log('Calling setupEventListeners...');
+        setupEventListeners();
+        console.log('setupEventListeners completed');
+        console.log('=== KHỞI TẠO HOÀN TẤT ===');
+    } catch (error) {
+        console.error('Error during initialization:', error);
+    }
 }
 
 // Update unread count
@@ -271,14 +291,27 @@ function createNotificationElement(notification) {
 
 // Load notifications
 async function loadNotifications(reset = false) {
-    if (loading) return;
+    console.log('=== LOAD NOTIFICATIONS CALLED ===');
+    console.log('Reset:', reset);
+    console.log('Loading state:', loading);
+    console.log('All notifications length:', allNotifications.length);
+
+    if (loading) {
+        console.log('Already loading, returning...');
+        return;
+    }
     loading = true;
+    console.log('Set loading to true');
 
     const filter = document.querySelector('.notification-filter')?.value || 'all';
     const loadMoreBtn = document.querySelector('.load-more');
 
+    console.log('Filter:', filter);
+    console.log('Load more btn:', loadMoreBtn);
+
     try {
         if (reset || allNotifications.length === 0) {
+            console.log('Resetting notifications list...');
             notificationList.innerHTML = '';
             currentIndex = 0;
 
@@ -289,11 +322,16 @@ async function loadNotifications(reset = false) {
             notificationList.appendChild(newSection);
 
             const url = `/api/notifications/list?page=0&size=100&filter=${filter}`;
+            console.log('Fetching URL:', url);
+
             const response = await fetch(url, {
                 ...fetchOptions,
                 method: 'GET',
                 headers: createHeaders()
             });
+
+            console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
 
             if (!response.ok) {
                 throw new Error('Không thể tải thông báo');
@@ -302,17 +340,24 @@ async function loadNotifications(reset = false) {
             const data = await response.json();
             console.log('=== DỮ LIỆU THÔNG BÁO TỪ SERVER ===', data);
             allNotifications = data.notifications || [];
+            console.log('All notifications set to:', allNotifications.length);
         }
 
         if (allNotifications.length === 0) {
+            console.log('No notifications found, showing empty state');
             notificationList.innerHTML = '<div class="empty-state">Không có thông báo nào</div>';
-            loadMoreBtn.style.display = 'none';
+            if (loadMoreBtn) loadMoreBtn.style.display = 'none';
             return;
         }
 
+        console.log('Displaying notifications...');
         // Hiển thị thông báo tiếp theo
         const endIndex = Math.min(currentIndex + ITEMS_PER_PAGE, allNotifications.length);
         const nextNotifications = allNotifications.slice(currentIndex, endIndex);
+
+        console.log('Current index:', currentIndex);
+        console.log('End index:', endIndex);
+        console.log('Next notifications to display:', nextNotifications.length);
 
         nextNotifications.forEach(notification => {
             console.log('Xử lý thông báo:', {
@@ -339,12 +384,13 @@ async function loadNotifications(reset = false) {
         }
 
     } catch (error) {
-        console.error('Lỗi:', error);
+        console.error('Lỗi trong loadNotifications:', error);
         if (reset) {
-            notificationList.innerHTML = '<div class="empty-state">Không thể tải thông báo</div>';
+            notificationList.innerHTML = '<div class="empty-state">Không thể tải thông báo: ' + error.message + '</div>';
         }
     } finally {
         loading = false;
+        console.log('Set loading to false');
     }
 }
 
@@ -363,21 +409,30 @@ function setupEventListeners() {
             e.stopPropagation();
 
             const isVisible = notificationDropdown.classList.contains('show');
-            console.log('Trạng thái dropdown:', isVisible ? 'đang hiển thị' : 'đang ẩn');
+            console.log('Trạng thái dropdown trước khi xử lý:', isVisible ? 'đang hiển thị' : 'đang ẩn');
+            console.log('Classes của dropdown:', notificationDropdown.className);
 
             if (!isVisible) {
+                console.log('Dropdown đang ẩn, sẽ hiển thị và load notifications...');
                 // Đóng các dropdown khác
                 document.querySelectorAll('.dropdown-menu.show').forEach(dropdown => {
                     dropdown.classList.remove('show');
                 });
 
                 notificationDropdown.classList.add('show');
+                console.log('Đã thêm class show, classes hiện tại:', notificationDropdown.className);
                 currentIndex = 0;
+                console.log('Gọi loadNotifications(true)...');
                 await loadNotifications(true);
+                console.log('loadNotifications completed');
             } else {
+                console.log('Dropdown đang hiển thị, sẽ ẩn...');
                 notificationDropdown.classList.remove('show');
+                console.log('Đã xóa class show, classes hiện tại:', notificationDropdown.className);
             }
         };
+    } else {
+        console.error('Không tìm thấy notificationBtn để thiết lập sự kiện');
     }
 
     // Close dropdown when clicking outside

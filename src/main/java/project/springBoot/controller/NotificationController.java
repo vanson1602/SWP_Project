@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import project.springBoot.model.Notification;
 import project.springBoot.model.User;
 import project.springBoot.service.NotificationService;
+import project.springBoot.repository.NotificationRepository;
 
 import jakarta.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,9 @@ public class NotificationController {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     @GetMapping("/unread-count")
     @ResponseBody
@@ -206,11 +211,71 @@ public class NotificationController {
             }
 
             notificationService.markAllAsRead(currentUser.getUserID());
+            int unreadCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "unreadCount", 0));
+                    "unreadCount", unreadCount));
         } catch (Exception e) {
             logger.error("Error marking all notifications as read: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/create-test")
+    @ResponseBody
+    public ResponseEntity<?> createTestNotification(HttpSession session) {
+        try {
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "User not authenticated"));
+            }
+
+            // Tạo thông báo test
+            notificationService.createNotification(
+                    currentUser.getUserID(),
+                    "Thông báo test",
+                    "Đây là thông báo test để kiểm tra hệ thống thông báo hoạt động.",
+                    "General");
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Test notification created successfully"));
+        } catch (Exception e) {
+            logger.error("Error creating test notification: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/create-test-simple")
+    @ResponseBody
+    public ResponseEntity<?> createSimpleTestNotification(HttpSession session) {
+        try {
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "User not authenticated"));
+            }
+
+            // Tạo thông báo test đơn giản
+            Notification notification = new Notification();
+            notification.setUser(currentUser);
+            notification.setTitle("Test Simple");
+            notification.setMessage("Thông báo test đơn giản - " + System.currentTimeMillis());
+            notification.setNotificationType("General");
+            notification.setSentAt(LocalDateTime.now());
+            notification.setRead(false);
+
+            // Lưu trực tiếp vào repository
+            notificationRepository.save(notification);
+
+            logger.info("Created simple test notification for user: {}", currentUser.getUserID());
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Simple test notification created successfully",
+                    "notificationId", notification.getNotificationID()));
+        } catch (Exception e) {
+            logger.error("Error creating simple test notification: {}", e.getMessage(), e);
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import project.springBoot.model.*;
 import project.springBoot.service.WalletService;
 import project.springBoot.service.AppointmentService;
+import project.springBoot.service.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
 import java.math.BigDecimal;
@@ -30,6 +31,7 @@ public class WalletController {
     private final WalletService walletService;
     private final AppointmentService appointmentService;
     private final PayOS payOS;
+    private final NotificationService notificationService;
 
     @GetMapping
     public String getWalletPage(Model model, HttpSession session,
@@ -39,6 +41,10 @@ public class WalletController {
         if (currentUser == null) {
             return "redirect:/login";
         }
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
 
         // Kiểm tra xem người dùng đã có ví chưa
         boolean hasWallet = walletService.hasWallet(currentUser);
@@ -68,6 +74,11 @@ public class WalletController {
             return "redirect:/login";
         if (walletService.hasWallet(currentUser))
             return "redirect:/wallet";
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
+
         return "wallet/wallet-register";
     }
 
