@@ -46,7 +46,19 @@ public interface AppointmentService {
                         LocalDateTime endDate);
 
         Appointment findByIdAppointment(Long appointmentId);
+        Appointment findByIdAppointment(Long appointmentId);
 
+        long countTotalPatients();
+
+        long countTodaysAppointments();
+
+        double getTotalRevenue(); // Updated to use consultation_fee
+
+        List<Map<String, Object>> getMonthlyAppointments(int months);
+
+        Map<String, Long> getAppointmentStatusDistribution();
+
+        List<Appointment> findTop5ByStatusOrderByCreatedAtDesc(String status);
         long countTotalPatients();
 
         long countTodaysAppointments();
@@ -64,7 +76,17 @@ public interface AppointmentService {
         List<Map<String, Object>> getMonthlyAppointmentReport(LocalDateTime startDate, LocalDateTime endDate);
 
         Map<String, Object> getDashboardStatistics();
+        List<Map<String, Object>> getRevenueReport(LocalDateTime startDate, LocalDateTime endDate);
 
+        List<Map<String, Object>> getMonthlyAppointmentReport(LocalDateTime startDate, LocalDateTime endDate);
+
+        Map<String, Object> getDashboardStatistics();
+
+        long getDistinctAppointmentsCompletedBetween(LocalDateTime start, LocalDateTime end);
+
+        long getDistinctPatientsCompletedBetween(LocalDateTime start, LocalDateTime end);
+
+        double getRevenueBetween(LocalDateTime start, LocalDateTime end);
         long getDistinctAppointmentsCompletedBetween(LocalDateTime start, LocalDateTime end);
 
         long getDistinctPatientsCompletedBetween(LocalDateTime start, LocalDateTime end);
@@ -74,15 +96,53 @@ public interface AppointmentService {
         List<Map<String, Object>> getDailyAppointmentReport(LocalDateTime startDate, LocalDateTime endDate);
 
         Map<String, Long> getAppointmentStatusDistributionBetween(LocalDateTime startDate, LocalDateTime endDate);
+        List<Map<String, Object>> getDailyAppointmentReport(LocalDateTime startDate, LocalDateTime endDate);
+
+        Map<String, Long> getAppointmentStatusDistributionBetween(LocalDateTime startDate, LocalDateTime endDate);
 
         List<Invoice> getInvoicesInDateRange(LocalDateTime startDate, LocalDateTime endDate);
+        List<Invoice> getInvoicesInDateRange(LocalDateTime startDate, LocalDateTime endDate);
 
+        List<Map<String, Object>> getDoctorRevenueReport(LocalDateTime startDate, LocalDateTime endDate);
         List<Map<String, Object>> getDoctorRevenueReport(LocalDateTime startDate, LocalDateTime endDate);
 
         List<Appointment> getAppointmentsByDoctorAndDateRangeIncludingCompleted(Long doctorId, LocalDateTime startDate,
                         LocalDateTime endDate);
 
         List<Appointment> findAppointmentByPatientID(Long patientId);
+
+        // Thêm các phương thức mới cho thống kê bệnh nhân
+        List<Map<String, Object>> getPatientAppointmentsByMonthYear(Long patientId);
+
+        List<Map<String, Object>> getPatientAppointmentsBySpecialization(Long patientId);
+
+        long countPatientAppointmentsByMonthYear(Long patientId, int year, int month);
+
+        long countPatientAppointmentsBySpecialization(Long patientId, Long specializationId);
+
+        // Thêm các phương thức mới cho filter và chart
+        List<Map<String, Object>> getPatientAppointmentsByYear(Long patientId, int year);
+
+        List<Map<String, Object>> getPatientAppointmentsByYearMonth(Long patientId, int year, int month);
+
+        List<Map<String, Object>> getPatientAppointmentsBySpecializationAndYear(Long patientId, int year);
+
+        List<Map<String, Object>> getPatientAppointmentsBySpecializationAndYearMonth(Long patientId, int year,
+                        int month);
+
+        List<Integer> getAvailableYearsForPatient(Long patientId);
+
+        List<Map<String, Object>> getPatientMonthlyStatusStats(Long patientId, int year);
+
+        List<Map<String, Object>> getPatientDailyStatusStats(Long patientId, int year, int month);
+
+        List<Map<String, Object>> getPatientAppointmentsByWeekInMonth(Long patientId, int year, int month);
+
+        List<Map<String, Object>> getDoctorPatientCountByDay(Long doctorId, int year, int month);
+
+        List<Map<String, Object>> getDoctorPatientCountByWeek(Long doctorId, int year, int month);
+
+        List<Map<String, Object>> getDoctorPatientCountByMonth(Long doctorId, int year);
 
         /**
          * Huỷ lịch và xử lý hoàn tiền nếu đủ điều kiện. Trả về thông báo kết quả.

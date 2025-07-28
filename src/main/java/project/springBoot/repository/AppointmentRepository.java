@@ -138,7 +138,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             @Param("end") LocalDateTime end);
 
     @Query("SELECT COUNT(DISTINCT a.patient.patientID) FROM Appointment a WHERE a.status = 'Completed' AND a.appointmentDate BETWEEN :start AND :end")
-    long countDistinctPatientsCompletedBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+    long countDistinctPatientsCompletedBetween(@Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
 
     @Query("SELECT COUNT(a) FROM Appointment a WHERE a.status = :status AND a.appointmentDate BETWEEN :start AND :end")
     long countByStatusAndAppointmentDateBetween(@Param("status") String status, @Param("start") LocalDateTime start,
@@ -244,5 +245,174 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             "ORDER BY a.appointmentDate DESC")
     List<Appointment> findAppointmentByPatient_PatientID(Long patientId);
 
-    List<Appointment> findByStatusAndAppointmentDateBefore(String status, LocalDateTime date);
+    // Thêm các phương thức mới cho thống kê bệnh nhân
+    @Query("SELECT NEW map(" +
+            "EXTRACT(YEAR FROM a.appointmentDate) as year, " +
+            "EXTRACT(MONTH FROM a.appointmentDate) as month, " +
+            "COUNT(a) as appointmentCount) " +
+            "FROM Appointment a " +
+            "WHERE a.patient.patientID = :patientId " +
+            "AND a.status = 'Completed' " +
+            "GROUP BY EXTRACT(YEAR FROM a.appointmentDate), EXTRACT(MONTH FROM a.appointmentDate) " +
+            "ORDER BY year DESC, month DESC")
+    List<Map<String, Object>> getPatientAppointmentsByMonthYear(@Param("patientId") Long patientId);
+
+    @Query("SELECT NEW map(" +
+            "s.specializationName as specializationName, " +
+            "COUNT(a) as appointmentCount) " +
+            "FROM Appointment a " +
+            "JOIN a.doctor d " +
+            "JOIN d.specializations s " +
+            "WHERE a.patient.patientID = :patientId " +
+            "AND a.status = 'Completed' " +
+            "GROUP BY s.specializationID, s.specializationName " +
+            "ORDER BY appointmentCount DESC")
+    List<Map<String, Object>> getPatientAppointmentsBySpecialization(@Param("patientId") Long patientId);
+
+    @Query("SELECT COUNT(a) FROM Appointment a " +
+            "WHERE a.patient.patientID = :patientId " +
+            "AND a.status = 'Completed' " +
+            "AND EXTRACT(YEAR FROM a.appointmentDate) = :year " +
+            "AND EXTRACT(MONTH FROM a.appointmentDate) = :month")
+    long countPatientAppointmentsByMonthYear(@Param("patientId") Long patientId,
+            @Param("year") int year,
+            @Param("month") int month);
+
+    @Query("SELECT COUNT(a) FROM Appointment a " +
+            "JOIN a.doctor d " +
+            "JOIN d.specializations s " +
+            "WHERE a.patient.patientID = :patientId " +
+            "AND a.status = 'Completed' " +
+            "AND s.specializationID = :specializationId")
+    long countPatientAppointmentsBySpecialization(@Param("patientId") Long patientId,
+            @Param("specializationId") Long specializationId);
+
+    // Thêm các phương thức mới cho filter và chart
+    @Query("SELECT NEW map(" +
+            "EXTRACT(YEAR FROM a.appointmentDate) as year, " +
+            "EXTRACT(MONTH FROM a.appointmentDate) as month, " +
+            "COUNT(a) as appointmentCount) " +
+            "FROM Appointment a " +
+            "WHERE a.patient.patientID = :patientId " +
+            "AND a.status = 'Completed' " +
+            "AND EXTRACT(YEAR FROM a.appointmentDate) = :year " +
+            "GROUP BY EXTRACT(YEAR FROM a.appointmentDate), EXTRACT(MONTH FROM a.appointmentDate) " +
+            "ORDER BY month")
+    List<Map<String, Object>> getPatientAppointmentsByYear(@Param("patientId") Long patientId,
+            @Param("year") int year);
+
+    @Query("SELECT NEW map(" +
+            "EXTRACT(YEAR FROM a.appointmentDate) as year, " +
+            "EXTRACT(MONTH FROM a.appointmentDate) as month, " +
+            "COUNT(a) as appointmentCount) " +
+            "FROM Appointment a " +
+            "WHERE a.patient.patientID = :patientId " +
+            "AND a.status = 'Completed' " +
+            "AND EXTRACT(YEAR FROM a.appointmentDate) = :year " +
+            "AND EXTRACT(MONTH FROM a.appointmentDate) = :month " +
+            "GROUP BY EXTRACT(YEAR FROM a.appointmentDate), EXTRACT(MONTH FROM a.appointmentDate)")
+    List<Map<String, Object>> getPatientAppointmentsByYearMonth(@Param("patientId") Long patientId,
+            @Param("year") int year,
+            @Param("month") int month);
+
+    @Query("SELECT NEW map(" +
+            "s.specializationName as specializationName, " +
+            "COUNT(a) as appointmentCount) " +
+            "FROM Appointment a " +
+            "JOIN a.doctor d " +
+            "JOIN d.specializations s " +
+            "WHERE a.patient.patientID = :patientId " +
+            "AND a.status = 'Completed' " +
+            "AND EXTRACT(YEAR FROM a.appointmentDate) = :year " +
+            "GROUP BY s.specializationID, s.specializationName " +
+            "ORDER BY appointmentCount DESC")
+    List<Map<String, Object>> getPatientAppointmentsBySpecializationAndYear(@Param("patientId") Long patientId,
+            @Param("year") int year);
+
+    @Query("SELECT NEW map(" +
+            "s.specializationName as specializationName, " +
+            "COUNT(a) as appointmentCount) " +
+            "FROM Appointment a " +
+            "JOIN a.doctor d " +
+            "JOIN d.specializations s " +
+            "WHERE a.patient.patientID = :patientId " +
+            "AND a.status = 'Completed' " +
+            "AND EXTRACT(YEAR FROM a.appointmentDate) = :year " +
+            "AND EXTRACT(MONTH FROM a.appointmentDate) = :month " +
+            "GROUP BY s.specializationID, s.specializationName " +
+            "ORDER BY appointmentCount DESC")
+    List<Map<String, Object>> getPatientAppointmentsBySpecializationAndYearMonth(@Param("patientId") Long patientId,
+            @Param("year") int year,
+            @Param("month") int month);
+
+    @Query("SELECT DISTINCT EXTRACT(YEAR FROM a.appointmentDate) as year " +
+            "FROM Appointment a " +
+            "WHERE a.patient.patientID = :patientId " +
+            "AND a.status = 'Completed' " +
+            "ORDER BY year DESC")
+    List<Integer> getAvailableYearsForPatient(@Param("patientId") Long patientId);
+
+    @Query("SELECT NEW map(" +
+            "EXTRACT(MONTH FROM a.appointmentDate) as month, " +
+            "COUNT(a) as total, " +
+            "COUNT(CASE WHEN a.status = 'Completed' THEN 1 END) as completed, " +
+            "COUNT(CASE WHEN a.status = 'Rejected' OR a.status = 'Cancelled' THEN 1 END) as cancelled " +
+            ") FROM Appointment a " +
+            "WHERE a.patient.patientID = :patientId " +
+            "AND EXTRACT(YEAR FROM a.appointmentDate) = :year " +
+            "GROUP BY EXTRACT(MONTH FROM a.appointmentDate) " +
+            "ORDER BY month")
+    List<Map<String, Object>> getPatientMonthlyStatusStats(@Param("patientId") Long patientId,
+            @Param("year") int year);
+
+    @Query("SELECT NEW map(" +
+            "EXTRACT(DAY FROM a.appointmentDate) as day, " +
+            "COUNT(a) as total, " +
+            "COUNT(CASE WHEN a.status = 'Completed' THEN 1 END) as completed, " +
+            "COUNT(CASE WHEN a.status = 'Rejected' OR a.status = 'Cancelled' THEN 1 END) as cancelled " +
+            ") FROM Appointment a " +
+            "WHERE a.patient.patientID = :patientId " +
+            "AND EXTRACT(YEAR FROM a.appointmentDate) = :year " +
+            "AND EXTRACT(MONTH FROM a.appointmentDate) = :month " +
+            "GROUP BY EXTRACT(DAY FROM a.appointmentDate) " +
+            "ORDER BY day")
+    List<Map<String, Object>> getPatientDailyStatusStats(@Param("patientId") Long patientId,
+            @Param("year") int year, @Param("month") int month);
+
+    @Query("SELECT NEW map(" +
+            "FLOOR((EXTRACT(DAY FROM a.appointmentDate) - 1) / 7) + 1 as weekInMonth, " +
+            "COUNT(a) as appointmentCount) " +
+            "FROM Appointment a " +
+            "WHERE a.patient.patientID = :patientId " +
+            "AND a.status = 'Completed' " +
+            "AND EXTRACT(YEAR FROM a.appointmentDate) = :year " +
+            "AND EXTRACT(MONTH FROM a.appointmentDate) = :month " +
+            "GROUP BY FLOOR((EXTRACT(DAY FROM a.appointmentDate) - 1) / 7) + 1 " +
+            "ORDER BY appointmentCount DESC")
+    List<Map<String, Object>> getPatientAppointmentsByWeekInMonth(@Param("patientId") Long patientId,
+            @Param("year") int year,
+            @Param("month") int month);
+
+    @Query("SELECT NEW map(EXTRACT(DAY FROM a.appointmentDate) as day, COUNT(DISTINCT a.patient.patientID) as patientCount) "
+            +
+            "FROM Appointment a WHERE a.doctor.doctorID = :doctorId AND a.status = 'Completed' " +
+            "AND EXTRACT(YEAR FROM a.appointmentDate) = :year AND EXTRACT(MONTH FROM a.appointmentDate) = :month " +
+            "GROUP BY EXTRACT(DAY FROM a.appointmentDate) ORDER BY day")
+    List<Map<String, Object>> getDoctorPatientCountByDay(@Param("doctorId") Long doctorId, @Param("year") int year,
+            @Param("month") int month);
+
+    @Query("SELECT NEW map(FLOOR((EXTRACT(DAY FROM a.appointmentDate) - 1) / 7) + 1 as weekInMonth, COUNT(DISTINCT a.patient.patientID) as patientCount) "
+            +
+            "FROM Appointment a WHERE a.doctor.doctorID = :doctorId AND a.status = 'Completed' " +
+            "AND EXTRACT(YEAR FROM a.appointmentDate) = :year AND EXTRACT(MONTH FROM a.appointmentDate) = :month " +
+            "GROUP BY FLOOR((EXTRACT(DAY FROM a.appointmentDate) - 1) / 7) + 1 ORDER BY weekInMonth")
+    List<Map<String, Object>> getDoctorPatientCountByWeek(@Param("doctorId") Long doctorId, @Param("year") int year,
+            @Param("month") int month);
+
+    @Query("SELECT NEW map(EXTRACT(MONTH FROM a.appointmentDate) as month, COUNT(DISTINCT a.patient.patientID) as patientCount) "
+            +
+            "FROM Appointment a WHERE a.doctor.doctorID = :doctorId AND a.status = 'Completed' " +
+            "AND EXTRACT(YEAR FROM a.appointmentDate) = :year " +
+            "GROUP BY EXTRACT(MONTH FROM a.appointmentDate) ORDER BY month")
+    List<Map<String, Object>> getDoctorPatientCountByMonth(@Param("doctorId") Long doctorId, @Param("year") int year);
 }

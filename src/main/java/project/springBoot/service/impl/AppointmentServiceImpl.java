@@ -621,6 +621,84 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointmentRepository.getRevenueByDoctor(startDate, endDate);
     }
 
+    // Thêm các phương thức mới cho thống kê bệnh nhân
+    @Override
+    public List<Map<String, Object>> getPatientAppointmentsByMonthYear(Long patientId) {
+        return appointmentRepository.getPatientAppointmentsByMonthYear(patientId);
+    }
+
+    @Override
+    public List<Map<String, Object>> getPatientAppointmentsBySpecialization(Long patientId) {
+        return appointmentRepository.getPatientAppointmentsBySpecialization(patientId);
+    }
+
+    @Override
+    public long countPatientAppointmentsByMonthYear(Long patientId, int year, int month) {
+        return appointmentRepository.countPatientAppointmentsByMonthYear(patientId, year, month);
+    }
+
+    @Override
+    public long countPatientAppointmentsBySpecialization(Long patientId, Long specializationId) {
+        return appointmentRepository.countPatientAppointmentsBySpecialization(patientId, specializationId);
+    }
+
+    // Thêm các phương thức mới cho filter và chart
+    @Override
+    public List<Map<String, Object>> getPatientAppointmentsByYear(Long patientId, int year) {
+        return appointmentRepository.getPatientAppointmentsByYear(patientId, year);
+    }
+
+    @Override
+    public List<Map<String, Object>> getPatientAppointmentsByYearMonth(Long patientId, int year, int month) {
+        return appointmentRepository.getPatientAppointmentsByYearMonth(patientId, year, month);
+    }
+
+    @Override
+    public List<Map<String, Object>> getPatientAppointmentsBySpecializationAndYear(Long patientId, int year) {
+        return appointmentRepository.getPatientAppointmentsBySpecializationAndYear(patientId, year);
+    }
+
+    @Override
+    public List<Map<String, Object>> getPatientAppointmentsBySpecializationAndYearMonth(Long patientId, int year,
+            int month) {
+        return appointmentRepository.getPatientAppointmentsBySpecializationAndYearMonth(patientId, year, month);
+    }
+
+    @Override
+    public List<Integer> getAvailableYearsForPatient(Long patientId) {
+        return appointmentRepository.getAvailableYearsForPatient(patientId);
+    }
+
+    @Override
+    public List<Map<String, Object>> getPatientMonthlyStatusStats(Long patientId, int year) {
+        return appointmentRepository.getPatientMonthlyStatusStats(patientId, year);
+    }
+
+    @Override
+    public List<Map<String, Object>> getPatientDailyStatusStats(Long patientId, int year, int month) {
+        return appointmentRepository.getPatientDailyStatusStats(patientId, year, month);
+    }
+
+    @Override
+    public List<Map<String, Object>> getPatientAppointmentsByWeekInMonth(Long patientId, int year, int month) {
+        return appointmentRepository.getPatientAppointmentsByWeekInMonth(patientId, year, month);
+    }
+
+    @Override
+    public List<Map<String, Object>> getDoctorPatientCountByDay(Long doctorId, int year, int month) {
+        return appointmentRepository.getDoctorPatientCountByDay(doctorId, year, month);
+    }
+
+    @Override
+    public List<Map<String, Object>> getDoctorPatientCountByWeek(Long doctorId, int year, int month) {
+        return appointmentRepository.getDoctorPatientCountByWeek(doctorId, year, month);
+    }
+
+    @Override
+    public List<Map<String, Object>> getDoctorPatientCountByMonth(Long doctorId, int year) {
+        return appointmentRepository.getDoctorPatientCountByMonth(doctorId, year);
+    }
+
     @Scheduled(fixedRate = 120000)
     public void updateExpiredBookingSlots() {
         System.out.println("Running updateExpiredBookingSlots at: " + LocalDateTime.now());
