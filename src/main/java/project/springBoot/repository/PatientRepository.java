@@ -11,5 +11,8 @@ import project.springBoot.model.User;
 @Repository
 public interface PatientRepository extends JpaRepository<Patient, Long> {
     Optional<Patient> findByUserUsername(String username);
+
+    Optional<Patient> findByUserEmail(String email);
+
     Patient findByUser(User user);
 }

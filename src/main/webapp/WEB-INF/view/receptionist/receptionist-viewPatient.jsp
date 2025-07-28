@@ -79,11 +79,20 @@
 
         <body>
           <h2>Danh sách bệnh nhân</h2>
-
+          <form method="get" action="/booking-receptionist/searchPatient"
+            style="margin-bottom: 20px; text-align: center;">
+            <input type="text" name="nameOrEmail" placeholder="nhập name or email" value="${nameOrEmail}" />
+            <button type="submit">Tìm kiếm</button>
+            <a href="/booking-receptionist/patientInfor">tất cả bệnh nhân</a>
+          </form>
           <div class="table-container">
+            <c:if test="${not empty error}">
+              <p style="color: red; text-align: center">${error}</p>
+            </c:if>
             <table>
               <thead>
                 <tr>
+                  <th>UserName</th>
                   <th>Họ và tên</th>
                   <th>Email</th>
                   <th>Điện thoại</th>
@@ -93,6 +102,7 @@
               <tbody>
                 <c:forEach var="patient" items="${listPatient}">
                   <tr>
+                    <td>${patient.username}</td>
                     <td>${patient.fullName}</td>
                     <td>${patient.email}</td>
                     <td>${patient.phone}</td>

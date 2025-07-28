@@ -26,4 +26,18 @@ public class ReceptionistController {
         model.addAttribute("listPatient", listPatient);
         return "receptionist/receptionist-viewPatient";
     }
+
+    @GetMapping("/booking-receptionist/searchPatient")
+    public String searchPatient(@RequestParam("nameOrEmail") String nameOrEmail, Model model) {
+        User patient = userService.getUserByEmailOrUsername(nameOrEmail, nameOrEmail);
+        if (patient == null) {
+            model.addAttribute("error", "không tìm thấy bệnh nhân " + nameOrEmail);
+            model.addAttribute("listPatient", List.of());
+        } else {
+            model.addAttribute("listPatient", List.of(patient));
+        }
+        model.addAttribute("email", nameOrEmail);
+        return "receptionist/receptionist-viewPatient";
+    }
+
 }
