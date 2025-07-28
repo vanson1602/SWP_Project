@@ -14,70 +14,71 @@
           <style>
             body {
               font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-              background-color: #f0f4f8;
+              background-color: #f8fafc;
               margin: 0;
               padding: 30px;
             }
 
             form {
-              max-width: 900px;
+              max-width: 960px;
               margin: auto;
               background-color: #ffffff;
-              padding: 40px;
+              padding: 50px 40px;
               border-radius: 20px;
-              box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+              box-shadow: 0 12px 32px rgba(0, 0, 0, 0.05);
             }
 
             label {
               font-weight: 600;
-              font-size: 18px;
+              font-size: 20px;
               display: block;
-              margin-bottom: 16px;
-              color: #2d3e50;
+              margin-bottom: 20px;
+              color: #1e293b;
             }
 
             .card-grid {
               display: grid;
               grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-              gap: 20px;
+              gap: 24px;
             }
 
             .card {
-              background-color: #f8fafc;
+              background-color: #f1f5f9;
               border: 2px solid transparent;
-              padding: 20px;
-              border-radius: 14px;
+              padding: 24px;
+              border-radius: 16px;
               text-align: center;
+              position: relative;
               cursor: pointer;
               transition: all 0.3s ease;
-              position: relative;
               box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
             }
 
             .card:hover {
-              background-color: #f1f5f9;
+              background-color: #e2e8f0;
               transform: translateY(-2px);
-              box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+              box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
             }
 
             .card img {
-              width: 100px;
-              height: 100px;
+              width: 96px;
+              height: 96px;
               object-fit: cover;
               border-radius: 50%;
               margin-bottom: 14px;
-              border: 2px solid #dce3ed;
+              border: 2px solid #d1d5db;
             }
 
             .card h4 {
-              font-size: 18px;
-              color: #007bff;
-              margin: 8px 0 4px;
+              font-size: 17px;
+              font-weight: 600;
+              color: #0f172a;
+              margin-bottom: 6px;
             }
 
             .card p {
               font-size: 14px;
-              color: #555;
+              color: #475569;
               margin: 4px 0;
             }
 
@@ -86,9 +87,9 @@
             }
 
             input[type="radio"]:checked+label.card {
-              border-color: #007bff;
-              background-color: #e9f3ff;
-              box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+              border-color: #3b82f6;
+              background-color: #e0f2fe;
+              box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
               transform: scale(1.02);
             }
 
@@ -97,29 +98,53 @@
               position: absolute;
               top: 12px;
               right: 16px;
-              background-color: #007bff;
-              color: #fff;
+              background-color: #3b82f6;
+              color: white;
               font-size: 14px;
               padding: 5px 7px;
               border-radius: 50%;
             }
 
-            button[type="submit"] {
-              width: 100%;
-              background-color: #007bff;
-              color: white;
-              padding: 16px;
-              font-size: 17px;
-              font-weight: 600;
-              border: none;
-              border-radius: 12px;
-              margin-top: 36px;
-              cursor: pointer;
-              transition: background-color 0.3s ease, transform 0.2s ease;
+            .action-buttons {
+              display: flex;
+              justify-content: center;
+              gap: 20px;
+              margin-top: 40px;
+              flex-wrap: wrap;
             }
 
-            button[type="submit"]:hover {
-              background-color: #0056b3;
+            .back-button,
+            .continue-button {
+              padding: 14px 26px;
+              font-size: 15px;
+              font-weight: 500;
+              border-radius: 10px;
+              text-decoration: none;
+              cursor: pointer;
+              transition: background-color 0.3s ease, transform 0.2s ease;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+              display: inline-block;
+            }
+
+            .back-button {
+              background-color: #f1f5f9;
+              color: #334155;
+              border: 1px solid #cbd5e1;
+            }
+
+            .back-button:hover {
+              background-color: #e2e8f0;
+              transform: translateY(-1px);
+            }
+
+            .continue-button {
+              background-color: #3b82f6;
+              color: white;
+              border: none;
+            }
+
+            .continue-button:hover {
+              background-color: #2563eb;
               transform: translateY(-1px);
             }
 
@@ -131,6 +156,17 @@
               .card img {
                 width: 80px;
                 height: 80px;
+              }
+
+              .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+              }
+
+              .back-button,
+              .continue-button {
+                width: 100%;
+                text-align: center;
               }
             }
           </style>
@@ -169,7 +205,10 @@
               </c:forEach>
             </div>
 
-            <button type="submit">Tiếp tục</button>
+            <div class="action-buttons">
+              <a href="javascript:history.back()" class="back-button">← Quay lại</a>
+              <button type="submit" class="continue-button">Tiếp tục</button>
+            </div>
           </form>
         </body>
 

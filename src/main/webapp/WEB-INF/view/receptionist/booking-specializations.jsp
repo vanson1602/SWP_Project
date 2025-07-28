@@ -142,22 +142,43 @@
                 margin-bottom: 20px;
               }
 
-              button[type="submit"] {
-                width: 100%;
-                background-color: #007bff;
-                color: white;
-                padding: 16px;
-                font-size: 17px;
-                font-weight: 600;
-                border: none;
-                border-radius: 12px;
-                margin-top: 36px;
-                cursor: pointer;
-                transition: background-color 0.3s ease, transform 0.2s ease;
+              .action-buttons {
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+                margin-top: 40px;
               }
 
-              button[type="submit"]:hover {
-                background-color: #0056b3;
+              .back-button,
+              .continue-button {
+                padding: 12px 24px;
+                font-size: 15px;
+                font-weight: 500;
+                border-radius: 8px;
+                border: none;
+                text-decoration: none;
+                cursor: pointer;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+              }
+
+              .back-button {
+                background-color: #f1f5f9;
+                color: #334155;
+                border: 1px solid #cbd5e1;
+              }
+
+              .back-button:hover {
+                background-color: #e2e8f0;
+              }
+
+              .continue-button {
+                background-color: #3b82f6;
+                color: white;
+              }
+
+              .continue-button:hover {
+                background-color: #2563eb;
                 transform: translateY(-1px);
               }
 
@@ -213,8 +234,10 @@
                   </label>
                 </c:forEach>
               </div>
-
-              <button type="submit">Tiếp tục</button>
+              <div class="action-buttons">
+                <a href="javascript:history.back()" class="back-button">← Quay lại</a>
+                <button type="submit" class="continue-button">Tiếp tục</button>
+              </div>
             </form>
           </body>
 

@@ -123,6 +123,49 @@
             outline: none;
           }
 
+          .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+          }
+
+          .back-button,
+          .continue-button {
+            padding: 12px 28px;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 10px;
+            border: none;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+          }
+
+          .back-button {
+            background-color: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+          }
+
+          .back-button:hover {
+            background-color: #e2e8f0;
+            transform: translateY(-1px);
+          }
+
+          .continue-button {
+            background-color: #3b82f6;
+            color: white;
+            border: 1px solid #2563eb;
+          }
+
+          .continue-button:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+          }
+
+
           .submit-button {
             margin-top: 30px;
             padding: 16px;
@@ -287,7 +330,10 @@
           <textarea name="note" rows="4" placeholder="Nhập ghi chú thêm nếu cần..."></textarea>
 
           <!-- Submit -->
-          <button type="submit" class="submit-button">Tiếp tục</button>
+          <div class="action-buttons">
+            <a href="javascript:history.back()" class="back-button">← Quay lại</a>
+            <button type="submit" class="continue-button">Tiếp tục</button>
+          </div>
         </form>
       </body>
 
