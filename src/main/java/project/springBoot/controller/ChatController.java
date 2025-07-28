@@ -52,6 +52,8 @@ public class ChatController {
                 receiverId,
                 content);
 
+        System.out.println("Saved message with timestamp: " + savedMessage.getCreatedAt()); // Add logging
+
         // Lấy conversation đã cập nhật
         Conversation updatedConversation = messagingService.getConversation(sender, conversationId);
 
@@ -64,6 +66,7 @@ public class ChatController {
         Map<String, Object> conversationUpdate = Map.of(
                 "conversationId", conversationId,
                 "content", content,
+                "createdAt", savedMessage.getCreatedAt().toString(), // Add timestamp
                 "sender", Map.of(
                         "userID", sender.getUserID(),
                         "firstName", sender.getFirstName(),
@@ -71,7 +74,11 @@ public class ChatController {
                 "receiver", Map.of(
                         "userID", receiver.getUserID(),
                         "firstName", receiver.getFirstName(),
-                        "lastName", receiver.getLastName()));
+                        "lastName", receiver.getLastName()),
+                "isRead", savedMessage.isRead() // Thêm trường này để JS nhận biết
+        );
+
+        System.out.println("Sending conversation update: " + conversationUpdate); // Add logging
 
         messagingTemplate.convertAndSend(
                 "/topic/user/" + senderId + "/conversations",
@@ -81,7 +88,6 @@ public class ChatController {
                 "/topic/user/" + receiverId + "/conversations",
                 conversationUpdate);
 
-        // Gửi thông báo về cuộc hội thoại mới cho receptionist
         if (receiver.getRole().equals("receptionist") || sender.getRole().equals("receptionist")) {
             messagingTemplate.convertAndSend(
                     "/topic/conversations/" + (receiver.getRole().equals("receptionist") ? receiverId : senderId),
@@ -101,7 +107,7 @@ public class ChatController {
         model.addAttribute("conversation", conversation);
         model.addAttribute("currentUser", currentUser);
 
-        return "chat/chat"; // ✅ Luôn hiển thị giao diện chat
+        return "chat/chat";
     }
 
     @GetMapping("/api/chat/conversation/{conversationId}")
@@ -154,7 +160,18 @@ public class ChatController {
         }
 
         List<Conversation> conversations = messagingService.getConversations(currentUser);
+        java.util.Map<Long, Boolean> unreadMap = new java.util.HashMap<>();
+        for (Conversation conv : conversations) {
+            boolean unread = false;
+            java.util.List<project.springBoot.model.Message> messages = conv.getMessages();
+            if (messages != null && !messages.isEmpty()) {
+                project.springBoot.model.Message last = messages.get(messages.size() - 1);
+                unread = Long.valueOf(last.getReceiver().getUserID()).equals(currentUser.getUserID()) && !last.isRead();
+            }
+            unreadMap.put(conv.getId(), unread);
+        }
         model.addAttribute("conversations", conversations);
+        model.addAttribute("unreadMap", unreadMap);
         model.addAttribute("currentUser", currentUser);
         return "receptionist/dashboard";
     }
@@ -198,19 +215,20 @@ public class ChatController {
     @ResponseBody
     public ResponseEntity<?> markConversationAsRead(
             @PathVariable Long conversationId,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            HttpSession session) {
         try {
-            User currentUser = userRepository.findByUsername(userDetails.getUsername())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null) {
+                return ResponseEntity.status(401).body("User not authenticated");
+            }
             Conversation conversation = messagingService.findById(conversationId);
             if (conversation == null) {
                 return ResponseEntity.notFound().build();
             }
-
             boolean updated = messagingService.markConversationAsRead(conversation, currentUser);
             return updated ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }

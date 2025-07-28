@@ -59,12 +59,13 @@ import project.springBoot.service.MedicalRecordService;
 import project.springBoot.service.MedicationService;
 import project.springBoot.service.PrescriptionService;
 import project.springBoot.service.SpecializationService;
-import project.springBoot.service.UploadFileService;
 import project.springBoot.service.SpecializationService;
+import project.springBoot.service.UploadFileService;
 import project.springBoot.service.UploadFileService;
 import project.springBoot.service.UserService;
 import project.springBoot.model.DoctorSchedule;
 import project.springBoot.service.DoctorScheduleService;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Slf4j
 @Controller
@@ -94,8 +95,6 @@ public class DoctorController {
     private UploadFileService uploadFileService;
     @Autowired
     private SpecializationService specializationService;
-    
-    
 
     @GetMapping("/doctor/home")
     public String getDoctorHomePage(Model model, HttpSession session) {
@@ -279,8 +278,6 @@ public class DoctorController {
                 + examination.getExaminationID());
         return "doctors/doctor-create-exam";
     }
-
-   
 
     @GetMapping("/doctor/appointments/{appointmentId}/prescriptions")
     public String getPrescriptionPage(@PathVariable Long appointmentId, @RequestParam(required = false) Long edit,
@@ -636,6 +633,116 @@ public class DoctorController {
         List<Doctor> doctors = doctorService.findAll();
         model.addAttribute("doctors", doctors);
         return "doctor/list-doctor";
+    }
+
+    @GetMapping("/api/doctor/stats/patients")
+    @ResponseBody
+    public Map<String, Object> getDoctorPatientStats(
+            @RequestParam(defaultValue = "0") int year,
+            @RequestParam(defaultValue = "0") int month,
+            @RequestParam(defaultValue = "day") String mode,
+            HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        User user = (User) session.getAttribute("currentUser");
+        if (user == null || !"doctor".equalsIgnoreCase(user.getRole())) {
+            return result;
+        }
+        Doctor doctor = doctorService.getDoctorByUsername(user.getUsername());
+        if (doctor == null)
+            return result;
+        Long doctorId = doctor.getDoctorID();
+        if (year == 0)
+            year = java.time.LocalDate.now().getYear();
+        if ("day".equals(mode) && month > 0) {
+            List<Map<String, Object>> stats = appointmentService.getDoctorPatientCountByDay(doctorId, year, month);
+            result.put("stats", stats);
+            result.put("mode", "day");
+        } else if ("week".equals(mode) && month > 0) {
+            List<Map<String, Object>> stats = appointmentService.getDoctorPatientCountByWeek(doctorId, year, month);
+            result.put("stats", stats);
+            result.put("mode", "week");
+        } else if ("month".equals(mode)) {
+            List<Map<String, Object>> stats = appointmentService.getDoctorPatientCountByMonth(doctorId, year);
+            result.put("stats", stats);
+            result.put("mode", "month");
+        }
+        result.put("year", year);
+        result.put("month", month);
+        return result;
+    }
+
+    @GetMapping("/doctor/profile")
+    public String getDoctorProfile(Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
+            return "redirect:/login";
+        }
+
+        Doctor doctor = doctorService.getDoctorByUsername(currentUser.getUsername());
+        if (doctor == null) {
+            return "redirect:/access-denied";
+        }
+
+        // Lấy năm hiện tại
+        int currentYear = LocalDateTime.now().getYear();
+        int currentMonth = LocalDateTime.now().getMonthValue();
+
+        // Lấy thống kê bệnh nhân đã khám theo tháng trong năm hiện tại
+        List<Map<String, Object>> monthStats = appointmentService.getDoctorPatientCountByMonth(doctor.getDoctorID(),
+                currentYear);
+
+        // Tính tổng số bệnh nhân đã khám trong năm
+        long totalPatients = 0;
+        if (monthStats != null) {
+            for (Map<String, Object> stat : monthStats) {
+                totalPatients += ((Number) stat.get("patientCount")).longValue();
+            }
+        }
+        model.addAttribute("totalPatients", totalPatients);
+
+        // Truyền dữ liệu lên view
+        model.addAttribute("doctor", doctor);
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("currentYear", currentYear);
+        model.addAttribute("currentMonth", currentMonth);
+        model.addAttribute("totalPatients", totalPatients);
+        model.addAttribute("monthStats", monthStats);
+
+        return "doctor/profile";
+    }
+
+    @PostMapping("/doctor/profile/change-password")
+    public String changeDoctorPassword(@RequestParam("currentPassword") String currentPassword,
+            @RequestParam("newPassword") String newPassword,
+            @RequestParam("confirmPassword") String confirmPassword,
+            HttpSession session,
+            RedirectAttributes ra) {
+        try {
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
+                return "redirect:/login";
+            }
+            // Lấy user mới nhất từ DB
+            User dbUser = userService.getUserById(currentUser.getUserID());
+            if (!org.mindrot.jbcrypt.BCrypt.checkpw(currentPassword, dbUser.getPassword())) {
+                ra.addFlashAttribute("error", "Mật khẩu hiện tại không đúng");
+                return "redirect:/doctor/profile";
+            }
+            if (!newPassword.equals(confirmPassword)) {
+                ra.addFlashAttribute("error", "Mật khẩu xác nhận không khớp");
+                return "redirect:/doctor/profile";
+            }
+            String hashedPassword = org.mindrot.jbcrypt.BCrypt.hashpw(newPassword,
+                    org.mindrot.jbcrypt.BCrypt.gensalt());
+            dbUser.setPassword(hashedPassword);
+            userService.handleUpdateUser(dbUser);
+            session.setAttribute("currentUser", dbUser);
+            ra.addFlashAttribute("success", "Đổi mật khẩu thành công!");
+            return "redirect:/doctor/profile";
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Có lỗi xảy ra. Vui lòng thử lại sau!");
+            return "redirect:/doctor/profile";
+        }
     }
 
 }

@@ -48,6 +48,9 @@ public class Conversation {
     @Column(name = "last_message_time")
     private LocalDateTime lastMessageTime;
 
+    @Column(name = "has_unread", nullable = false)
+    private boolean hasUnread = false;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -72,6 +75,15 @@ public class Conversation {
         }
         messages.add(message);
         message.setConversation(this);
+    }
+
+    public boolean isUnreadForUser(User user) {
+        if (user == null || messages == null || messages.isEmpty())
+            return false;
+        Message last = messages.get(messages.size() - 1);
+        if (last == null || last.getReceiver() == null)
+            return false;
+        return Long.valueOf(last.getReceiver().getUserID()).equals(user.getUserID()) && !last.isRead();
     }
 
     @Override

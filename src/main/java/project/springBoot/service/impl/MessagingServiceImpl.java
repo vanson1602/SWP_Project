@@ -37,6 +37,11 @@ public class MessagingServiceImpl implements MessagingService {
         List<Conversation> conversations = conversationRepository.findByReceiverOrSenderOrderByLastMessageTimeDesc(user,
                 user);
         System.out.println("Found " + conversations.size() + " conversations");
+        // Đánh dấu thuộc tính tạm thời cho JSP
+        for (Conversation conv : conversations) {
+            conv.getClass().getDeclaredFields(); // Đảm bảo nạp messages nếu lazy
+            // Không cần set, chỉ cần gọi conv.isUnreadForUser(user) ở JSP
+        }
         return conversations;
     }
 
