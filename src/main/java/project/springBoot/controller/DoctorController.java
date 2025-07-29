@@ -148,7 +148,7 @@ public class DoctorController {
         int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
         model.addAttribute("notificationCount", notificationCount);
         model.addAttribute("appointments", appointments);
-        model.addAttribute("bookingSlots", bookingSlots);
+        model.addAttribute("bookingSlots", bookingSlotsToday);
         model.addAttribute("currentUser", currentUser);
         return "doctors/doctor-appointments";
     }

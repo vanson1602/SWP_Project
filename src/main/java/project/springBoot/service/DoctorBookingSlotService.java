@@ -45,4 +45,9 @@ public class DoctorBookingSlotService {
         return bookingSlotRepository.findByScheduleDoctorDoctorIDAndNotCompleted(doctorId);
     }
 
+    public List<DoctorBookingSlot> getTodayBookingSlotsByDoctorId(Long doctorId) {
+        LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
+        return bookingSlotRepository.findByScheduleDoctorDoctorIDAndDateRange(doctorId, startOfDay, endOfDay);
+    }
 }
