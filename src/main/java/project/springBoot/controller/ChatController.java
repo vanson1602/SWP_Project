@@ -17,6 +17,8 @@ import project.springBoot.service.MessagingService;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Controller
 public class ChatController {
@@ -41,6 +43,8 @@ public class ChatController {
 
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new RuntimeException("Sender not found"));
+        User receiver = userRepository.findById(receiverId)
+                .orElseThrow(() -> new RuntimeException("Receiver not found"));
 
         Message savedMessage = messagingService.addMessageToConversation(
                 conversationId,
@@ -48,18 +52,45 @@ public class ChatController {
                 receiverId,
                 content);
 
+        System.out.println("Saved message with timestamp: " + savedMessage.getCreatedAt()); // Add logging
+
+        // Lấy conversation đã cập nhật
+        Conversation updatedConversation = messagingService.getConversation(sender, conversationId);
+
         // Gửi tin nhắn đến topic của cuộc trò chuyện
         messagingTemplate.convertAndSend(
                 "/topic/conversation/" + conversationId,
                 savedMessage);
 
-        // Gửi thông báo về cuộc hội thoại mới cho receptionist
-        User receiver = userRepository.findById(receiverId)
-                .orElseThrow(() -> new RuntimeException("Receiver not found"));
-        if (receiver.getRole().equals("receptionist")) {
-            Conversation updatedConversation = messagingService.getConversation(sender, conversationId);
+        // Gửi cập nhật conversation cho cả người gửi và người nhận
+        Map<String, Object> conversationUpdate = Map.of(
+                "conversationId", conversationId,
+                "content", content,
+                "createdAt", savedMessage.getCreatedAt().toString(), // Add timestamp
+                "sender", Map.of(
+                        "userID", sender.getUserID(),
+                        "firstName", sender.getFirstName(),
+                        "lastName", sender.getLastName()),
+                "receiver", Map.of(
+                        "userID", receiver.getUserID(),
+                        "firstName", receiver.getFirstName(),
+                        "lastName", receiver.getLastName()),
+                "isRead", savedMessage.isRead() // Thêm trường này để JS nhận biết
+        );
+
+        System.out.println("Sending conversation update: " + conversationUpdate); // Add logging
+
+        messagingTemplate.convertAndSend(
+                "/topic/user/" + senderId + "/conversations",
+                conversationUpdate);
+
+        messagingTemplate.convertAndSend(
+                "/topic/user/" + receiverId + "/conversations",
+                conversationUpdate);
+
+        if (receiver.getRole().equals("receptionist") || sender.getRole().equals("receptionist")) {
             messagingTemplate.convertAndSend(
-                    "/topic/conversations/" + receiverId,
+                    "/topic/conversations/" + (receiver.getRole().equals("receptionist") ? receiverId : senderId),
                     updatedConversation);
         }
     }
@@ -76,7 +107,7 @@ public class ChatController {
         model.addAttribute("conversation", conversation);
         model.addAttribute("currentUser", currentUser);
 
-        return "chat/chat"; // ✅ Luôn hiển thị giao diện chat
+        return "chat/chat";
     }
 
     @GetMapping("/api/chat/conversation/{conversationId}")
@@ -129,7 +160,18 @@ public class ChatController {
         }
 
         List<Conversation> conversations = messagingService.getConversations(currentUser);
+        java.util.Map<Long, Boolean> unreadMap = new java.util.HashMap<>();
+        for (Conversation conv : conversations) {
+            boolean unread = false;
+            java.util.List<project.springBoot.model.Message> messages = conv.getMessages();
+            if (messages != null && !messages.isEmpty()) {
+                project.springBoot.model.Message last = messages.get(messages.size() - 1);
+                unread = Long.valueOf(last.getReceiver().getUserID()).equals(currentUser.getUserID()) && !last.isRead();
+            }
+            unreadMap.put(conv.getId(), unread);
+        }
         model.addAttribute("conversations", conversations);
+        model.addAttribute("unreadMap", unreadMap);
         model.addAttribute("currentUser", currentUser);
         return "receptionist/dashboard";
     }
@@ -166,6 +208,28 @@ public class ChatController {
             return ResponseEntity.ok(conversation);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error creating conversation: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/api/chat/conversation/{conversationId}/mark-read")
+    @ResponseBody
+    public ResponseEntity<?> markConversationAsRead(
+            @PathVariable Long conversationId,
+            HttpSession session) {
+        try {
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null) {
+                return ResponseEntity.status(401).body("User not authenticated");
+            }
+            Conversation conversation = messagingService.findById(conversationId);
+            if (conversation == null) {
+                return ResponseEntity.notFound().build();
+            }
+            boolean updated = messagingService.markConversationAsRead(conversation, currentUser);
+            return updated ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

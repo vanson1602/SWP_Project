@@ -19,17 +19,15 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
     @Autowired
     private PrescriptionRepository prescriptionRepository;
-    
+
     @Autowired
     private AppointmentService appointmentService;
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Prescription> findByExaminationId(Long examinationId) {
-        if (Objects.isNull(examinationId)) {
-            throw new IllegalArgumentException("ID khám bệnh không được để trống");
-        }
-        return prescriptionRepository.findByExaminationExaminationID(examinationId);
+    public Prescription getPrescriptionByExaminationId(Long examinationId) {
+        return prescriptionRepository
+                .findFirstByExaminationExaminationID(examinationId)
+                .orElse(null);
     }
 
     @Override
@@ -51,37 +49,31 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     }
 
     @Override
+    public void completePrescriptions(List<Long> prescriptionIds) {
+        if (prescriptionIds == null || prescriptionIds.isEmpty()) {
+            throw new IllegalArgumentException("Danh sách ID đơn thuốc không được để trống");
+        }
+
+        for (Long id : prescriptionIds) {
+            Prescription prescription = prescriptionRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn thuốc với ID: " + id));
+            prescription.setStatus("COMPLETED");
+            prescription.setModifiedAt(LocalDateTime.now()); // nếu có field này
+            prescriptionRepository.save(prescription);
+        }
+    }
+
+    @Override
     public void deletePrescription(Long prescriptionId) {
         if (prescriptionId == null) {
             throw new IllegalArgumentException("ID đơn thuốc không được để trống");
         }
-        
+
         if (!prescriptionRepository.existsById(prescriptionId)) {
             throw new IllegalArgumentException("Không tìm thấy đơn thuốc với ID: " + prescriptionId);
         }
-        
+
         prescriptionRepository.deleteById(prescriptionId);
-    }
-
-    @Override
-    public void completePrescriptions(List<Long> prescriptionIds) {
-        if (prescriptionIds == null || prescriptionIds.isEmpty()) {
-            throw new IllegalArgumentException("Danh sách đơn thuốc không được để trống");
-        }
-
-        List<Prescription> prescriptions = prescriptionRepository.findAllById(prescriptionIds);
-        
-        if (prescriptions.size() != prescriptionIds.size()) {
-            throw new IllegalArgumentException("Một số đơn thuốc không tồn tại");
-        }
-
-        for (Prescription prescription : prescriptions) {
-            prescription.setStatus("COMPLETED");
-            prescription.setModifiedAt(LocalDateTime.now());
-            prescription.setCompletedAt(LocalDateTime.now());
-        }
-
-        prescriptionRepository.saveAll(prescriptions);
     }
 
     @Override
@@ -140,4 +132,14 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         }
         return prescriptionRepository.countByExaminationExaminationID(examinationId);
     }
-} 
+
+    @Override
+    public List<Prescription> getAllPrescriptionsByExaminationId(Long examinationId) {
+        return prescriptionRepository.findByExaminationExaminationID(examinationId);
+    }
+
+    @Override
+    public List<Prescription> findByExaminationId(Long examinationId) {
+        return prescriptionRepository.findByExaminationExaminationID(examinationId);
+    }
+}

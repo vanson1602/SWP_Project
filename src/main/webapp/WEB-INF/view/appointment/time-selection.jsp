@@ -15,6 +15,11 @@
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/homepage.css">
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common.css">
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/time-selection.css">
+
+                <!-- Required scripts -->
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/vi.js"></script>
+                <script defer src="/resources/js/notifications.js"></script>
             </head>
 
             <body>
@@ -112,13 +117,13 @@
                                         <c:set var="isAvailable" value="false" />
                                         <c:set var="slotId" value="" />
 
-                                            <c:forEach items="${availableSlots}" var="availableSlot">
-                                                <c:if
-                                                    test="${availableSlot.startTime.toLocalTime() eq timeSlot.toLocalTime()}">
-                                                    <c:set var="isAvailable" value="true" />
-                                                    <c:set var="slotId" value="${availableSlot.slotID}" />
-                                                </c:if>
-                                            </c:forEach>
+                                        <c:forEach items="${availableSlots}" var="availableSlot">
+                                            <c:if
+                                                test="${availableSlot.startTime.toLocalTime() eq timeSlot.toLocalTime()}">
+                                                <c:set var="isAvailable" value="true" />
+                                                <c:set var="slotId" value="${availableSlot.slotID}" />
+                                            </c:if>
+                                        </c:forEach>
 
                                         <div class="time-slot ${!isAvailable ? 'unavailable' : ''}"
                                             data-slot-id="${slotId}" data-time="${timeSlot.toLocalTime()}"
@@ -138,7 +143,7 @@
 
                                 <!-- Navigation Buttons -->
                                 <div class="nav-buttons">
-                                    <a href="${pageContext.request.contextPath}/appointments/doctor?specializationId=${param.specializationId}"
+                                    <a href="${pageContext.request.contextPath}/appointments/doctor?specializationId=${selectedSpecialization.specializationID}"
                                         class="btn btn-secondary">
                                         <i class="bi bi-arrow-left"></i> Quay lại
                                     </a>

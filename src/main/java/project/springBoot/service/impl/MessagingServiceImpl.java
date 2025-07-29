@@ -37,6 +37,11 @@ public class MessagingServiceImpl implements MessagingService {
         List<Conversation> conversations = conversationRepository.findByReceiverOrSenderOrderByLastMessageTimeDesc(user,
                 user);
         System.out.println("Found " + conversations.size() + " conversations");
+        // Đánh dấu thuộc tính tạm thời cho JSP
+        for (Conversation conv : conversations) {
+            conv.getClass().getDeclaredFields(); // Đảm bảo nạp messages nếu lazy
+            // Không cần set, chỉ cần gọi conv.isUnreadForUser(user) ở JSP
+        }
         return conversations;
     }
 
@@ -113,5 +118,39 @@ public class MessagingServiceImpl implements MessagingService {
         System.out.println("Saved message with conversation: " + conversation.getId());
 
         return message;
+    }
+
+    @Override
+    public Conversation findById(Long id) {
+        return conversationRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public boolean markConversationAsRead(Conversation conversation, User reader) {
+        try {
+            // Lấy tất cả tin nhắn chưa đọc trong cuộc trò chuyện mà người dùng hiện tại là
+            // người nhận
+            List<Message> unreadMessages = messageRepository.findByConversationAndReceiverAndIsReadFalse(
+                    conversation, reader);
+
+            // Đánh dấu tất cả là đã đọc
+            for (Message message : unreadMessages) {
+                message.setRead(true);
+            }
+
+            // Lưu các thay đổi
+            messageRepository.saveAll(unreadMessages);
+
+            return true;
+        } catch (Exception e) {
+            // log.error("Error marking conversation as read: ", e); // Original code had
+            // this line commented out
+            return false;
+        }
+    }
+
+    @Override
+    public Message sendMessage(Message message) {
+        return messageRepository.save(message);
     }
 }

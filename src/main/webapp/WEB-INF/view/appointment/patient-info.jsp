@@ -23,6 +23,12 @@
                                 href="${pageContext.request.contextPath}/resources/css/patient-info.css">
                             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
                             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common.css">
+
+                            <!-- Required scripts -->
+                            <script
+                                src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+                            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/vi.js"></script>
+                            <script defer src="/resources/js/notifications.js"></script>
                         </head>
 
                         <body>

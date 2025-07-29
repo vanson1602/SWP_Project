@@ -84,6 +84,13 @@ public class DoctorSchedule {
         if (status != null && !status.matches("Available|Busy|Processing|Done")) {
             throw new IllegalArgumentException("Invalid status: " + status);
         }
+        if (workDate != null && workDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Work date cannot be in the past");
+        }
+        if (startTime != null && endTime != null && startTime.isAfter(endTime)) {
+            throw new IllegalArgumentException("Start time cannot be after end time");
+        }
+
     }
 
     @Override

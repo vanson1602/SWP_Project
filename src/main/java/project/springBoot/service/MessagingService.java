@@ -14,4 +14,10 @@ public interface MessagingService {
     Conversation createConversation(User sender, User receiver);
 
     Message addMessageToConversation(Long conversationId, User sender, Long receiverId, String content);
+
+    Message sendMessage(Message message);
+
+    Conversation findById(Long id);
+
+    boolean markConversationAsRead(Conversation conversation, User reader);
 }

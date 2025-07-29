@@ -3,9 +3,12 @@ package project.springBoot.controller;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,29 +19,37 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 import project.springBoot.model.Appointment;
 import project.springBoot.model.Doctor;
 import project.springBoot.model.DoctorBookingSlot;
+import project.springBoot.model.DoctorSchedule;
 import project.springBoot.model.DoctorSchedule;
 import project.springBoot.model.Examination;
 import project.springBoot.model.MedicalRecord;
 import project.springBoot.model.Medication;
 import project.springBoot.model.Prescription;
 import project.springBoot.model.Specialization;
+import project.springBoot.model.Specialization;
 import project.springBoot.model.User;
 import project.springBoot.service.AppointmentService;
 import project.springBoot.service.DoctorBookingSlotService;
+import project.springBoot.service.DoctorScheduleService;
 import project.springBoot.service.DoctorScheduleService;
 import project.springBoot.service.DoctorScheduleService;
 import project.springBoot.service.DoctorService;
@@ -48,10 +59,14 @@ import project.springBoot.service.MedicalRecordService;
 import project.springBoot.service.MedicationService;
 import project.springBoot.service.PrescriptionService;
 import project.springBoot.service.SpecializationService;
+import project.springBoot.service.SpecializationService;
+import project.springBoot.service.UploadFileService;
 import project.springBoot.service.UploadFileService;
 import project.springBoot.service.UserService;
+import project.springBoot.service.NotificationService;
 import project.springBoot.model.DoctorSchedule;
 import project.springBoot.service.DoctorScheduleService;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Slf4j
 @Controller
@@ -81,6 +96,8 @@ public class DoctorController {
     private UploadFileService uploadFileService;
     @Autowired
     private SpecializationService specializationService;
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/doctor/home")
     public String getDoctorHomePage(Model model, HttpSession session) {
@@ -88,7 +105,6 @@ public class DoctorController {
         if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/login";
         }
-
 
         Long doctorId = (Long) session.getAttribute("doctorId");
         if (doctorId == null) {
@@ -101,7 +117,9 @@ public class DoctorController {
             }
         }
 
-
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("doctorId", doctorId);
         return "doctors/doctor-home";
@@ -125,8 +143,13 @@ public class DoctorController {
                 doctorId, startDate,
                 endDate);
         List<DoctorBookingSlot> bookingSlots = bookingSlotService.getBookingSlotsByDoctorId(doctorId);
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        List<DoctorBookingSlot> bookingSlotsToday = bookingSlotService.getTodayBookingSlotsByDoctorId(doctorId);
+        model.addAttribute("notificationCount", notificationCount);
         model.addAttribute("appointments", appointments);
-        model.addAttribute("bookingSlots", bookingSlots);
+        model.addAttribute("bookingSlots", bookingSlotsToday);
         model.addAttribute("currentUser", currentUser);
         return "doctors/doctor-appointments";
     }
@@ -152,6 +175,9 @@ public class DoctorController {
                         .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
             }
 
+            // Add notification count
+            int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+            model.addAttribute("notificationCount", notificationCount);
             model.addAttribute("appointment", appointment);
             model.addAttribute("examination", latestExamination);
             model.addAttribute("followUpDateStr", followUpDateStr);
@@ -167,6 +193,10 @@ public class DoctorController {
         if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/access-denied";
         }
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
         model.addAttribute("appointmentId", appointmentId);
         model.addAttribute("examination", new Examination());
         model.addAttribute("icdCodes", icdCodeService.getAllActiveCodes());
@@ -201,7 +231,26 @@ public class DoctorController {
                 examination.setModifiedAt(LocalDateTime.now());
             }
 
+            if (examination.getExaminationID() == 0) {
+                examination.setExaminationDate(LocalDateTime.now());
+                examination.setCreatedAt(LocalDateTime.now());
+            } else {
+                Examination existingExamination = examinationService.getExaminationById(examination.getExaminationID());
+                if (existingExamination != null && existingExamination.getPrescriptions() != null) {
+                    examination.setPrescriptions(existingExamination.getPrescriptions());
+                }
+                examination.setModifiedAt(LocalDateTime.now());
+            }
+
             examinationService.saveExamination(examination);
+            if (examination.getExaminationID() == 0 || !appointment.getStatus().equals("Completed")) {
+                appointmentService.updateAppointmentStatus(appointment.getAppointmentID(), "Completed",
+                        "Khám bệnh hoàn tất vào " + LocalDateTime.now()
+                                .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+            }
+
+            System.out.println("Examination saved for appointmentId: " + appointmentId + ", examinationId: "
+                    + examination.getExaminationID());
             if (examination.getExaminationID() == 0 || !appointment.getStatus().equals("Completed")) {
                 appointmentService.updateAppointmentStatus(appointment.getAppointmentID(), "Completed",
                         "Khám bệnh hoàn tất vào " + LocalDateTime.now()
@@ -238,6 +287,9 @@ public class DoctorController {
             return "redirect:/doctor/appointments/" + appointmentId + "/examination/create";
         }
 
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
         model.addAttribute("appointmentId", appointmentId);
         model.addAttribute("examination", examination);
         model.addAttribute("isEdit", true);
@@ -283,6 +335,10 @@ public class DoctorController {
             }
 
             List<Prescription> prescriptions = prescriptionService.findByExaminationId(examination.getExaminationID());
+
+            // Add notification count
+            int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+            model.addAttribute("notificationCount", notificationCount);
             model.addAttribute("appointment", appointment);
             model.addAttribute("examination", examination);
             model.addAttribute("prescriptions", prescriptions);
@@ -320,12 +376,10 @@ public class DoctorController {
             // Create new prescription
             Prescription prescription = new Prescription();
 
-
             // Set basic fields
             if (requestData.get("prescription_id") != null) {
                 prescription.setPrescriptionID(Long.parseLong(requestData.get("prescription_id").toString()));
             }
-
 
             // Get medication
             Long medicationId = Long.parseLong(requestData.get("medication_id").toString());
@@ -334,14 +388,12 @@ public class DoctorController {
                 throw new IllegalArgumentException("Không tìm thấy thuốc");
             }
 
-
             // Set quantity and validate stock
             int quantity = Integer.parseInt(requestData.get("quantity").toString());
             if (quantity > medication.getStockQuantity()) {
                 throw new IllegalArgumentException("Số lượng yêu cầu vượt quá số lượng tồn kho");
             }
             prescription.setQuantity(quantity);
-
 
             // Update medication stock
             medication.setStockQuantity(medication.getStockQuantity() - quantity);
@@ -351,7 +403,6 @@ public class DoctorController {
             prescription.setMedication(medication);
             prescription.setExamination(examination);
 
-
             // Set doctor directly from prescribed_by
             Long doctorId = Long.parseLong(requestData.get("prescribed_by").toString());
             Doctor doctor = doctorService.findById(doctorId);
@@ -359,7 +410,6 @@ public class DoctorController {
                 throw new IllegalArgumentException("Không tìm thấy bác sĩ");
             }
             prescription.setPrescribedBy(doctor);
-
 
             prescription.setDosage(requestData.get("dosage").toString());
             prescription.setFrequency(requestData.get("frequency").toString());
@@ -371,9 +421,12 @@ public class DoctorController {
                     .setDuration(requestData.get("duration") != null ? requestData.get("duration").toString() : null);
             prescription.setInstructions(
                     requestData.get("instructions") != null ? requestData.get("instructions").toString() : null);
+            prescription
+                    .setDuration(requestData.get("duration") != null ? requestData.get("duration").toString() : null);
+            prescription.setInstructions(
+                    requestData.get("instructions") != null ? requestData.get("instructions").toString() : null);
             prescription.setIsRefillable(Boolean.parseBoolean(requestData.get("is_refillable").toString()));
             prescription.setStatus("PENDING");
-
 
             if (prescription.getPrescriptionID() == null) {
                 prescription.setCreatedAt(LocalDateTime.now());
@@ -411,7 +464,6 @@ public class DoctorController {
 
             // Update status of prescriptions
             prescriptionService.completePrescriptions(prescriptionIds);
-
 
             response.put("success", true);
             response.put("message", "Đơn thuốc đã được hoàn thành");
@@ -486,6 +538,10 @@ public class DoctorController {
             schedule.setBookingSlots(
                     doctorScheduleService.getScheduleWithSlots(schedule.getScheduleID()).getBookingSlots());
         }
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
         model.addAttribute("schedules", schedules);
         model.addAttribute("currentUser", currentUser);
         return "doctors/doctor-schedule";
@@ -510,6 +566,10 @@ public class DoctorController {
                 endTimes.add("N/A");
             }
         }
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
         model.addAttribute("startTime", startTime);
         model.addAttribute("endTimes", endTimes);
         model.addAttribute("formatter", formatter);
@@ -526,6 +586,10 @@ public class DoctorController {
         Examination examination = examinationService.getExaminationByAppointmentId(appointmentID);
         DateTimeFormatter date = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         DateTimeFormatter time = DateTimeFormatter.ofPattern("HH:mm");
+
+        // Add notification count
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
         model.addAttribute("examination", examination);
         model.addAttribute("time", time);
         model.addAttribute("date", date);
@@ -598,6 +662,123 @@ public class DoctorController {
             model.addAttribute("specializations", specializationService.getAllActiveSpecializations());
             model.addAttribute("error", "Failed to create doctor: " + e.getMessage());
             return "doctor/create-doctor";
+        }
+    }
+
+    @RequestMapping("/doctors")
+    public String getDoctorsPage(Model model) {
+        List<Doctor> doctors = doctorService.findAll();
+        model.addAttribute("doctors", doctors);
+        return "doctor/list-doctor";
+    }
+
+    @GetMapping("/api/doctor/stats/patients")
+    @ResponseBody
+    public Map<String, Object> getDoctorPatientStats(
+            @RequestParam(defaultValue = "0") int year,
+            @RequestParam(defaultValue = "0") int month,
+            @RequestParam(defaultValue = "day") String mode,
+            HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        User user = (User) session.getAttribute("currentUser");
+        if (user == null || !"doctor".equalsIgnoreCase(user.getRole())) {
+            return result;
+        }
+        Doctor doctor = doctorService.getDoctorByUsername(user.getUsername());
+        if (doctor == null)
+            return result;
+        Long doctorId = doctor.getDoctorID();
+        if (year == 0)
+            year = java.time.LocalDate.now().getYear();
+        if ("day".equals(mode) && month > 0) {
+            List<Map<String, Object>> stats = appointmentService.getDoctorPatientCountByDay(doctorId, year, month);
+            result.put("stats", stats);
+            result.put("mode", "day");
+        } else if ("week".equals(mode) && month > 0) {
+            List<Map<String, Object>> stats = appointmentService.getDoctorPatientCountByWeek(doctorId, year, month);
+            result.put("stats", stats);
+            result.put("mode", "week");
+        } else if ("month".equals(mode)) {
+            List<Map<String, Object>> stats = appointmentService.getDoctorPatientCountByMonth(doctorId, year);
+            result.put("stats", stats);
+            result.put("mode", "month");
+        }
+        result.put("year", year);
+        result.put("month", month);
+        return result;
+    }
+
+    @GetMapping("/doctor/profile")
+    public String getDoctorProfile(Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
+            return "redirect:/login";
+        }
+
+        Doctor doctor = doctorService.getDoctorByUsername(currentUser.getUsername());
+        if (doctor == null) {
+            return "redirect:/access-denied";
+        }
+
+        // Lấy năm hiện tại
+        int currentYear = LocalDateTime.now().getYear();
+        int currentMonth = LocalDateTime.now().getMonthValue();
+
+        // Lấy thống kê bệnh nhân đã khám theo tháng trong năm hiện tại
+        List<Map<String, Object>> monthStats = appointmentService.getDoctorPatientCountByMonth(doctor.getDoctorID(),
+                currentYear);
+
+        // Tính tổng số bệnh nhân đã khám trong năm
+        long totalPatients = 0;
+        if (monthStats != null) {
+            for (Map<String, Object> stat : monthStats) {
+                totalPatients += ((Number) stat.get("patientCount")).longValue();
+            }
+        }
+        model.addAttribute("totalPatients", totalPatients);
+
+        // Truyền dữ liệu lên view
+        model.addAttribute("doctor", doctor);
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("currentYear", currentYear);
+        model.addAttribute("currentMonth", currentMonth);
+        model.addAttribute("totalPatients", totalPatients);
+        model.addAttribute("monthStats", monthStats);
+
+        return "doctor/profile";
+    }
+
+    @PostMapping("/doctor/profile/change-password")
+    public String changeDoctorPassword(@RequestParam("currentPassword") String currentPassword,
+            @RequestParam("newPassword") String newPassword,
+            @RequestParam("confirmPassword") String confirmPassword,
+            HttpSession session,
+            RedirectAttributes ra) {
+        try {
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null || !"doctor".equalsIgnoreCase(currentUser.getRole())) {
+                return "redirect:/login";
+            }
+            // Lấy user mới nhất từ DB
+            User dbUser = userService.getUserById(currentUser.getUserID());
+            if (!org.mindrot.jbcrypt.BCrypt.checkpw(currentPassword, dbUser.getPassword())) {
+                ra.addFlashAttribute("error", "Mật khẩu hiện tại không đúng");
+                return "redirect:/doctor/profile";
+            }
+            if (!newPassword.equals(confirmPassword)) {
+                ra.addFlashAttribute("error", "Mật khẩu xác nhận không khớp");
+                return "redirect:/doctor/profile";
+            }
+            String hashedPassword = org.mindrot.jbcrypt.BCrypt.hashpw(newPassword,
+                    org.mindrot.jbcrypt.BCrypt.gensalt());
+            dbUser.setPassword(hashedPassword);
+            userService.handleUpdateUser(dbUser);
+            session.setAttribute("currentUser", dbUser);
+            ra.addFlashAttribute("success", "Đổi mật khẩu thành công!");
+            return "redirect:/doctor/profile";
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Có lỗi xảy ra. Vui lòng thử lại sau!");
+            return "redirect:/doctor/profile";
         }
     }
 

@@ -66,6 +66,9 @@ public class Prescription {
     @Column(length = 500)
     private String instructions;
 
+    @Column(name = "status", length = 20)
+    private String status = "PENDING";
+
     @Column(name = "is_refillable")
     private Boolean isRefillable = false;
 
@@ -74,9 +77,6 @@ public class Prescription {
 
     @Column(name = "modified_at", nullable = false)
     private LocalDateTime modifiedAt;
-
-    @Column(name = "status", length = 20)
-    private String status = "PENDING";
 
     @Column(name = "completed_at")
     private LocalDateTime completedAt;

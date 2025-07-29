@@ -118,4 +118,5 @@ public class UserService {
     public List<User> findUserByRole(String role) {
         return userRepository.findByRole(role);
     }
+
 }

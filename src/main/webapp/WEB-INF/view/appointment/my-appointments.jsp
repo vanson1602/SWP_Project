@@ -5,6 +5,7 @@
                 <%@ page import="java.time.format.DateTimeFormatter" %>
                     <% pageContext.setAttribute("dateFormatter", DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                         pageContext.setAttribute("timeFormatter", DateTimeFormatter.ofPattern("HH:00")); %>
+
                         <!DOCTYPE html>
                         <html lang="vi">
 
@@ -12,12 +13,15 @@
                             <meta charset="UTF-8">
                             <meta name="viewport" content="width=device-width, initial-scale=1.0">
                             <title>Lịch hẹn của tôi - HealthCare+</title>
-                            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-                                rel="stylesheet">
-                            <link rel="stylesheet"
-                                href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+                            <jsp:include page="../shared/head.jsp" />
                             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/base.css">
                             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/homepage.css">
+
+                            <!-- Required scripts -->
+                            <script
+                                src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+                            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/vi.js"></script>
+                            <script defer src="/resources/js/notifications.js"></script>
                             <style>
                                 body {
                                     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -489,6 +493,10 @@
                                                     class="btn ${param.status == 'Confirmed' ? 'btn-success' : 'btn-outline-success'}">
                                                     <i class="bi bi-check-circle"></i> Đã xác nhận
                                                 </a>
+                                                <a href="/appointments/my-appointments?status=Completed"
+                                                    class="btn ${param.status == 'Completed' ? 'btn-info' : 'btn-outline-info'}">
+                                                    <i class="bi bi-check-all"></i> Hoàn thành
+                                                </a>
                                                 <a href="/appointments/my-appointments?status=Cancelled"
                                                     class="btn ${param.status == 'Cancelled' ? 'btn-danger' : 'btn-outline-danger'}">
                                                     <i class="bi bi-x-circle"></i> Đã hủy
@@ -520,10 +528,12 @@
                                                     <span class="status-badge 
                                                 ${appointment.status == 'Pending' ? 'status-pending' : ''}
                                                 ${appointment.status == 'Confirmed' ? 'status-confirmed' : ''}
+                                                ${appointment.status == 'Completed' ? 'status-completed' : ''}
                                                 ${appointment.status == 'Cancelled' ? 'status-cancelled' : ''}">
                                                         <i class="bi 
                                                     ${appointment.status == 'Pending' ? 'bi-hourglass-split' : ''}
                                                     ${appointment.status == 'Confirmed' ? 'bi-check-circle' : ''}
+                                                    ${appointment.status == 'Completed' ? 'bi-check-all' : ''}
                                                     ${appointment.status == 'Cancelled' ? 'bi-x-circle' : ''}">
                                                         </i>
                                                         ${appointment.status}
@@ -672,7 +682,8 @@
                                                             <button type="button" class="btn-close btn-close-white"
                                                                 data-bs-dismiss="modal"></button>
                                                         </div>
-                                                        <form action="/appointments/${appointment.appointmentID}/cancel"
+                                                        <form
+                                                            action="${pageContext.request.contextPath}/appointments/${appointment.appointmentID}/cancel"
                                                             method="post">
                                                             <div class="modal-body">
                                                                 <div class="mb-3">

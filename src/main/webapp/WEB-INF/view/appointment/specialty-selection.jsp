@@ -14,6 +14,11 @@
             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/shared.css">
             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common.css">
             <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/specialty-selection.css">
+
+            <!-- Required scripts -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/vi.js"></script>
+            <script defer src="/resources/js/notifications.js"></script>
         </head>
 
         <body>
@@ -66,31 +71,33 @@
 
                                 <!-- Specialty Selection -->
                                 <h3 style="margin-bottom: 1.5rem; color: #333;">Chọn chuyên khoa</h3>
-                                <div class="specialties-grid">
-                                    <c:forEach items="${specializations}" var="spec">
-                                        <div class="specialty-card"
-                                            onclick="handleSpecialtyClick(this, '${spec.specializationID}')">
-                                            <div class="specialty-icon">
-                                                <img src="/resources/images/specialties/${spec.specializationID}.png"
-                                                    alt="${spec.specializationName}">
+                                <form id="specialtyForm" action="/appointments/doctor" method="GET">
+                                    <input type="hidden" id="specializationId" name="specializationId" value="">
+                                    <div class="specialties-grid">
+                                        <c:forEach items="${specializations}" var="spec">
+                                            <div class="specialty-card"
+                                                onclick="handleSpecialtyClick(this, '${spec.specializationID}')">
+                                                <div class="specialty-icon">
+                                                    <img src="/resources/images/specialties/${spec.specializationID}.png"
+                                                        alt="${spec.specializationName}">
+                                                </div>
+                                                <h3>${spec.specializationName}</h3>
+                                                <p>${spec.description}</p>
                                             </div>
-                                            <h3>${spec.specializationName}</h3>
-                                            <p>${spec.description}</p>
-                                        </div>
-                                    </c:forEach>
-                                </div>
+                                        </c:forEach>
+                                    </div>
 
-                                <!-- Navigation Buttons -->
-                                <div class="nav-buttons">
-                                    <a href="${pageContext.request.contextPath}/appointments/booking"
-                                        class="btn btn-secondary">
-                                        ← Quay lại
-                                    </a>
-                                    <button id="continueBtn" class="btn btn-primary" disabled
-                                        onclick="selectSpecialty()">
-                                        Tiếp tục →
-                                    </button>
-                                </div>
+                                    <!-- Navigation Buttons -->
+                                    <div class="nav-buttons">
+                                        <a href="${pageContext.request.contextPath}/appointments/booking"
+                                            class="btn btn-secondary">
+                                            ← Quay lại
+                                        </a>
+                                        <button type="submit" id="continueBtn" class="btn btn-primary" disabled>
+                                            Tiếp tục →
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </main>
@@ -101,7 +108,6 @@
             <jsp:include page="/WEB-INF/view/shared/footer.jsp" />
 
             <script>
-                let selectedSpecialtyId = null;
                 let clickCount = 0;
 
                 function handleSpecialtyClick(card, specializationId) {
@@ -113,8 +119,8 @@
                     // Add selected class to clicked card
                     card.classList.add('selected');
 
-                    // Store selected specialty ID
-                    selectedSpecialtyId = specializationId;
+                    // Set value to hidden input
+                    document.getElementById('specializationId').value = specializationId;
 
                     // Enable continue button
                     document.getElementById('continueBtn').disabled = false;
@@ -122,7 +128,7 @@
                     // Handle double click
                     clickCount++;
                     if (clickCount === 2) {
-                        selectSpecialty();
+                        document.getElementById('specialtyForm').submit();
                         clickCount = 0;
                     }
 
@@ -130,12 +136,6 @@
                     setTimeout(() => {
                         clickCount = 0;
                     }, 500);
-                }
-
-                function selectSpecialty() {
-                    if (selectedSpecialtyId) {
-                        window.location.href = '/appointments/doctor?specializationId=' + selectedSpecialtyId;
-                    }
                 }
             </script>
         </body>

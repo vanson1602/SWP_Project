@@ -1,6 +1,6 @@
 let stompClient = null;
 let currentConversation = null;
-
+let currentImageFile = null;
 
 const chatData = document.getElementById('chatData');
 
@@ -26,38 +26,10 @@ const initialConversation = {
 };
 
 function connect() {
-    const socket = new SockJS('/ws');
-    stompClient = Stomp.over(socket);
-    stompClient.debug = null;
-
-    stompClient.connect({}, function (frame) {
-        console.log('Connected: ' + frame);
-
-        // Subscribe to conversation messages
-        const conversationQueue = `/topic/conversation/${currentConversation.id}`;
-        console.log('Subscribing to conversation topic:', conversationQueue);
-
-        stompClient.subscribe(conversationQueue, function (message) {
-            const messageBody = JSON.parse(message.body);
-            console.log('Received message from topic:', messageBody);
-            displayMessage(messageBody);
-        });
-
-        // Subscribe to new conversations (for receptionist)
-        if (currentUser.role === 'receptionist') {
-            const newConversationsQueue = `/topic/conversations/${currentUser.id}`;
-            console.log('Subscribing to new conversations topic:', newConversationsQueue);
-
-            stompClient.subscribe(newConversationsQueue, function (conversation) {
-                const conversationData = JSON.parse(conversation.body);
-                console.log('Received new conversation:', conversationData);
-                addNewConversationToUI(conversationData);
-            });
+    stompClient = initializeWebSocket(currentUser, function (messageData) {
+        if (currentConversation && messageData.conversationId === currentConversation.id) {
+            displayMessage(messageData);
         }
-
-    }, function (error) {
-        console.error('WebSocket error:', error);
-        setTimeout(connect, 5000); // Tự reconnect nếu mất kết nối
     });
 }
 
@@ -65,8 +37,13 @@ function sendMessage() {
     const messageInput = document.getElementById('messageInput');
     const content = messageInput.value.trim();
 
-    if (!currentConversation || !content) {
-        console.error('Invalid state: no conversation or message empty');
+    if (!currentConversation) {
+        console.error('Invalid state: no conversation');
+        return;
+    }
+
+    if (!content && !currentImageFile) {
+        console.error('No message content or image');
         return;
     }
 
@@ -74,6 +51,12 @@ function sendMessage() {
         const receiver = currentUser.id === currentConversation.sender.id
             ? currentConversation.receiver
             : currentConversation.sender;
+
+        if (currentImageFile) {
+            uploadAndSendImage(currentImageFile, receiver);
+            currentImageFile = null;
+            return;
+        }
 
         const message = {
             conversationId: currentConversation.id,
@@ -93,47 +76,145 @@ function sendMessage() {
     }
 }
 
+document.getElementById('imageInput')?.addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (file) {
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            alert('Kích thước file không được vượt quá 5MB');
+            this.value = '';
+            return;
+        }
+        currentImageFile = file;
+        sendMessage();
+    }
+});
+
+async function uploadAndSendImage(file, receiver) {
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('/api/upload/images', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error('Upload failed');
+        }
+
+        const imageUrl = await response.text();
+
+        const message = {
+            conversationId: currentConversation.id,
+            senderId: currentUser.id,
+            receiverId: receiver.id,
+            content: `<img src="${imageUrl}" alt="Uploaded image">`
+        };
+
+        stompClient.send("/app/chat.send", {}, JSON.stringify(message));
+
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        alert('Không thể tải lên hình ảnh. Vui lòng thử lại.');
+    }
+}
+
 function formatTime(timestamp) {
     if (!timestamp) return 'Không xác định';
 
     try {
+        // Chuyển đổi timestamp sang đối tượng moment
         const momentDate = moment(timestamp);
         if (!momentDate.isValid()) return 'Không xác định';
 
-        const now = moment();
-        const diff = now.diff(momentDate, 'minutes');
+        // Đặt locale cho moment.js là tiếng Việt
+        moment.locale('vi');
 
-        if (diff < 1) return 'Vừa xong';
-        if (diff < 60) return `${diff} phút trước`;
-        if (diff < 1440) return momentDate.format('HH:mm [hôm nay]');
-        if (diff < 2880) return momentDate.format('HH:mm [hôm qua]');
-        if (diff < 7200) return momentDate.format('HH:mm [• ] DD/MM');
-        return momentDate.format('HH:mm [•] DD/MM/YYYY');
+        const now = moment();
+        const diff = now.diff(momentDate, 'days');
+
+        // Trong ngày
+        if (diff < 1 && momentDate.isSame(now, 'day')) {
+            return momentDate.format('HH:mm');
+        }
+
+        // Trong tuần
+        if (diff < 7) {
+            // Sử dụng dddd để lấy tên thứ đầy đủ, sau đó lấy chữ cái đầu và số thứ tự
+            const weekday = momentDate.format('dddd');
+            const dayNumber = weekday === 'Chủ Nhật' ? 'CN' : 'T' + (momentDate.day() + 1);
+            return momentDate.format('HH:mm ') + dayNumber;
+        }
+
+        // Sau 1 tuần
+        return momentDate.format('HH:mm D [Tháng] M, YYYY');
     } catch (error) {
         console.error('Error formatting date:', error);
         return 'Không xác định';
     }
 }
 
+function shouldShowTimeDivider(currentMessageTime, previousMessageTime) {
+    if (!previousMessageTime) return true;
+
+    const current = moment(currentMessageTime);
+    const previous = moment(previousMessageTime);
+
+    // Hiển thị divider nếu khác ngày hoặc cách nhau hơn 1 giờ
+    return !current.isSame(previous, 'day') ||
+        Math.abs(current.diff(previous, 'hours')) >= 1;
+}
+
 function displayMessage(message) {
     const messageArea = document.getElementById('messageArea');
     if (!messageArea) return;
 
-    const messageDiv = document.createElement('div');
-    const isSent = message.sender.userID === currentUser.id;
+    const sender = message.sender || {};
+    const currentUserId = currentUser.id;
+    const senderId = sender.userID || sender.id;
+    const messageTime = moment(message.createdAt);
 
+    // Tìm tin nhắn cuối cùng để so sánh thời gian
+    const lastMessage = messageArea.lastElementChild;
+    let lastMessageTime = null;
+    if (lastMessage && lastMessage.dataset.timestamp) {
+        lastMessageTime = lastMessage.dataset.timestamp;
+    }
+
+    // Kiểm tra và thêm time divider nếu cần
+    if (shouldShowTimeDivider(message.createdAt, lastMessageTime)) {
+        const timeDivider = document.createElement('div');
+        timeDivider.className = 'time-divider';
+        timeDivider.innerHTML = `<span>${formatTime(message.createdAt)}</span>`;
+        messageArea.appendChild(timeDivider);
+    }
+
+    const isSent = senderId === currentUserId;
+    const senderFullName = sender.fullName ||
+        (`${sender.firstName || ''} ${sender.lastName || ''}`.trim()) ||
+        'Người dùng';
+    const firstLetter = senderFullName.charAt(0).toUpperCase();
+
+    const messageDiv = document.createElement('div');
     messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+    messageDiv.dataset.timestamp = message.createdAt;
 
     messageDiv.innerHTML = `
-        <div class="message-header">
-            <strong>${message.sender.fullName}</strong>
-            <span class="time">${formatTime(message.createdAt)}</span>
+        <div class="message-container">
+            <div class="avatar">${firstLetter}</div>
+            <div class="message-content-wrapper">
+                <div class="message-header">
+                    <strong>${senderFullName}</strong>
+                    <span class="time">${formatTime(message.createdAt)}</span>
+                </div>
+                <div class="message-content">${message.content}</div>
+            </div>
         </div>
-        <div class="message-content">${message.content}</div>
     `;
 
     messageArea.appendChild(messageDiv);
-    messageArea.scrollTop = messageArea.scrollHeight;
+    scrollToBottom(messageArea);
 }
 
 function loadConversation(conversationId) {
@@ -144,48 +225,110 @@ function loadConversation(conversationId) {
             const messageArea = document.getElementById('messageArea');
             messageArea.innerHTML = '';
 
+            let lastMessageTime = null;
             if (conversation.messages) {
                 conversation.messages.forEach(message => {
+
+                    if (shouldShowTimeDivider(message.createdAt, lastMessageTime)) {
+                        const timeDivider = document.createElement('div');
+                        timeDivider.className = 'time-divider';
+                        timeDivider.innerHTML = `<span>${formatTime(message.createdAt)}</span>`;
+                        messageArea.appendChild(timeDivider);
+                    }
+                    lastMessageTime = message.createdAt;
+
                     displayMessage(message);
                 });
             }
+
+            // Cuộn xuống cuối sau khi tất cả tin nhắn đã được hiển thị
+            scrollToBottom(messageArea);
         })
         .catch(error => console.error('Error loading conversation:', error));
 }
 
-function addNewConversationToUI(conversation) {
-    const conversationsContainer = document.querySelector('.tab-pane#conversations');
-    if (!conversationsContainer) return;
+function findConversationItem(conversationId) {
 
-    // Remove "no conversations" message if it exists
+    const selectors = [
+        `.conversation-item[data-conversation-id="${conversationId}"]`,
+        `.conversation-item[data-id="${conversationId}"]`,
+        `.conversation-item[data-conversationid="${conversationId}"]`
+    ];
+
+    for (const selector of selectors) {
+        const item = document.querySelector(selector);
+        if (item) return item;
+    }
+    return null;
+}
+
+function updateConversationLastMessage(messageData) {
+    const conversationItem = findConversationItem(messageData.conversationId);
+
+    if (conversationItem) {
+
+        const lastMessageDiv = conversationItem.querySelector('.last-message');
+        if (lastMessageDiv) {
+            lastMessageDiv.textContent = messageData.content;
+        }
+
+
+        const parent = conversationItem.parentNode;
+        if (parent && parent.firstChild) {
+            parent.insertBefore(conversationItem, parent.firstChild);
+        }
+    } else {
+        console.warn('Conversation not found for update:', messageData.conversationId);
+    }
+}
+
+function addNewConversationToUI(conversation) {
+
+    const existingConversation = findConversationItem(conversation.id);
+    if (existingConversation) {
+        console.log('Conversation already exists, updating instead of creating new');
+        return updateConversationLastMessage({
+            conversationId: conversation.id,
+            content: conversation.messages?.[conversation.messages.length - 1]?.content || ''
+        });
+    }
+
+    const conversationsContainer = document.querySelector('.tab-pane#conversations') ||
+        document.querySelector('#conversations') ||
+        document.querySelector('.conversations-container');
+
+    if (!conversationsContainer) {
+        console.error('Could not find conversations container');
+        return;
+    }
+
     const noConversationsDiv = conversationsContainer.querySelector('.no-conversations');
     if (noConversationsDiv) {
         noConversationsDiv.remove();
     }
 
     const otherUser = conversation.sender.userID === currentUser.id ? conversation.receiver : conversation.sender;
+    const firstName = otherUser.firstName || otherUser.fullName?.split(' ')[0] || 'U';
 
     const conversationDiv = document.createElement('div');
-    conversationDiv.className = 'd-flex align-items-center p-3 border rounded mb-2 conversation-item';
+    conversationDiv.className = 'conversation-item';
+    conversationDiv.setAttribute('data-conversation-id', conversation.id);
     conversationDiv.onclick = () => window.location.href = `/chat/conversation/${conversation.id}`;
 
     conversationDiv.innerHTML = `
-        <div class="avatar">
-            ${otherUser.firstName.charAt(0)}
-        </div>
-        <div>
-            <div class="fw-bold">
-                ${otherUser.firstName} ${otherUser.lastName}
+        <div class="avatar">${firstName.charAt(0).toUpperCase()}</div>
+        <div class="user-info">
+            <div class="user-name">
+                ${otherUser.firstName || ''} ${otherUser.lastName || ''}
             </div>
             ${conversation.messages && conversation.messages.length > 0 ? `
-                <div class="text-muted small">
+                <div class="last-message">
                     ${conversation.messages[conversation.messages.length - 1].content}
                 </div>
             ` : ''}
         </div>
     `;
 
-    // Add new conversation at the top of the list
     conversationsContainer.insertBefore(conversationDiv, conversationsContainer.firstChild);
 }
 
@@ -196,6 +339,15 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeof initialConversation !== 'undefined') {
         currentConversation = initialConversation;
         console.log('Initial conversation:', currentConversation);
+
+        // Đảm bảo cuộn xuống cuối sau khi trang đã load hoàn toàn
+        const messageArea = document.getElementById('messageArea');
+        if (messageArea) {
+            // Sử dụng requestAnimationFrame để đảm bảo DOM đã được render
+            requestAnimationFrame(() => {
+                messageArea.scrollTop = messageArea.scrollHeight;
+            });
+        }
     }
 
     const conversationItems = document.querySelectorAll('.conversation-item');
@@ -253,4 +405,12 @@ async function startChatWithReceptionist() {
     }
 }
 
+// Cập nhật hàm scrollToBottom để sử dụng requestAnimationFrame
+function scrollToBottom(element) {
+    if (!element) return;
 
+    // Sử dụng requestAnimationFrame để đảm bảo DOM đã được render
+    requestAnimationFrame(() => {
+        element.scrollTop = element.scrollHeight;
+    });
+}

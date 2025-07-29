@@ -19,11 +19,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import lombok.RequiredArgsConstructor;
 import project.springBoot.model.Appointment;
 import project.springBoot.model.Examination;
+import project.springBoot.model.Medication;
 import project.springBoot.model.Patient;
+import project.springBoot.model.Prescription;
 import project.springBoot.model.User;
 import project.springBoot.service.AppointmentService;
 import project.springBoot.service.ExaminationService;
+import project.springBoot.service.MedicationService;
+import project.springBoot.service.NotificationService;
 import project.springBoot.service.PatientService;
+import project.springBoot.service.PrescriptionService;
 import project.springBoot.service.UserService;
 
 @Controller
@@ -36,6 +41,12 @@ public class PatientHistoryController {
     private AppointmentService appointmentService;
     @Autowired
     private ExaminationService examinationService;
+    @Autowired
+    private PrescriptionService prescriptionService;
+    @Autowired
+    private MedicationService medicationService;
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/medical-history")
     public String viewPatientHistory(HttpSession session, Model model) {
@@ -43,6 +54,11 @@ public class PatientHistoryController {
         if (currentUser == null || !"patient".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/access-denied";
         }
+
+        // Add notification count for header
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
+
         Patient patient = patientService.getPatientByUsername(currentUser.getUsername());
         List<Appointment> appointments = appointmentService.findAppointmentByPatientID(patient.getPatientID());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -70,6 +86,11 @@ public class PatientHistoryController {
         if (currentUser == null || !"patient".equalsIgnoreCase(currentUser.getRole())) {
             return "redirect:/login";
         }
+
+        // Add notification count for header
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
+
         Examination examination = examinationService.getExaminationByAppointmentId(appointmentID);
         DateTimeFormatter date = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         DateTimeFormatter time = DateTimeFormatter.ofPattern("HH:mm");
@@ -77,5 +98,31 @@ public class PatientHistoryController {
         model.addAttribute("time", time);
         model.addAttribute("date", date);
         return "patient/patient-medicalRecord";
+    }
+
+    @GetMapping("/medical-history/prescription/{appointmentID}")
+    public String viewPrescriptionDetail(HttpSession session, Model model, @PathVariable Long appointmentID) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null || !"patient".equalsIgnoreCase(currentUser.getRole())) {
+            return "redirect:/login";
+        }
+
+        // Add notification count for header
+        int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        model.addAttribute("notificationCount", notificationCount);
+
+        Examination examination = examinationService.getExaminationByAppointmentId(appointmentID);
+        if (examination == null) {
+            model.addAttribute("errorMessage", "Không tìm thấy đơn thuốc nào cho cuộc hẹn này.");
+            return "patient/patient-viewPrescription";
+        }
+        List<Prescription> prescriptions = prescriptionService
+                .getAllPrescriptionsByExaminationId(examination.getExaminationID());
+        if (prescriptions == null) {
+            model.addAttribute("errorMessage", "Không tìm thấy đơn thuốc nào cho cuộc hẹn này.");
+        } else {
+            model.addAttribute("prescriptions", prescriptions);
+        }
+        return "patient/patient-viewPrescription";
     }
 }

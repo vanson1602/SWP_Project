@@ -1,154 +1,85 @@
-<%@page contentType="text/html" pageEncoding="UTF-8" %> <%@ taglib prefix="c"
-uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib
-uri="http://www.springframework.org/tags/form" prefix="form" %> <%@ taglib
-prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@page contentType="text/html" pageEncoding="UTF-8" %>
+  <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+    <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+      <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Patient History Medical Record</title>
-  </head>
-  <style>
-    body {
-      font-family: "Segoe UI", "Helvetica Neue", sans-serif;
-      background: linear-gradient(135deg, #e0f2fe, #fef9c3);
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 40px;
-      min-height: 100vh;
-      color: #1f2937;
-    }
+        <!DOCTYPE html>
+        <html lang="en">
 
-    .card {
-      background-color: #ffffff;
-      padding: 32px;
-      border-radius: 16px;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 700px;
-      border: 1px solid #e5e7eb;
-      animation: fadeIn 0.4s ease-in-out;
-    }
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <title>Patient History Medical Record</title>
+          <!-- Include header with notifications -->
+          <jsp:include page="../shared/head.jsp" />
+          <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/base.css">
+          <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/homepage.css">
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(16px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+          <!-- Required scripts -->
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/vi.js"></script>
+          <script defer src="/resources/js/notifications.js"></script>
+        </head>
 
-    .card h1 {
-      font-size: 28px;
-      font-weight: 700;
-      text-align: center;
-      color: #1e40af;
-      margin-bottom: 32px;
-    }
+        <body>
+          <!-- Include header with notifications -->
+          <jsp:include page="../shared/header.jsp" />
 
-    .section-title {
-      font-size: 20px;
-      font-weight: 600;
-      color: #0ea5e9;
-      margin-top: 24px;
-      margin-bottom: 12px;
-      border-bottom: 2px solid #bae6fd;
-      padding-bottom: 6px;
-      letter-spacing: 0.5px;
-    }
+          <div class="container mt-4">
+            <div class="card">
+              <h1>Hồ sơ bệnh án</h1>
 
-    .info {
-      font-size: 16px;
-      color: #374151;
-      margin: 10px 0;
-      line-height: 1.6;
-      padding-left: 8px;
-      border-left: 3px solid #93c5fd;
-      background-color: #f8fafc;
-      padding: 10px 12px;
-      border-radius: 6px;
-    }
+              <c:if test="${examination != null}">
+                <div class="section-title">Dấu hiệu sinh tồn</div>
+                <div class="info">
+                  <span>Huyết áp:</span> ${examination.bloodPressureDiastolic}/3 mmHg
+                </div>
+                <div class="info">
+                  <span>Nhịp tim:</span> ${examination.heartRate} bpm
+                </div>
+                <div class="info">
+                  <span>Nhiệt độ:</span> ${examination.temperature}
+                </div>
+                <div class="info">
+                  <span>Nhịp thở:</span> ${examination.respiratoryRate} lần/phút
+                </div>
+                <div class="info">
+                  <span>SpO2:</span> ${examination.oxygenSaturation}
+                </div>
 
-    .info span {
-      font-weight: 600;
-      color: #111827;
-    }
+                <div class="section-title">Tình trạng bệnh</div>
+                <div class="info">
+                  <span>Triệu chứng:</span> ${examination.symptoms}
+                </div>
+                <div class="info">
+                  <span>Khám Lâm Sàng:</span> ${examination.physicalExamination}
+                </div>
+                <div class="info">
+                  <span>Chẩn đoán:</span> ${examination.diseaseDiagnosis}
+                </div>
+                <div class="info">
+                  <span>Ngày tái khám:</span>
+                  <c:choose>
+                    <c:when test="${examination.followUpDate != null}">
+                      ${examination.followUpDate.format(date)}
+                    </c:when>
+                    <c:otherwise>Không có</c:otherwise>
+                  </c:choose>
+                </div>
+              </c:if>
 
-    .back-button {
-      display: inline-block;
-      margin-top: 30px;
-      padding: 12px 24px;
-      background-color: #1d4ed8;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 16px;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 14px rgba(29, 78, 216, 0.25);
-    }
+              <c:if test="${examination == null}">
+                <div class="info" style="color: red; font-weight: bold">
+                  Không có hồ sơ bệnh án
+                </div>
+              </c:if>
 
-    .back-button:hover {
-      background-color: #2563eb;
-      transform: translateY(-2px);
-    }
+              <a href="javascript:history.back()" class="back-button">← Quay lại</a>
+            </div>
+          </div>
 
-    .info[style*="red"] {
-      background-color: #fef2f2;
-      color: #dc2626;
-      border-left-color: #f87171;
-    }
-  </style>
+          <!-- Include footer -->
+          <jsp:include page="../shared/footer.jsp" />
+        </body>
 
-  <body>
-    <div class="card">
-      <h1>Medical Record Details</h1>
-
-      <c:if test="${examination != null}">
-        <div class="section-title">Dấu hiệu sinh tồn</div>
-        <p class="info">
-          <span>Huyết áp:</span> ${examination.bloodPressureDiastolic}/3 mmHg
-        </p>
-        <p class="info"><span>Nhịp tim:</span> ${examination.heartRate} bpm</p>
-        <p class="info"><span>Nhiệt độ:</span> ${examination.temperature}</p>
-        <p class="info">
-          <span>Nhịp thở:</span> ${examination.respiratoryRate} lần/phút
-        </p>
-        <p class="info"><span>SpO2:</span> ${examination.oxygenSaturation}</p>
-
-        <div class="section-title">Tình trạng bệnh</div>
-        <p class="info"><span>Triệu chứng:</span> ${examination.symptoms}</p>
-        <p class="info">
-          <span>Khám Lâm Sàng:</span> ${examination.physicalExamination}
-        </p>
-        <p class="info">
-          <span>Chẩn đoán:</span> ${examination.diseaseDiagnosis}
-        </p>
-        <p class="info">
-          <span>Ngày tái khám:</span>
-          <c:choose>
-            <c:when test="${examination.followUpDate != null}">
-              ${examination.followUpDate.format(date)}
-            </c:when>
-            <c:otherwise>Không có</c:otherwise>
-          </c:choose>
-        </p>
-      </c:if>
-
-      <c:if test="${examination == null}">
-        <p class="info" style="color: red; font-weight: bold">
-          Không có hồ sơ bệnh án
-        </p>
-      </c:if>
-
-      <a href="javascript:history.back()" class="back-button">← Quay lại</a>
-    </div>
-  </body>
-</html>
+        </html>
