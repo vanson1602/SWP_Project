@@ -146,6 +146,7 @@ public class DoctorController {
 
         // Add notification count
         int notificationCount = notificationService.getUnreadNotificationsCount(currentUser.getUserID());
+        List<DoctorBookingSlot> bookingSlotsToday = bookingSlotService.getTodayBookingSlotsByDoctorId(doctorId);
         model.addAttribute("notificationCount", notificationCount);
         model.addAttribute("appointments", appointments);
         model.addAttribute("bookingSlots", bookingSlotsToday);
