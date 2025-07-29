@@ -670,11 +670,25 @@
                                         font-size: 1rem;
                                     }
 
-                                    .vital-signs p:nth-child(1) strong::before { content: "🩸"; }
-                                    .vital-signs p:nth-child(2) strong::before { content: "💓"; }
-                                    .vital-signs p:nth-child(3) strong::before { content: "🌡️"; }
-                                    .vital-signs p:nth-child(4) strong::before { content: "🫁"; }
-                                    .vital-signs p:nth-child(5) strong::before { content: "🫧"; }
+                                    .vital-signs p:nth-child(1) strong::before {
+                                        content: "🩸";
+                                    }
+
+                                    .vital-signs p:nth-child(2) strong::before {
+                                        content: "💓";
+                                    }
+
+                                    .vital-signs p:nth-child(3) strong::before {
+                                        content: "🌡️";
+                                    }
+
+                                    .vital-signs p:nth-child(4) strong::before {
+                                        content: "🫁";
+                                    }
+
+                                    .vital-signs p:nth-child(5) strong::before {
+                                        content: "🫧";
+                                    }
 
                                     .symptoms-diagnosis {
                                         background: linear-gradient(135deg, #f0f8ff 0%, #bee3f8 100%) !important;
@@ -719,11 +733,25 @@
                                         font-size: 1rem;
                                     }
 
-                                    .symptoms-diagnosis p:nth-child(1) strong::before { content: "🤒"; }
-                                    .symptoms-diagnosis p:nth-child(2) strong::before { content: "📝"; }
-                                    .symptoms-diagnosis p:nth-child(3) strong::before { content: "👨‍⚕️"; }
-                                    .symptoms-diagnosis p:nth-child(4) strong::before { content: "🎯"; }
-                                    .symptoms-diagnosis p:nth-child(5) strong::before { content: "🏷️"; }
+                                    .symptoms-diagnosis p:nth-child(1) strong::before {
+                                        content: "🤒";
+                                    }
+
+                                    .symptoms-diagnosis p:nth-child(2) strong::before {
+                                        content: "📝";
+                                    }
+
+                                    .symptoms-diagnosis p:nth-child(3) strong::before {
+                                        content: "👨‍⚕️";
+                                    }
+
+                                    .symptoms-diagnosis p:nth-child(4) strong::before {
+                                        content: "🎯";
+                                    }
+
+                                    .symptoms-diagnosis p:nth-child(5) strong::before {
+                                        content: "🏷️";
+                                    }
 
                                     .treatment-plan {
                                         background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%) !important;
@@ -788,21 +816,21 @@
                                     }
 
                                     /* Row spacing and animation */
-                                    .medical-record-details .row.g-3 > .col-md-6,
-                                    .medical-record-details .row.g-3 > .col-12 {
+                                    .medical-record-details .row.g-3>.col-md-6,
+                                    .medical-record-details .row.g-3>.col-12 {
                                         animation: fadeInUp 0.6s ease-out;
                                         animation-fill-mode: both;
                                     }
 
-                                    .medical-record-details .row.g-3 > .col-md-6:nth-child(1) {
+                                    .medical-record-details .row.g-3>.col-md-6:nth-child(1) {
                                         animation-delay: 0.1s;
                                     }
 
-                                    .medical-record-details .row.g-3 > .col-md-6:nth-child(2) {
+                                    .medical-record-details .row.g-3>.col-md-6:nth-child(2) {
                                         animation-delay: 0.2s;
                                     }
 
-                                    .medical-record-details .row.g-3 > .col-12 {
+                                    .medical-record-details .row.g-3>.col-12 {
                                         animation-delay: 0.3s;
                                     }
 
@@ -811,6 +839,7 @@
                                             opacity: 0;
                                             transform: translateY(20px);
                                         }
+
                                         to {
                                             opacity: 1;
                                             transform: translateY(0);
@@ -844,11 +873,14 @@
                                             padding: 15px;
                                         }
 
-                                        .vital-signs, .symptoms-diagnosis, .treatment-plan {
+                                        .vital-signs,
+                                        .symptoms-diagnosis,
+                                        .treatment-plan {
                                             padding: 15px !important;
                                         }
 
-                                        .vital-signs p, .symptoms-diagnosis p {
+                                        .vital-signs p,
+                                        .symptoms-diagnosis p {
                                             flex-direction: column;
                                             align-items: flex-start;
                                         }
@@ -1168,12 +1200,10 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Prescription Tab -->
                                                         <div class="tab-pane fade" id="prescription" role="tabpanel">
                                                             <div class="prescription-content">
                                                                 <c:choose>
                                                                     <c:when test="${not empty examination}">
-                                                                        <!-- Form kê đơn thuốc -->
                                                                         <div class="prescription-form-container"
                                                                             id="prescriptionFormContainer">
                                                                             <button type="button"
@@ -1208,7 +1238,6 @@
                                                                             </form>
                                                                         </div>
 
-                                                                        <!-- Danh sách đơn thuốc hiện có -->
                                                                         <c:choose>
                                                                             <c:when
                                                                                 test="${not empty examination.prescriptions}">
@@ -1273,14 +1302,6 @@
                                                                                                                 role="group">
                                                                                                                 <button
                                                                                                                     type="button"
-                                                                                                                    class="btn btn-sm btn-outline-primary"
-                                                                                                                    onclick="editPrescriptionInline('${prescription.prescriptionID}')"
-                                                                                                                    title="Sửa đơn thuốc">
-                                                                                                                    <i
-                                                                                                                        class="bi bi-pencil"></i>
-                                                                                                                </button>
-                                                                                                                <button
-                                                                                                                    type="button"
                                                                                                                     class="btn btn-sm btn-outline-danger"
                                                                                                                     onclick="deletePrescription('${prescription.prescriptionID}')"
                                                                                                                     title="Xóa đơn thuốc">
@@ -1294,6 +1315,19 @@
                                                                                             </tbody>
                                                                                         </table>
                                                                                     </div>
+                                                                                </div>
+                                                                                <div class="container">
+                                                                                    <a href="/doctor/prescription/export/pdf?examinationId=${examination.examinationID}"
+                                                                                        class="me-3">
+                                                                                        <i
+                                                                                            class="bi bi-filetype-pdf fs-1"></i>
+                                                                                    </a>
+                                                                                    <a
+                                                                                        href="/doctor/prescription/export/csv?examinationId=${examination.examinationID}">
+                                                                                        <i
+                                                                                            class="bi bi-filetype-csv fs-1"></i>
+                                                                                    </a>
+
                                                                                 </div>
                                                                             </c:when>
                                                                             <c:otherwise>
@@ -1318,7 +1352,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Notification Tab -->
                                                         <div class="tab-pane fade" id="notification" role="tabpanel">
                                                             <div class="loading-spinner">
                                                                 <div class="spinner-border text-primary" role="status">
@@ -1368,7 +1401,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Notes Tab -->
                                                         <div class="tab-pane fade" id="notes" role="tabpanel">
                                                             <div class="loading-spinner">
                                                                 <div class="spinner-border text-primary" role="status">
@@ -1446,7 +1478,6 @@
                                     </div>
                                 </section>
 
-                                <!-- Bootstrap JS -->
                                 <script
                                     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
                                 <script>
@@ -1482,7 +1513,6 @@
                                             container.appendChild(content);
                                         }
 
-                                        // Function to handle tab switching
                                         function switchTab(targetTabId) {
                                             // Hide all tab contents first
                                             Object.keys(tabs).forEach(function (tabId) {
@@ -1492,14 +1522,10 @@
                                                     currentTab.content.classList.remove('show', 'active');
                                                 }
                                             });
-
-                                            // Show the selected tab and its content
                                             var selectedTab = tabs[targetTabId];
                                             if (selectedTab && selectedTab.tab && selectedTab.content) {
                                                 selectedTab.tab.classList.add('active');
                                                 selectedTab.content.classList.add('show', 'active');
-
-                                                // Handle content for each tab
                                                 if (targetTabId === 'examination') {
                                                     var hasExamination = '${not empty examination}' === 'true';
                                                     if (!hasExamination) {
@@ -1573,7 +1599,6 @@
                                             }
                                         }
 
-                                        // Add click event listeners to all tabs
                                         Object.keys(tabs).forEach(function (tabId) {
                                             var tab = tabs[tabId].tab;
                                             if (tab) {
@@ -1583,21 +1608,14 @@
                                                 });
                                             }
                                         });
-
-                                        // Show medical record tab by default
                                         switchTab('medical-record');
-
-                                        // Function to save notes
                                         window.saveNotes = function () {
                                             var notes = document.getElementById('doctorNotes').value;
                                             var appointmentId = '${appointment.appointmentID}';
-
-                                            // Show loading state
                                             var saveButton = document.querySelector('#notes button.btn-primary');
                                             var originalText = saveButton.innerHTML;
                                             saveButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang lưu...';
                                             saveButton.disabled = true;
-
                                             fetch('/doctor/appointments/' + appointmentId + '/notes/save', {
                                                 method: 'POST',
                                                 headers: {
@@ -1622,27 +1640,16 @@
                                                     saveButton.disabled = false;
                                                 });
                                         };
-
-                                        // Function to show toast notification (moved to global scope later)
-                                        // showToast function moved to global scope below
-
-                                        // Check if URL has #prescription hash
                                         if (window.location.hash === '#prescription') {
-                                            // Get the prescription tab element
                                             const prescriptionTab = document.getElementById('prescription-tab');
                                             if (prescriptionTab) {
-                                                // Create a new bootstrap tab instance and show it
                                                 const tab = new bootstrap.Tab(prescriptionTab);
                                                 tab.show();
                                             }
                                         }
-
-                                        // Load medications on page load
                                         if (typeof loadMedications === 'function') {
                                             loadMedications();
                                         }
-
-                                        // Add prescription button
                                         const addPrescriptionBtn = document.getElementById('addPrescriptionBtn');
                                         if (addPrescriptionBtn) {
                                             addPrescriptionBtn.addEventListener('click', function () {
@@ -1651,8 +1658,6 @@
                                                 }
                                             });
                                         }
-
-                                        // Cancel button
                                         const cancelPrescriptionBtn = document.getElementById('cancelPrescriptionBtn');
                                         if (cancelPrescriptionBtn) {
                                             cancelPrescriptionBtn.addEventListener('click', function () {
@@ -1661,8 +1666,6 @@
                                                 }
                                             });
                                         }
-
-                                        // Form submission
                                         const prescriptionForm = document.getElementById('prescriptionForm');
                                         if (prescriptionForm) {
                                             prescriptionForm.addEventListener('submit', function (e) {
@@ -1673,13 +1676,9 @@
                                             });
                                         }
                                     });
-
-                                    // Variables for prescription management
                                     let prescriptionRowCount = 0;
                                     let allMedications = [];
                                     let prescriptionData = [];
-
-                                    // Function to handle network errors
                                     async function handleResponse(response, errorMessage) {
                                         if (!response.ok) {
                                             let error = errorMessage;
@@ -1690,15 +1689,12 @@
                                                 try {
                                                     error = await response.text() || errorMessage;
                                                 } catch (e2) {
-                                                    // Use default error message
                                                 }
                                             }
                                             throw new Error(error);
                                         }
                                         return response.json();
                                     }
-
-                                    // Function to show error message
                                     function showError(message) {
                                         const errorDiv = document.createElement('div');
                                         errorDiv.className = 'alert alert-danger alert-dismissible fade show';
@@ -1708,16 +1704,12 @@
         `;
                                         const container = document.getElementById('prescriptionFormContainer');
                                         container.insertBefore(errorDiv, container.firstChild);
-
-                                        // Auto dismiss after 5 seconds
                                         setTimeout(() => {
                                             if (errorDiv.parentNode) {
                                                 errorDiv.remove();
                                             }
                                         }, 5000);
                                     }
-
-                                    // Function to show success message
                                     function showSuccess(message) {
                                         const successDiv = document.createElement('div');
                                         successDiv.className = 'alert alert-success alert-dismissible fade show';
@@ -1727,16 +1719,12 @@
         `;
                                         const container = document.getElementById('prescriptionFormContainer');
                                         container.insertBefore(successDiv, container.firstChild);
-
-                                        // Auto dismiss after 3 seconds
                                         setTimeout(() => {
                                             if (successDiv.parentNode) {
                                                 successDiv.remove();
                                             }
                                         }, 3000);
                                     }
-
-                                    // Function to load medications with improved error handling
                                     async function loadMedications() {
                                         try {
                                             console.log('Loading medications from API...');
@@ -1754,7 +1742,6 @@
                                             console.log('Medications loaded from API:', allMedications.length, 'items');
                                         } catch (error) {
                                             console.warn('Error loading medications from API:', error.message);
-                                            // Use mock data if API fails for testing
                                             allMedications = [
                                                 {
                                                     medicationID: 1,
@@ -1790,7 +1777,6 @@
                                         }
                                     }
 
-                                    // Simple function to create prescription row with minimal HTML
                                     function createPrescriptionRow() {
                                         console.log('=== STARTING ROW CREATION ===');
                                         prescriptionRowCount++;
@@ -1804,13 +1790,9 @@
                                             console.error('prescriptionRows element not found!');
                                             return;
                                         }
-
-                                        // Create element using DOM API instead of innerHTML
                                         const rowDiv = document.createElement('div');
                                         rowDiv.id = rowId;
                                         rowDiv.className = 'prescription-row border rounded p-3 mb-3';
-
-                                        // Simple inner HTML - only one prescription form
                                         rowDiv.innerHTML = `
              <div class="row">
                  <div class="col-md-6 mb-3">
@@ -1849,11 +1831,9 @@
                                         console.log('Row ID set:', rowDiv.id);
                                         console.log('Row className:', rowDiv.className);
 
-                                        // Append using DOM API
                                         prescriptionRows.appendChild(rowDiv);
                                         console.log('Row appended to container');
 
-                                        // Immediate check
                                         const immediateCheck = document.getElementById(rowId);
                                         console.log('IMMEDIATE CHECK - Element found:', !!immediateCheck);
 
@@ -1869,8 +1849,6 @@
                                             }
                                         } else {
                                             console.log('❌ Row not found immediately. Trying with delay...');
-
-                                            // Multiple attempts with increasing delays
                                             let attempts = 0;
                                             const checkRow = function () {
                                                 attempts++;
@@ -1905,25 +1883,18 @@
 
                                         console.log('=== ROW CREATION END ===');
                                     }
-
-                                    // Function to remove prescription row (not used anymore - single prescription only)
                                     function removePrescriptionRow(rowId) {
                                         console.log('removePrescriptionRow called but not implemented for single prescription mode');
                                     }
-
-                                    // Function to update row numbers (not needed for single prescription)
                                     function updateRowNumbers() {
                                         console.log('updateRowNumbers called but not needed for single prescription mode');
                                     }
-
-                                    // Function to setup medication search for a row
                                     function setupMedicationSearch(rowId) {
                                         const row = document.getElementById(rowId);
                                         if (!row) {
                                             console.error('Row element not found:', rowId);
                                             return;
                                         }
-
                                         const searchInput = row.querySelector('.medication-search');
                                         const searchResults = row.querySelector('.search-results');
                                         const medicationIdInput = row.querySelector('.medication-id');
@@ -1965,13 +1936,11 @@
                                                     searchInput.value = selectedMed.medicationName;
                                                     medicationIdInput.value = selectedMed.medicationID;
                                                     searchResults.classList.add('d-none');
-                                                    // Validate form after medication selection
                                                     validatePrescriptionForm();
                                                 }
                                             }
                                         });
 
-                                        // Hide results when clicking outside
                                         document.addEventListener('click', function (e) {
                                             if (!row.contains(e.target)) {
                                                 searchResults.classList.add('d-none');
@@ -1979,7 +1948,6 @@
                                         });
                                     }
 
-                                    // Function to setup form validation for a row
                                     function setupFormValidation(rowId) {
                                         const row = document.getElementById(rowId);
                                         if (!row) {
@@ -1995,7 +1963,6 @@
                                         });
                                     }
 
-                                    // Function to display medications in search results
                                     function displayMedications(medications, resultsContainer) {
                                         if (medications && medications.length > 0) {
                                             const html = medications.map(function (med) {
@@ -2019,68 +1986,51 @@
                                         }
                                     }
 
-                                    // Function to show prescription form
                                     function showPrescriptionForm() {
-                                        console.log('Showing prescription form...');
                                         const addBtn = document.getElementById('addPrescriptionBtn');
                                         const form = document.getElementById('prescriptionForm');
                                         const container = document.getElementById('prescriptionFormContainer');
 
-                                        console.log('Elements found:', {
-                                            addBtn: !!addBtn,
-                                            form: !!form,
-                                            container: !!container
-                                        });
-
                                         if (addBtn) addBtn.style.display = 'none';
-                                        if (form) form.style.display = 'block';
+                                        if (form) {
+                                            form.style.display = 'block';
+                                            form.onsubmit = function (e) {
+                                                e.preventDefault();
+                                                savePrescriptions(true);
+                                            };
+                                        }
                                         if (container) container.classList.add('active');
 
-                                        // Clear any existing rows first
                                         const prescriptionRows = document.getElementById('prescriptionRows');
                                         if (prescriptionRows) {
                                             prescriptionRows.innerHTML = '';
                                             prescriptionRowCount = 0;
                                         }
 
-                                        // Create only one prescription row
                                         createPrescriptionRow();
-
-                                        // Initial validation
-                                        setTimeout(function () {
-                                            validatePrescriptionForm();
-                                        }, 100);
+                                        setTimeout(validatePrescriptionForm, 100);
                                     }
 
-                                    // Function to hide prescription form
                                     function hidePrescriptionForm() {
-                                        document.getElementById('addPrescriptionBtn').style.display = 'block';
-                                        document.getElementById('prescriptionForm').style.display = 'none';
-                                        document.getElementById('prescriptionFormContainer').classList.remove('active');
-                                        document.getElementById('prescriptionRows').innerHTML = '';
+                                        const addBtn = document.getElementById('addPrescriptionBtn');
+                                        const form = document.getElementById('prescriptionForm');
+                                        const container = document.getElementById('prescriptionFormContainer');
+                                        const rows = document.getElementById('prescriptionRows');
+
+                                        if (addBtn) addBtn.style.display = 'block';
+                                        if (form) form.style.display = 'none';
+                                        if (container) container.classList.remove('active');
+                                        if (rows) rows.innerHTML = '';
+
                                         prescriptionRowCount = 0;
 
-                                        // Clear any error/success messages
-                                        const alerts = document.querySelectorAll('#prescriptionFormContainer .alert');
-                                        alerts.forEach(function (alert) {
-                                            alert.remove();
-                                        });
-
-                                        // Restore any temporarily hidden rows
                                         const hiddenRows = document.querySelectorAll('tr[data-prescription-id][style*="opacity"]');
-                                        hiddenRows.forEach(function (row) {
+                                        hiddenRows.forEach(row => {
                                             row.style.opacity = '';
                                             row.style.pointerEvents = '';
                                         });
-
-                                        // Reset save button text
-                                        const saveButton = document.getElementById('savePrescriptionBtn');
-                                        if (saveButton) {
-                                            saveButton.innerHTML = '<i class="bi bi-save me-1"></i>Lưu đơn thuốc';
-                                        }
                                     }
 
-                                    // Function to validate prescription form (single prescription)
                                     function validatePrescriptionForm() {
                                         const row = document.querySelector('.prescription-row');
                                         let isValid = false;
@@ -2104,7 +2054,6 @@
                                         return isValid;
                                     }
 
-                                    // Function to collect prescription data (single prescription)
                                     function collectPrescriptionData() {
                                         const row = document.querySelector('.prescription-row');
                                         const prescriptions = [];
@@ -2127,8 +2076,6 @@
                                                     duration: duration || null,
                                                     instructions: instructions || null
                                                 };
-
-                                                // If editing, include the prescription ID
                                                 if (editId) {
                                                     prescriptionData.prescription_id = parseInt(editId);
                                                 }
@@ -2139,8 +2086,6 @@
 
                                         return prescriptions;
                                     }
-
-                                    // Function to remove prescription row
                                     function removePrescriptionRow(rowId) {
                                         document.getElementById(rowId).remove();
                                         updateRowNumbers();
@@ -2149,8 +2094,6 @@
                                             hidePrescriptionForm();
                                         }
                                     }
-
-                                    // Function to validate prescription data
                                     function validatePrescriptionData(prescriptions) {
                                         for (let i = 0; i < prescriptions.length; i++) {
                                             const prescription = prescriptions[i];
@@ -2166,47 +2109,57 @@
                                         }
                                         return true;
                                     }
+                                    function reloadPrescriptionTab() {
+                                        window.location.href = window.location.pathname + '#prescription';
+                                        window.location.reload();
+                                    }
+                                    function attachPrescriptionEventListeners() {
+                                        document.querySelectorAll('[onclick*="editPrescriptionInline"]').forEach(button => {
+                                            const prescriptionId = button.getAttribute('onclick').match(/['"]([^'"]+)['"]/)[1];
+                                            button.onclick = () => editPrescriptionInline(prescriptionId);
+                                        });
 
-                                    // Function to save prescriptions (following doctor-prescription.jsp logic)
-                                    async function savePrescriptions() {
+                                        document.querySelectorAll('[onclick*="deletePrescription"]').forEach(button => {
+                                            const prescriptionId = button.getAttribute('onclick').match(/['"]([^'"]+)['"]/)[1];
+                                            button.onclick = () => deletePrescription(prescriptionId);
+                                        });
+                                    }
+
+                                    async function savePrescriptions(confirmed = false) {
                                         const prescriptions = collectPrescriptionData();
 
                                         if (prescriptions.length === 0) {
-                                            showError('Vui lòng thêm ít nhất một thuốc');
                                             return;
                                         }
 
-                                        // Declare variables outside try block to avoid scope issues
+                                        if (!confirmed) {
+                                            if (!confirm('Bạn muốn lưu đơn thuốc này chứ?')) {
+                                                return;
+                                            }
+                                        }
+
                                         const saveButton = document.getElementById('savePrescriptionBtn');
                                         const originalButtonText = saveButton ? saveButton.innerHTML : '<i class="bi bi-save me-1"></i>Lưu đơn thuốc';
 
                                         try {
-                                            // Validate prescription data
                                             validatePrescriptionData(prescriptions);
 
-                                            // Disable save button
                                             if (saveButton) {
                                                 saveButton.disabled = true;
                                                 saveButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang lưu...';
                                             }
 
-                                            // Save each prescription individually (like doctor-prescription.jsp)
                                             const savedPrescriptions = [];
                                             for (let i = 0; i < prescriptions.length; i++) {
                                                 const prescription = prescriptions[i];
-
-                                                console.log('Saving prescription', i + 1, ':', prescription);
-
                                                 const appointmentId = '${appointment.appointmentID}';
                                                 const url = '/doctor/appointments/' + appointmentId + '/prescriptions/save';
-                                                console.log('Making request to:', url);
 
-                                                // Validate required data
                                                 const examinationId = '${examination != null ? examination.examinationID : ""}';
                                                 const doctorId = '${examination != null && examination.doctor != null ? examination.doctor.doctorID : ""}';
 
                                                 if (!examinationId || !doctorId) {
-                                                    throw new Error('Thiếu thông tin khám bệnh hoặc bác sĩ. Vui lòng tạo bệnh án trước.');
+                                                    continue;
                                                 }
 
                                                 const requestData = {
@@ -2222,61 +2175,42 @@
                                                     is_refillable: false,
                                                     status: 'PENDING'
                                                 };
-                                                console.log('Request data:', requestData);
 
-                                                const response = await fetch(url, {
-                                                    method: 'POST',
-                                                    headers: {
-                                                        'Content-Type': 'application/json',
-                                                        'X-CSRF-TOKEN': '${_csrf.token}'
-                                                    },
-                                                    body: JSON.stringify(requestData)
-                                                });
+                                                try {
+                                                    const response = await fetch(url, {
+                                                        method: 'POST',
+                                                        headers: {
+                                                            'Content-Type': 'application/json',
+                                                            'X-CSRF-TOKEN': '${_csrf.token}'
+                                                        },
+                                                        body: JSON.stringify(requestData)
+                                                    });
 
-                                                console.log('Response status for prescription', i + 1, ':', response.status);
-                                                console.log('Response headers:', [...response.headers.entries()]);
-
-                                                if (response.status >= 200 && response.status < 300) {
-                                                    const contentType = response.headers.get('content-type');
-                                                    console.log('Response content-type:', contentType);
-
-                                                    if (contentType && contentType.includes('application/json')) {
-                                                        const data = await response.json();
-                                                        console.log('Response data:', data);
-
-                                                        if (data.success) {
-                                                            savedPrescriptions.push(prescription);
-                                                            console.log('✅ Prescription', i + 1, 'saved successfully');
-                                                        } else {
-                                                            throw new Error(`Lỗi lưu thuốc ${i + 1}: ${data.message || 'Không thể lưu đơn thuốc'}`);
-                                                        }
-                                                    } else {
-                                                        const text = await response.text();
-                                                        console.log('Response text:', text);
-                                                        throw new Error(`Lỗi lưu thuốc ${i + 1}: Unexpected response format - ${text.substring(0, 200)}`);
+                                                    let responseData;
+                                                    try {
+                                                        responseData = await response.json();
+                                                    } catch {
+                                                        responseData = { success: response.ok };
                                                     }
-                                                } else {
-                                                    const errorText = await response.text();
-                                                    console.log('Error response text:', errorText);
-                                                    throw new Error(`Lỗi lưu thuốc ${i + 1}: HTTP ${response.status} - ${errorText || 'Không thể lưu đơn thuốc'}`);
+
+                                                    if (response.ok || responseData.success) {
+                                                        savedPrescriptions.push(prescription);
+                                                    }
+                                                } catch (error) {
+                                                    console.warn('Warning: Error saving prescription:', error);
                                                 }
                                             }
 
-                                            console.log('✅ All prescriptions saved:', savedPrescriptions.length);
-                                            showSuccess(`Đã lưu thành công ${savedPrescriptions.length} đơn thuốc!`);
-
-                                            // Hide form and reload page
-                                            hidePrescriptionForm();
-                                            setTimeout(function () {
-                                                console.log('Reloading page to show updated prescriptions...');
-                                                window.location.reload();
-                                            }, 1500);
+                                            if (savedPrescriptions.length > 0) {
+                                                hidePrescriptionForm();
+                                                setTimeout(() => {
+                                                    reloadPrescriptionTab();
+                                                }, 100);
+                                            }
 
                                         } catch (error) {
                                             console.error('Error saving prescriptions:', error);
-                                            showError(error.message);
                                         } finally {
-                                            // Re-enable save button
                                             if (saveButton) {
                                                 saveButton.disabled = false;
                                                 saveButton.innerHTML = originalButtonText;
@@ -2284,7 +2218,30 @@
                                         }
                                     }
 
-                                    // Function to edit prescription inline
+                                    function deletePrescription(prescriptionId) {
+                                        if (confirm('Bạn có chắc chắn muốn xóa đơn thuốc này không?')) {
+                                            const appointmentId = '${appointment.appointmentID}';
+                                            const deleteUrl = '/doctor/appointments/' + appointmentId + '/prescriptions/' + prescriptionId + '/delete';
+
+                                            fetch(deleteUrl, {
+                                                method: 'POST',
+                                                headers: {
+                                                    'X-CSRF-TOKEN': '${_csrf.token}'
+                                                }
+                                            })
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    if (data.success) {
+                                                        reloadPrescriptionTab();
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    console.error('Error:', error);
+                                                    window.location.reload();
+                                                });
+                                        }
+                                    }
+
                                     function editPrescriptionInline(prescriptionId) {
                                         // Get prescription data from the table row
                                         const row = document.querySelector(`tr[data-prescription-id="${prescriptionId}"]`);
@@ -2293,7 +2250,6 @@
                                             return;
                                         }
 
-                                        // Extract data from the row
                                         const medicationName = row.querySelector('td:nth-child(2) strong').textContent;
                                         const quantity = row.querySelector('td:nth-child(3)').textContent;
                                         const dosage = row.querySelector('td:nth-child(4)').textContent;
@@ -2301,14 +2257,11 @@
                                         const duration = row.querySelector('td:nth-child(6)').textContent;
                                         const instructions = row.querySelector('td:nth-child(7) .text-muted').textContent;
 
-                                        // Show prescription form
                                         showPrescriptionForm();
 
-                                        // Wait for form to be created then populate it
                                         setTimeout(function () {
                                             const prescriptionRow = document.querySelector('.prescription-row');
                                             if (prescriptionRow) {
-                                                // Find the medication in allMedications array
                                                 const medication = allMedications.find(m => m.medicationName === medicationName);
                                                 if (medication) {
                                                     prescriptionRow.querySelector('.medication-search').value = medicationName;
@@ -2320,93 +2273,26 @@
                                                 prescriptionRow.querySelector('.frequency').value = frequency;
                                                 prescriptionRow.querySelector('.duration').value = duration;
                                                 prescriptionRow.querySelector('.instructions').value = instructions.replace('Không có hướng dẫn', '');
-
-                                                // Store the prescription ID for updating
                                                 prescriptionRow.setAttribute('data-edit-id', prescriptionId);
-
-                                                // Update button text
                                                 const saveButton = document.getElementById('savePrescriptionBtn');
                                                 if (saveButton) {
                                                     saveButton.innerHTML = '<i class="bi bi-save me-1"></i>Cập nhật đơn thuốc';
                                                 }
 
-                                                // Validate form
                                                 validatePrescriptionForm();
 
-                                                // Hide the original row temporarily
                                                 row.style.opacity = '0.5';
                                                 row.style.pointerEvents = 'none';
                                             }
                                         }, 200);
                                     }
-
-                                    // Function to delete prescription
-                                    function deletePrescription(prescriptionId) {
-                                        if (confirm('Bạn có chắc chắn muốn xóa đơn thuốc này không?')) {
-                                            const appointmentId = '${appointment.appointmentID}';
-                                            const deleteUrl = '/doctor/appointments/' + appointmentId + '/prescriptions/' + prescriptionId + '/delete';
-                                            console.log('Making delete request to:', deleteUrl);
-
-                                            fetch(deleteUrl, {
-                                                method: 'POST',
-                                                headers: {
-                                                    'X-CSRF-TOKEN': '${_csrf.token}'
-                                                }
-                                            })
-                                                .then(function (response) {
-                                                    console.log('Response status:', response.status);
-                                                    if (!response.ok) {
-                                                        return response.text().then(function (text) {
-                                                            throw new Error(text || 'Không thể xóa đơn thuốc');
-                                                        });
-                                                    }
-                                                    return response.json();
-                                                })
-                                                .then(function (data) {
-                                                    console.log('Success response:', data);
-                                                    if (data.success) {
-                                                        showToast('Thành công', 'Đơn thuốc đã được xóa thành công!', 'success');
-                                                        // Remove row from table
-                                                        const row = document.querySelector(`tr[data-prescription-id="${prescriptionId}"]`);
-                                                        if (row) {
-                                                            row.remove();
-                                                            // Update row numbers in table
-                                                            const tableRows = document.querySelectorAll('#existingPrescriptions tr');
-                                                            tableRows.forEach((tr, index) => {
-                                                                const firstCell = tr.querySelector('td:first-child');
-                                                                if (firstCell) {
-                                                                    firstCell.textContent = index + 1;
-                                                                }
-                                                            });
-
-                                                            // Show empty state if no prescriptions left
-                                                            if (tableRows.length === 0) {
-                                                                document.querySelector('.prescription-list').style.display = 'none';
-                                                                document.getElementById('emptyPrescriptionState').style.display = 'block';
-                                                            }
-                                                        }
-                                                    } else {
-                                                        throw new Error(data.message || 'Có lỗi xảy ra khi xóa đơn thuốc');
-                                                    }
-                                                })
-                                                .catch(function (error) {
-                                                    console.error('Error:', error);
-                                                    showToast('Lỗi', 'Có lỗi xảy ra khi xóa đơn thuốc: ' + error.message, 'danger');
-                                                });
-                                        }
-                                    }
-
-                                    // Function to switch to prescription tab and show form
                                     function switchToPrescriptionTab() {
                                         console.log('Switching to prescription tab...');
-                                        // Switch to prescription tab
                                         if (typeof switchTab === 'function') {
                                             switchTab('prescription');
                                         } else {
                                             console.error('switchTab function not found!');
                                         }
-
-                                        // Wait a bit for tab to load, then show the prescription form
                                         setTimeout(function () {
                                             const addBtn = document.getElementById('addPrescriptionBtn');
                                             console.log('Add button found:', !!addBtn, 'Display:', addBtn ? addBtn.style.display : 'N/A');
@@ -2417,8 +2303,6 @@
                                             }
                                         }, 100);
                                     }
-
-                                    // Debug function to check page state
                                     function debugPageState() {
                                         console.log('===== PAGE DEBUG STATE =====');
                                         console.log('All required elements:');
@@ -2447,8 +2331,6 @@
                                         console.log('Current prescription rows in DOM:', document.querySelectorAll('.prescription-row'));
                                         console.log('================================');
                                     }
-
-                                    // Test function to manually create a row
                                     function testCreateRow() {
                                         console.log('===== TESTING ROW CREATION =====');
                                         const container = document.getElementById('prescriptionRows');
@@ -2472,22 +2354,16 @@
                                         }
                                         console.log('================================');
                                     }
-
-                                    // Initialize with debug
                                     document.addEventListener('DOMContentLoaded', function () {
                                         console.log('DOM content loaded - initializing prescription system...');
 
                                         setTimeout(function () {
                                             debugPageState();
                                             loadMedications();
-
-                                            // Add event listeners
                                             const savePrescriptionBtn = document.getElementById('savePrescriptionBtn');
                                             const cancelPrescriptionBtn = document.getElementById('cancelPrescriptionBtn');
                                             const addPrescriptionBtn = document.getElementById('addPrescriptionBtn');
                                             const prescriptionForm = document.getElementById('prescriptionForm');
-
-                                            // Form submit event listener
                                             if (prescriptionForm) {
                                                 console.log('Setting up form submit event listener');
                                                 prescriptionForm.addEventListener('submit', function (e) {
@@ -2502,7 +2378,7 @@
                                                 savePrescriptionBtn.addEventListener('click', function (e) {
                                                     e.preventDefault();
                                                     console.log('Save button clicked');
-                                                    savePrescriptions();
+                                                    savePrescriptions(false);
                                                 });
                                             } else {
                                                 console.warn('Save prescription button not found');
@@ -2526,10 +2402,8 @@
                                                 });
                                             }
 
-                                        }, 500); // Wait for all elements to be rendered
+                                        }, 500);
                                     });
-
-                                    // Make functions globally available for onclick handlers
                                     window.removePrescriptionRow = removePrescriptionRow;
                                     window.createPrescriptionRow = createPrescriptionRow;
                                     window.editPrescriptionInline = editPrescriptionInline;

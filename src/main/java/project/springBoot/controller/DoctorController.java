@@ -136,9 +136,9 @@ public class DoctorController {
         List<Appointment> appointments = appointmentService.getAppointmentsByDoctorAndDateRangeIncludingCompleted(
                 doctorId, startDate,
                 endDate);
-        List<DoctorBookingSlot> bookingSlots = bookingSlotService.getBookingSlotsByDoctorId(doctorId);
+        List<DoctorBookingSlot> bookingSlotsToday = bookingSlotService.getTodayBookingSlotsByDoctorId(doctorId);
         model.addAttribute("appointments", appointments);
-        model.addAttribute("bookingSlots", bookingSlots);
+        model.addAttribute("bookingSlots", bookingSlotsToday);
         model.addAttribute("currentUser", currentUser);
         return "doctors/doctor-appointments";
     }

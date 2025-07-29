@@ -34,8 +34,7 @@
                         <ul class="nav-links" id="navLinks">
                             <li><a href="<c:url value='/doctor/home' />"><i class="bi bi-house-door"></i> Trang chủ</a>
                             </li>
-                            <li><a href="/doctor/busy/schedule"><i class="bi bi-person-badge"></i> Gửi lịch
-                                    bận</a></li>
+                            <li><a href="/feedback/list"><i class="bi bi-person-badge"></i> Feedback</a></li>
                             <li><a href="/doctor/schedules"><i class="bi bi-clipboard2-pulse"></i> Xem lịch làm việc</a>
                             </li>
                             <li><a href="<c:url value='/doctor/appointments' />" class="active"><i
@@ -134,56 +133,10 @@
                         </c:choose>
                     </div>
 
-                    <!-- Week's Appointments -->
-                    <h2 class="section-title">
-                        <i class="bi bi-calendar-week"></i>
-                        Lịch hẹn trong tuần
-                    </h2>
-                    <div class="appointment-cards">
-                        <c:choose>
-                            <c:when test="${not empty appointments}">
-                                <c:forEach var="appointment" items="${appointments}">
-                                    <div class="appointment-card">
-                                        <div class="appointment-item">
-                                            <div class="appointment-info">
-                                                <div class="appointment-time">
-                                                    <i class="bi bi-calendar2-date"></i>
-                                                    ${appointment.appointmentDate}
-                                                </div>
-                                                <div class="appointment-patient">
-                                                    <i class="bi bi-hash"></i>
-                                                    ${appointment.appointmentNumber}
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center gap-3">
-                                                <span
-                                                    class="status-badge ${appointment.status == 'Pending' ? 'status-pending' : 'status-confirmed'}">
-                                                    ${appointment.status}
-                                                </span>
-                                                <a href="<c:url value='/doctor/appointments/${appointment.appointmentID}' />"
-                                                    class="action-button view-btn">
-                                                    <i class="bi bi-eye"></i> Xem chi tiết
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </c:forEach>
-                            </c:when>
-                            <c:otherwise>
-                                <div class="empty-state">
-                                    <i class="bi bi-calendar-x"></i>
-                                    <p>Không có lịch hẹn nào trong tuần này</p>
-                                </div>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
                 </div>
             </section>
 
-            <!-- Bootstrap JS -->
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-            <!-- Custom JavaScript -->
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
                     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
