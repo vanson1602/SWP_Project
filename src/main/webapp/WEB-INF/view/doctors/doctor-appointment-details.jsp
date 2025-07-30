@@ -1100,23 +1100,29 @@
                                                             </button>
                                                         </li>
                                                         <li class="nav-item" role="presentation">
-                                                            <button class="nav-link" id="notification-tab"
-                                                                data-bs-toggle="tab" data-bs-target="#notification"
+                                                            <button class="nav-link" id="comorbidity-tab"
+                                                                data-bs-toggle="tab" data-bs-target="#comorbidity"
                                                                 type="button" role="tab">
-                                                                <i class="bi bi-bell me-2"></i>Thông báo
-                                                                <span
-                                                                    class="badge bg-gradient bg-danger rounded-pill ms-1">2</span>
-                                                            </button>
-                                                        </li>
-                                                        <li class="nav-item" role="presentation">
-                                                            <button class="nav-link" id="notes-tab" data-bs-toggle="tab"
-                                                                data-bs-target="#notes" type="button" role="tab">
-                                                                <i class="bi bi-journal-text me-2"></i>Ghi chú
+                                                                <i class="bi bi-heart-pulse me-2"></i>Bệnh nền
                                                             </button>
                                                         </li>
                                                     </ul>
 
                                                     <div class="tab-content" id="medicalRecordTabContent">
+                                                        <div class="tab-pane fade" id="comorbidity" role="tabpanel">
+                                                            <input type="hidden" id="currentPatientId"
+                                                                value="${appointment.patient.patientID}" />
+                                                            <div id="comorbidityLoadingSpinner" class="text-center"
+                                                                style="display: none;">
+                                                                <div class="spinner-border text-primary" role="status">
+                                                                    <span class="visually-hidden">Loading...</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="comorbidity-list">
+                                                                <div id="comorbidityContent">
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                         <!-- Medical Record Tab -->
                                                         <div class="tab-pane fade show active" id="medical-record"
                                                             role="tabpanel">
@@ -2427,6 +2433,7 @@
                                         testCreateRow: typeof testCreateRow
                                     });
                                 </script>
+                                <script src="/resources/js/comorbidity.js"></script>
                             </body>
 
                             </html>

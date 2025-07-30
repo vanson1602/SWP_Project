@@ -79,7 +79,7 @@ function sendMessage() {
 document.getElementById('imageInput')?.addEventListener('change', function (e) {
     const file = e.target.files[0];
     if (file) {
-        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        if (file.size > 5 * 1024 * 1024) { 
             alert('Kích thước file không được vượt quá 5MB');
             this.value = '';
             return;
