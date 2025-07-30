@@ -29,6 +29,13 @@ public class ReceptionistController {
 
     @GetMapping("/booking-receptionist/searchPatient")
     public String searchPatient(@RequestParam("nameOrEmail") String nameOrEmail, Model model) {
+        if (nameOrEmail.contains("@")) {
+            if (!nameOrEmail.matches("^[\\w.-]+@[\\w.-]+\\.(com|fpt\\.edu\\.vn)$")) {
+                model.addAttribute("error", "Email phải kết thúc bằng @gmail.com hoặc @fpt.edu.vn");
+                model.addAttribute("listPatient", List.of());
+                return "receptionist/receptionist-viewPatient";
+            }
+        }
         User patient = userService.getUserByEmailOrUsername(nameOrEmail, nameOrEmail);
         if (patient == null) {
             model.addAttribute("error", "không tìm thấy bệnh nhân " + nameOrEmail);

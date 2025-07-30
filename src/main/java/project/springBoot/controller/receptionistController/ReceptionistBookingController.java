@@ -67,18 +67,17 @@ public class ReceptionistBookingController {
     public String getSpecializationSelection(@RequestParam String email,
             @RequestParam Long specializationId,
             RedirectAttributes redirectAttributes, Model model) {
+        if (!email.matches("^[\\w.-]+@(gmail\\.com|fpt\\.edu\\.vn)$")) {
+            redirectAttributes.addFlashAttribute("error", "Email phải là abc@gmail.com hoặc abc@fpt.edu.vn");
+            redirectAttributes.addFlashAttribute("email", email);
+            return "redirect:/booking-receptionist/step-1";
+        }
         User user = userService.getUserByEmail(email);
-        if (user == null) {
+        if (user == null || !"patient".equalsIgnoreCase(user.getRole())) {
             redirectAttributes.addFlashAttribute("error", "Không tìm thấy bệnh nhân với email: " + email);
             redirectAttributes.addFlashAttribute("email", email);
             return "redirect:/booking-receptionist/step-1";
         }
-        // if (user.getRole() != "patient") {
-        // redirectAttributes.addFlashAttribute("error", "Không tìm thấy bệnh nhân với
-        // email: " + email);
-        // redirectAttributes.addFlashAttribute("email", email);
-        // return "redirect:/booking-receptionist/step-1";
-        // }
         redirectAttributes.addAttribute("email", email);
         redirectAttributes.addAttribute("specializationId", specializationId);
         return "redirect:/booking-receptionist/step-2";
